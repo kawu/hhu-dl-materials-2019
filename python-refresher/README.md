@@ -745,7 +745,18 @@ for x in range(10):
 
 ## Testing
 
-TODO
+There are various frameworks for testing code, but during this course we will
+mostly restrict ourselves to using the `assert` statements, which simply verify
+that the given Boolean expression is `True` during the code execution.
+```python
+assert 2 + 2 == 4                         # You can use optional comment
+assert 2 + 2 == 4, "2 + 2 should be 4"    # in case the assertion fails
+```
+
+You can use `assert` to test the functions and classes you write, to verify
+that function arguments and/or the function's result satisfy certain
+conditions, etc.
+
 
 ## Object-Oriented Programming
 
