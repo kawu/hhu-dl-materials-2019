@@ -8,12 +8,15 @@ some additional topics (e.g. types).
 
 ## ToC
 
-* [Comments](TODO)
+* [Comments](Comments)
+* [Whitespace Formatting](Whitespace Formatting)
 * [Primitive Datatypes and Operators](TODO)
 * TODO
 
 
 ## Comments
+
+Python itself ignores the comments, but they help to understand your code.
 
 ```python
 # Single line comments start with a number symbol.
@@ -23,6 +26,27 @@ some additional topics (e.g. types).
     as documentation.
 """
 ```
+
+
+## Whiltespace Formatting
+
+Many programming languages delimit blocks of code.  Python uses indentation for
+this purpose.
+
+```python
+for i in [1, 2, 3]:
+    # Start of the body of the "for i" loop
+    print(i)
+    for j in [1, 2]:
+        # Start of the body of the "for j" loop
+        print(i, j)
+        print("Something else")
+        # End of the body of the "for j" loop
+    # End of the body of the "for i" loop
+```
+
+This is pretty neat, but can lead to errors.  For instance, be careful about
+using tabs for indentation!  VS Code should take care of that, though.
 
 
 ## Primitive Datatypes and Operators
