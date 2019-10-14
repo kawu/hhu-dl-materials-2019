@@ -180,6 +180,7 @@ None  # => None
 # Use "is" instead. This checks for equality of object identity.
 "etc" is None  # => False
 None is None   # => True
+```
 
 <!---
 # Comparison operators look at the numerical value of True and False
@@ -204,7 +205,6 @@ bool([])  # => False
 bool({})  # => False
 bool(())  # => False
 -->
-```
 
 
 ## Variables and Collections
