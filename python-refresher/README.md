@@ -774,29 +774,35 @@ class Bag:
         self.data = {}
         for elem in elems:
             self.add(elem)
-      
+
     # An instance method. All methods take "self" as the first argument.
     def add(self, elem):
         """Add the given element to the bag."""
         try:
             self.data[elem] += 1
-        except IndexError:
-            self.data[elem]  = 1
+        except KeyError:
+            self.data[elem] = 1
 
-    def del(self, elem):
+    def delete(self, elem):
         """Remove the given element from the bag."""
         try:
-            self.data[elem] += 1
-        except IndexError:
-            self.data[elem]  = 1
+            k = self.data[elem]
+            if k > 1:
+                self.data[elem] = k - 1
+            else:
+                del self.data[elem]
+        except KeyError:
+            pass
 
     def number(self, elem):
         """Get the number of occurrences of the element in the bag."""
         try:
             return self.data[elem]
-        except IndexError:
+        except KeyError:
             return 0
 ```
+
+### Inheritance
 
 We can use inheritance to create new classes by extending or restricting the
 existing ones.  For instance, let's say we know that in a particular part of
@@ -814,9 +820,16 @@ class GrowingBag(Bag):
     # (e.g., `data`) of its parent class.
       
     # We overwrite the `del` method so that it raises an exception if used.
-    def del(self, elem):
+    def delete(self, elem):
         raise SomeException("You cannot delete elements from the GrowingBag.")
 ```
+
+Note that Python will not stop the user from accessing the `data` attribute of
+the `Bag` class (and, effectively, from deleting some elements manually).  You
+can indicate that the attribute is *private* by using a single underscore
+(i.e., `self._data`).  This works by convention, though, and the user is still
+allowed to modify the attribute manually.
+
 
 <!---
 Classes can be pretty handy in numerical computing as well.  To give an
