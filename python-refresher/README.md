@@ -813,15 +813,15 @@ a variant of the `Bag` which simply does not allow element removal.
 
 ```python
 # Note the base class `Bag` specified inside the parentheses.
-class GrowingBag(Bag):
+class SafeBag(Bag):
     """Bag from which elements cannot be removed"""
 
     # The sublass inherits all the methods (e.g., `number`) and attributes
     # (e.g., `data`) of its parent class.
-      
-    # We overwrite the `del` method so that it raises an exception if used.
+
+    # We overwrite the `delete` method so that it raises an exception if used.
     def delete(self, elem):
-        raise SomeException("You cannot delete elements from the GrowingBag.")
+        raise Exception("You cannot delete elements from the SafeBag.")
 ```
 
 Note that Python will not stop the user from accessing the `data` attribute of
