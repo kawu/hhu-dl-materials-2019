@@ -16,8 +16,6 @@ some additional topics (e.g. types).
 
 ## Comments
 
-Python itself ignores the comments, but they help to understand your code.
-
 ```python
 # Single line comments start with a number symbol.
 
@@ -27,11 +25,13 @@ Python itself ignores the comments, but they help to understand your code.
 """
 ```
 
+Python itself ignores the comments, but they help to understand your code.
+
 
 ## Whitespace Formatting
 
-Many programming languages delimit blocks of code.  Python uses indentation for
-this purpose.
+Many programming languages delimit blocks of code with brackets.  Python uses
+indentation for this purpose.
 
 ```python
 for i in [1, 2, 3]:
@@ -46,8 +46,19 @@ for i in [1, 2, 3]:
 ```
 
 This is pretty neat, but can lead to errors.  For instance, be careful about
-using tabs and not spaces for indentation!  Your editor will normally take care
-of that, though.
+using tabs (rather than spaces) for indentation!  Your editor will normally
+take care of that, though.
+
+Whitespace is ignored inside parentheses and brackets, which allows to make the
+code more readable:
+
+```python
+less_readable_list = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+more_readable_list = [[1, 2, 3],
+                      [4, 5, 6],
+                      [7, 8, 9]]
+```
 
 
 ## Primitive Datatypes and Operators
@@ -94,24 +105,10 @@ not False  # => True
 True and False  # => False
 False or True   # => True
 
-# True and False are actually 1 and 0 but with different keywords
+# True and False are actually aliases for 1 and 0
 True + True # => 2
 True * 8    # => 8
 False - 5   # => -5
-
-# Comparison operators look at the numerical value of True and False
-0 == False  # => True
-1 == True   # => True
-2 == True   # => False
--5 != False # => True
-
-# Using boolean logical operators on ints casts them to booleans for evaluation, but their non-cast value is returned
-# Don't mix up with bool(ints) and bitwise and/or (&,|)
-bool(0)     # => False
-bool(4)     # => True
-bool(-6)    # => True
-0 and 2     # => 0
--5 or 0     # => -5
 
 # Equality is ==
 1 == 1  # => True
@@ -169,10 +166,6 @@ len("This is a string")  # => 16
 # You can use keywords if you don't want to count.
 "{name} wants to eat {food}".format(name="Bob", food="lasagna")  # => "Bob wants to eat lasagna"
 
-# If your Python 3 code also needs to run on Python 2.5 and below, you can also
-# still use the old style of formatting:
-"%s can be %s the %s way" % ("Strings", "interpolated", "old")  # => "Strings can be interpolated the old way"
-
 # You can also format using f-strings or formatted string literals (in Python 3.6+)
 name = "Reiko"
 f"She said her name is {name}." # => "She said her name is Reiko"
@@ -180,13 +173,28 @@ f"She said her name is {name}." # => "She said her name is Reiko"
 f"{name} is {len(name)} characters long." # => "Reiko is 5 characters long."
 
 
-# None is an object
+# None indicates a nonexistent value, which is similar to 'null's in other languages
 None  # => None
 
 # Don't use the equality "==" symbol to compare objects to None
 # Use "is" instead. This checks for equality of object identity.
 "etc" is None  # => False
 None is None   # => True
+
+<!---
+# Comparison operators look at the numerical value of True and False
+0 == False  # => True
+1 == True   # => True
+2 == True   # => False
+-5 != False # => True
+
+# Using boolean logical operators on ints casts them to booleans for evaluation, but their non-cast value is returned
+# Don't mix up with bool(ints) and bitwise and/or (&,|)
+bool(0)     # => False
+bool(4)     # => True
+bool(-6)    # => True
+0 and 2     # => 0
+-5 or 0     # => -5
 
 # None, 0, and empty strings/lists/dicts/tuples all evaluate to False.
 # All other values are True
@@ -195,6 +203,7 @@ bool("")  # => False
 bool([])  # => False
 bool({})  # => False
 bool(())  # => False
+-->
 ```
 
 
