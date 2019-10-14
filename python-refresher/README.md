@@ -208,6 +208,42 @@ f"{name} is {len(name)} characters long." # => "Reiko is 5 characters long."
 -->
 
 
+### Strings
+
+```python
+# Strings are created with " or '
+"This is a string."
+'This is also a string.'
+
+# Strings can be added too! But try not to do this.
+"Hello " + "world!"  # => "Hello world!"
+# String literals (but not variables) can be concatenated without using '+'
+"Hello " "world!"    # => "Hello world!"
+
+# A string can be treated like a list of characters
+"This is a string"[0]  # => 'T'
+
+# You can find the length of a string
+len("This is a string")  # => 16
+
+# .format can be used to format strings, like this:
+"{} can be {}".format("Strings", "interpolated")  # => "Strings can be interpolated"
+
+# You can repeat the formatting arguments to save some typing.
+"{0} be nimble, {0} be quick, {0} jump over the {1}".format("Jack", "candle stick")
+# => "Jack be nimble, Jack be quick, Jack jump over the candle stick"
+
+# You can use keywords if you don't want to count.
+"{name} wants to eat {food}".format(name="Bob", food="lasagna")  # => "Bob wants to eat lasagna"
+
+# You can also format using f-strings or formatted string literals (in Python 3.6+)
+name = "Reiko"
+f"She said her name is {name}." # => "She said her name is Reiko"
+# You can basically put any Python statement inside the braces and it will be output in the string.
+f"{name} is {len(name)} characters long." # => "Reiko is 5 characters long."
+```
+
+
 
 
 ## Modules
@@ -373,41 +409,6 @@ set_x(43)
 set_global_x(6)
 -->
 
-
-## Strings
-
-```python
-# Strings are created with " or '
-"This is a string."
-'This is also a string.'
-
-# Strings can be added too! But try not to do this.
-"Hello " + "world!"  # => "Hello world!"
-# String literals (but not variables) can be concatenated without using '+'
-"Hello " "world!"    # => "Hello world!"
-
-# A string can be treated like a list of characters
-"This is a string"[0]  # => 'T'
-
-# You can find the length of a string
-len("This is a string")  # => 16
-
-# .format can be used to format strings, like this:
-"{} can be {}".format("Strings", "interpolated")  # => "Strings can be interpolated"
-
-# You can repeat the formatting arguments to save some typing.
-"{0} be nimble, {0} be quick, {0} jump over the {1}".format("Jack", "candle stick")
-# => "Jack be nimble, Jack be quick, Jack jump over the candle stick"
-
-# You can use keywords if you don't want to count.
-"{name} wants to eat {food}".format(name="Bob", food="lasagna")  # => "Bob wants to eat lasagna"
-
-# You can also format using f-strings or formatted string literals (in Python 3.6+)
-name = "Reiko"
-f"She said her name is {name}." # => "She said her name is Reiko"
-# You can basically put any Python statement inside the braces and it will be output in the string.
-f"{name} is {len(name)} characters long." # => "Reiko is 5 characters long."
-```
 
 
 ## Exceptions and Files
