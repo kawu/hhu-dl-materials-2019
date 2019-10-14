@@ -50,15 +50,202 @@ using tabs (rather than spaces) for indentation!  Your editor will normally
 take care of that, though.
 
 Whitespace is ignored inside parentheses and brackets, which allows to make the
-code more readable:
+code more readable and deal with long code lines.
 
 ```python
 less_readable_list = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
-more_readable_list = [[1, 2, 3],
-                      [4, 5, 6],
-                      [7, 8, 9]]
+potentially_more_readable_list = [[1, 2, 3],
+                                  [4, 5, 6],
+                                  [7, 8, 9]]
 ```
+
+
+## Modules
+
+```python
+# You can import modules
+import math
+print(math.sqrt(16))  # => 4.0
+
+# You can get specific functions from a module
+from math import ceil, floor
+print(ceil(3.7))   # => 4.0
+print(floor(3.7))  # => 3.0
+
+# You can import all functions from a module.
+# Warning: this is not recommended
+from math import *
+
+# You can shorten module names
+import math as m
+math.sqrt(16) == m.sqrt(16)  # => True
+```
+
+Python modules are just ordinary Python files. You can write your own, and
+import them. The name of the module is the same as the name of the file.
+
+If you have a Python script named math.py in the same folder as your current
+script, the file math.py will be loaded instead of the built-in Python module.
+This happens because the local folder has priority over Python's built-in
+libraries.
+
+<!---
+# You can find out which functions and attributes
+# are defined in a module.
+import math
+dir(math)
+-->
+
+
+## Functions
+
+```python
+# Use "def" to create new functions
+def add(x, y):
+    """Optional documetation string.  For example, return the sum
+    of the two arguments.
+    """
+    print("x is {} and y is {}".format(x, y))
+    return x + y  # Return values with a return statement
+
+# Calling functions with parameters
+add(5, 6)  # => prints out "x is 5 and y is 6" and returns 11
+
+# Another way to call functions is with keyword arguments
+add(y=6, x=5)  # Keyword arguments can arrive in any order.
+
+# Functions in Python are first-class, which means that you can
+# assign them to variables, provide as arguments, or return.
+def create_adder(x):
+    """"""
+    def adder(y):
+        return x + y
+    return adder
+
+add_10 = create_adder(10)
+add_10(3)   # => 13
+
+# Function Scope
+x = 5
+
+def set_x(num):
+    # Local var x not the same as global variable x
+    x = num    # => 43
+    print(x)   # => 43
+
+def set_global_x(num):
+    global x
+    print(x)   # => 5
+    x = num    # global var x is now set to 6
+    print(x)   # => 6
+
+set_x(43)
+set_global_x(6)
+
+# There are also anonymous functions
+(lambda x: x > 2)(3)                  # => True
+(lambda x, y: x ** 2 + y ** 2)(2, 1)  # => 5
+
+# As well as some higher-order functions (`map`, `filter`)
+list(map(add_10, [1, 2, 3]))          # => [11, 12, 13]
+
+# However, Python encourages to use comprehension (if possible)
+# instead (see below).
+```
+
+
+<!---
+# You can define functions that take a variable number of
+# positional arguments
+def varargs(*args):
+    return args
+
+varargs(1, 2, 3)  # => (1, 2, 3)
+
+# You can define functions that take a variable number of
+# keyword arguments, as well
+def keyword_args(**kwargs):
+    return kwargs
+
+# Let's call it to see what happens
+keyword_args(big="foot", loch="ness")  # => {"big": "foot", "loch": "ness"}
+
+# You can do both at once, if you like
+def all_the_args(*args, **kwargs):
+    print(args)
+    print(kwargs)
+"""
+all_the_args(1, 2, a=3, b=4) prints:
+    (1, 2)
+    {"a": 3, "b": 4}
+"""
+
+# When calling functions, you can do the opposite of args/kwargs!
+# Use * to expand tuples and use ** to expand kwargs.
+args = (1, 2, 3, 4)
+kwargs = {"a": 3, "b": 4}
+all_the_args(*args)            # equivalent to all_the_args(1, 2, 3, 4)
+all_the_args(**kwargs)         # equivalent to all_the_args(a=3, b=4)
+all_the_args(*args, **kwargs)  # equivalent to all_the_args(1, 2, 3, 4, a=3, b=4)
+
+# Returning multiple values (with tuple assignments)
+def swap(x, y):
+    return y, x  # Return multiple values as a tuple without the parenthesis.
+                 # (Note: parenthesis have been excluded but can be included)
+
+x = 1
+y = 2
+x, y = swap(x, y)     # => x = 2, y = 1
+# (x, y) = swap(x,y)  # Again parenthesis have been excluded but can be included.
+
+# There are built-in higher order functions
+list(map(add_10, [1, 2, 3]))          # => [11, 12, 13]
+list(map(max, [1, 2, 3], [4, 2, 1]))  # => [4, 2, 3]
+
+list(filter(lambda x: x > 5, [3, 4, 5, 6, 7]))  # => [6, 7]
+
+# We can use list comprehensions for nice maps and filters
+# List comprehension stores the output as a list which can itself be a nested list
+[add_10(i) for i in [1, 2, 3]]         # => [11, 12, 13]
+[x for x in [3, 4, 5, 6, 7] if x > 5]  # => [6, 7]
+
+# You can construct set and dict comprehensions as well.
+{x for x in 'abcddeef' if x not in 'abc'}  # => {'d', 'e', 'f'}
+{x: x**2 for x in range(5)}  # => {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}
+-->
+
+
+
+## Exceptions
+
+## Strings
+
+## Data Structures
+### Lists
+### Tuples
+### Dictionaries
+#### defaultdict
+### Sets
+### Counters
+
+## Control Flow
+
+## Thruthiness
+
+## Sorting
+
+## Comprehension
+
+## Testing
+
+## Object-Oriented Programming
+
+## Iterables and Generators
+
+## Randomness
+
+## zip and Argument Unpacking
 
 
 ## Primitive Datatypes and Operators
@@ -586,148 +773,6 @@ next(our_iterator)  # Raises StopIteration
 list(filled_dict.keys())  # => Returns ["one", "two", "three"]
 ```
 
-
-## Functions
-
-```python
-# Use "def" to create new functions
-def add(x, y):
-    print("x is {} and y is {}".format(x, y))
-    return x + y  # Return values with a return statement
-
-# Calling functions with parameters
-add(5, 6)  # => prints out "x is 5 and y is 6" and returns 11
-
-# Another way to call functions is with keyword arguments
-add(y=6, x=5)  # Keyword arguments can arrive in any order.
-
-# You can define functions that take a variable number of
-# positional arguments
-def varargs(*args):
-    return args
-
-varargs(1, 2, 3)  # => (1, 2, 3)
-
-# You can define functions that take a variable number of
-# keyword arguments, as well
-def keyword_args(**kwargs):
-    return kwargs
-
-# Let's call it to see what happens
-keyword_args(big="foot", loch="ness")  # => {"big": "foot", "loch": "ness"}
-
-
-# You can do both at once, if you like
-def all_the_args(*args, **kwargs):
-    print(args)
-    print(kwargs)
-"""
-all_the_args(1, 2, a=3, b=4) prints:
-    (1, 2)
-    {"a": 3, "b": 4}
-"""
-
-# When calling functions, you can do the opposite of args/kwargs!
-# Use * to expand tuples and use ** to expand kwargs.
-args = (1, 2, 3, 4)
-kwargs = {"a": 3, "b": 4}
-all_the_args(*args)            # equivalent to all_the_args(1, 2, 3, 4)
-all_the_args(**kwargs)         # equivalent to all_the_args(a=3, b=4)
-all_the_args(*args, **kwargs)  # equivalent to all_the_args(1, 2, 3, 4, a=3, b=4)
-
-# Returning multiple values (with tuple assignments)
-def swap(x, y):
-    return y, x  # Return multiple values as a tuple without the parenthesis.
-                 # (Note: parenthesis have been excluded but can be included)
-
-x = 1
-y = 2
-x, y = swap(x, y)     # => x = 2, y = 1
-# (x, y) = swap(x,y)  # Again parenthesis have been excluded but can be included.
-
-# Function Scope
-x = 5
-
-def set_x(num):
-    # Local var x not the same as global variable x
-    x = num    # => 43
-    print(x)   # => 43
-
-def set_global_x(num):
-    global x
-    print(x)   # => 5
-    x = num    # global var x is now set to 6
-    print(x)   # => 6
-
-set_x(43)
-set_global_x(6)
-
-
-# Python has first class functions
-def create_adder(x):
-    def adder(y):
-        return x + y
-    return adder
-
-add_10 = create_adder(10)
-add_10(3)   # => 13
-
-# There are also anonymous functions
-(lambda x: x > 2)(3)                  # => True
-(lambda x, y: x ** 2 + y ** 2)(2, 1)  # => 5
-
-# There are built-in higher order functions
-list(map(add_10, [1, 2, 3]))          # => [11, 12, 13]
-list(map(max, [1, 2, 3], [4, 2, 1]))  # => [4, 2, 3]
-
-list(filter(lambda x: x > 5, [3, 4, 5, 6, 7]))  # => [6, 7]
-
-# We can use list comprehensions for nice maps and filters
-# List comprehension stores the output as a list which can itself be a nested list
-[add_10(i) for i in [1, 2, 3]]         # => [11, 12, 13]
-[x for x in [3, 4, 5, 6, 7] if x > 5]  # => [6, 7]
-
-# You can construct set and dict comprehensions as well.
-{x for x in 'abcddeef' if x not in 'abc'}  # => {'d', 'e', 'f'}
-{x: x**2 for x in range(5)}  # => {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}
-```
-
-
-## Modules
-
-```python
-# You can import modules
-import math
-print(math.sqrt(16))  # => 4.0
-
-# You can get specific functions from a module
-from math import ceil, floor
-print(ceil(3.7))   # => 4.0
-print(floor(3.7))  # => 3.0
-
-# You can import all functions from a module.
-# Warning: this is not recommended
-from math import *
-
-# You can shorten module names
-import math as m
-math.sqrt(16) == m.sqrt(16)  # => True
-
-# Python modules are just ordinary Python files. You
-# can write your own, and import them. The name of the
-# module is the same as the name of the file.
-
-# You can find out which functions and attributes
-# are defined in a module.
-import math
-dir(math)
-
-# If you have a Python script named math.py in the same
-# folder as your current script, the file math.py will
-# be loaded instead of the built-in Python module.
-# This happens because the local folder has priority
-# over Python's built-in libraries.
-```
 
 
 ## Classes
