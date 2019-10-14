@@ -1,7 +1,7 @@
 # Python Refresher
 
 This document contains a quick course in Python 3.  It is based on the Python
-[learnxinyminutes][https://learnxinyminutes.com/docs/python3/] refresher, and
+[learnxinyminutes](https://learnxinyminutes.com/docs/python3/) refresher, and
 extends it with some additional topics (e.g. types).
 
 
