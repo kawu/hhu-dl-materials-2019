@@ -8,8 +8,8 @@ some additional topics (e.g. types).
 
 ## ToC
 
-* [Comments](Comments)
-* [Whitespace Formatting](Whitespace Formatting)
+* [Comments](#comments)
+* [Whitespace Formatting](#whitespace-formatting)
 * [Primitive Datatypes and Operators](TODO)
 * TODO
 
@@ -28,7 +28,7 @@ Python itself ignores the comments, but they help to understand your code.
 ```
 
 
-## Whiltespace Formatting
+## Whitespace Formatting
 
 Many programming languages delimit blocks of code.  Python uses indentation for
 this purpose.
