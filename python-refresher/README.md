@@ -46,7 +46,8 @@ for i in [1, 2, 3]:
 ```
 
 This is pretty neat, but can lead to errors.  For instance, be careful about
-using tabs for indentation!  VS Code should take care of that, though.
+using tabs and not spaces for indentation!  Your editor will normally take care
+of that, though.
 
 
 ## Primitive Datatypes and Operators
