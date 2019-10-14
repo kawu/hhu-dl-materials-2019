@@ -749,6 +749,92 @@ TODO
 
 ## Object-Oriented Programming
 
+Python, as many programming languages, allows to define *classes* to
+encapsulate data and the methods that can operate on them.
+
+To give an example, let's implement a `Bag` datatype which behaves a bit like a
+set, but allows to keep track of the number of occurrences of each element in
+it.
+
+```python
+class Bag:
+    """Just as functions, classes can/should be documented with docstrings."""
+
+    # Constructor of the class, which takes whatever objects are required
+    # to build a Bag.
+    #
+    # Note that the double leading and trailing underscores denote objects
+    # or attributes that are used by Python but that live in user-controlled
+    # namespaces. Methods(or objects or attributes) like: __init__, __str__,
+    # __repr__ etc. are called special methods. You should not invent such
+    # names on your own.
+    #
+    def __init__(self, elems=[]):
+        # We keep track of the elements and their number in a dictionary.
+        self.data = {}
+        for elem in elems:
+            self.add(elem)
+      
+    # An instance method. All methods take "self" as the first argument.
+    def add(self, elem):
+        """Add the given element to the bag."""
+        try:
+            self.data[elem] += 1
+        except IndexError:
+            self.data[elem]  = 1
+
+    def del(self, elem):
+        """Remove the given element from the bag."""
+        try:
+            self.data[elem] += 1
+        except IndexError:
+            self.data[elem]  = 1
+
+    def number(self, elem):
+        """Get the number of occurrences of the element in the bag."""
+        try:
+            return self.data[elem]
+        except IndexError:
+            return 0
+```
+
+We can use inheritance to create new classes by extending or restricting the
+existing ones.  For instance, let's say we know that in a particular part of
+the code no elements should be removed from a given `Bag`.  We can either hope
+for best and trust that the code works as expected (this may be a good idea
+even if we are the authors of this piece of code), or enforce this by creating
+a variant of the `Bag` which simply does not allow element removal.
+
+```python
+# Note the base class `Bag` specified inside the parentheses.
+class GrowingBag(Bag):
+    """Bag from which elements cannot be removed"""
+
+    # The sublass inherits all the methods (e.g., `number`) and attributes
+    # (e.g., `data`) of its parent class.
+      
+    # We overwrite the `del` method so that it raises an exception if used.
+    def del(self, elem):
+        raise SomeException("You cannot delete elements from the GrowingBag.")
+```
+
+<!---
+Classes can be pretty handy in numerical computing as well.  To give an
+example, let's say that we want to perform some computations on regular numbers
+in the logarithmic domain, e.g., because the numbers get either too small or
+too large.
+```python
+math.log(2 ** 8)          # => 8
+math.log(2 ** 1e10)       # raises OverflowError exception
+```
+
+One solution to this problem is to manually transform all the numbers using
+`math.log`, replace `*` with `+`, `/` with `-`, etc.
+-->
+
+
+
+<!---
 ```python
 # We use the "class" statement to create a class
 class Human:
@@ -1018,8 +1104,13 @@ if __name__ == '__main__':
     # Inherited attribute from 2nd ancestor whose default value was overridden.
     print('Can I fly? ' + str(sup.fly)) # => Can I fly? False
 ```
+-->
 
 ## Iterables and Generators
+
+<!---
+unique_words = set(word  for line in page  for word in line.split())
+-->
 
 ```python
 # Python offers a fundamental abstraction called the Iterable.
@@ -1285,6 +1376,10 @@ filled_set | other_set  # => {1, 2, 3, 4, 5, 6}
 # Check for existence in a set with in
 2 in filled_set   # => True
 10 in filled_set  # => False
+
+# if can be used as an expression
+# Equivalent of C's '?:' ternary operator
+"yahoo!" if 3 > 2 else 2  # => "yahoo!"
 -->
 
 ```python
@@ -1307,14 +1402,6 @@ some_var  # => 5
 # Accessing a previously unassigned variable is an exception.
 # See Control Flow to learn more about exception handling.
 some_unknown_var  # Raises a NameError
-
-# if can be used as an expression
-# Equivalent of C's '?:' ternary operator
-"yahoo!" if 3 > 2 else 2  # => "yahoo!"
-
-
-
-
 ```
 
 
