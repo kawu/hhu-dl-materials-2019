@@ -1484,9 +1484,9 @@ list(filled_dict.keys())  # => Returns ["one", "two", "three"]
 
 
 
+<!---
 ## Advanced
 
-<!---
 # Generators help you make lazy code.
 def double_numbers(iterable):
     for i in iterable:
@@ -1511,7 +1511,6 @@ for x in values:
 values = (-x for x in [1,2,3,4,5])
 gen_to_list = list(values)
 print(gen_to_list)  # => [-1, -2, -3, -4, -5]
--->
 
 ```python
 # Decorators
@@ -1540,3 +1539,4 @@ def say(say_please=False):
 print(say())                 # Can you buy me a beer?
 print(say(say_please=True))  # Can you buy me a beer? Please! I am poor :(
 ```
+-->
