@@ -63,6 +63,7 @@ potentially_more_readable_list = [[1, 2, 3],
 
 ## Primitive Datatypes and Operators
 
+### Numbers
 
 ```python
 # You have numbers
@@ -91,7 +92,11 @@ potentially_more_readable_list = [[1, 2, 3],
 
 # Enforce precedence with parentheses
 (1 + 3) * 2  # => 8
+```
 
+### Booleans
+
+```python
 # Boolean values are primitives (Note: the capitalization)
 True
 False
@@ -109,7 +114,19 @@ False or True   # => True
 True + True # => 2
 True * 8    # => 8
 False - 5   # => -5
+```
 
+### None
+
+```python
+# None indicates a nonexistent value, which is similar to
+# 'null's in other languages
+None  # => None
+```
+
+### Equality and Comparison
+
+```python
 # Equality is ==
 1 == 1  # => True
 2 == 1  # => False
@@ -131,7 +148,22 @@ False - 5   # => -5
 1 < 2 < 3  # => True
 2 < 3 < 2  # => False
 
+# (is vs. ==) is checks if two variables refer to the same object, but == checks
+# if the objects pointed to have the same values.
+a = [1, 2, 3, 4]  # Point a at a new list, [1, 2, 3, 4]
+b = a             # Point b at what a is pointing to
+b is a            # => True, a and b refer to the same object
+b == a            # => True, a's and b's objects are equal
+b = [1, 2, 3, 4]  # Point b at a new list, [1, 2, 3, 4]
+b is a            # => False, a and b do not refer to the same object
+b == a            # => True, a's and b's objects are equal
+
+# Don't use the equality "==" symbol to compare objects to None
+# Use "is" instead. This checks for equality of object identity.
+"etc" is None  # => False
+None is None   # => True
 ```
+
 
 <!---
 # (is vs. ==) is checks if two variables refer to the same object, but == checks
@@ -454,14 +486,6 @@ print(contents)
 
 ## Data Structures
 
-### None
-
-```python
-# None indicates a nonexistent value, which is similar to
-# 'null's in other languages
-None  # => None
-```
-
 ### Lists
 
 ```python
@@ -703,25 +727,6 @@ for x in range(10):
 ```
 
 <!--- ## Thruthiness -->
-
-## Equality
-
-```python
-# (is vs. ==) is checks if two variables refer to the same object, but == checks
-# if the objects pointed to have the same values.
-a = [1, 2, 3, 4]  # Point a at a new list, [1, 2, 3, 4]
-b = a             # Point b at what a is pointing to
-b is a            # => True, a and b refer to the same object
-b == a            # => True, a's and b's objects are equal
-b = [1, 2, 3, 4]  # Point b at a new list, [1, 2, 3, 4]
-b is a            # => False, a and b do not refer to the same object
-b == a            # => True, a's and b's objects are equal
-
-# Don't use the equality "==" symbol to compare objects to None
-# Use "is" instead. This checks for equality of object identity.
-"etc" is None  # => False
-None is None   # => True
-```
 
 <!--- ## Sorting -->
 
