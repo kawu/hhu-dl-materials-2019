@@ -381,38 +381,6 @@ list(map(add_10, [1, 2, 3]))          # => [11, 12, 13]
 
 
 <!---
-# You can define functions that take a variable number of
-# positional arguments
-def varargs(*args):
-    return args
-
-varargs(1, 2, 3)  # => (1, 2, 3)
-
-# You can define functions that take a variable number of
-# keyword arguments, as well
-def keyword_args(**kwargs):
-    return kwargs
-
-# Let's call it to see what happens
-keyword_args(big="foot", loch="ness")  # => {"big": "foot", "loch": "ness"}
-
-# You can do both at once, if you like
-def all_the_args(*args, **kwargs):
-    print(args)
-    print(kwargs)
-"""
-all_the_args(1, 2, a=3, b=4) prints:
-    (1, 2)
-    {"a": 3, "b": 4}
-"""
-
-# When calling functions, you can do the opposite of args/kwargs!
-# Use * to expand tuples and use ** to expand kwargs.
-args = (1, 2, 3, 4)
-kwargs = {"a": 3, "b": 4}
-all_the_args(*args)            # equivalent to all_the_args(1, 2, 3, 4)
-all_the_args(**kwargs)         # equivalent to all_the_args(a=3, b=4)
-all_the_args(*args, **kwargs)  # equivalent to all_the_args(1, 2, 3, 4, a=3, b=4)
 
 # Returning multiple values (with tuple assignments)
 def swap(x, y):
@@ -1263,7 +1231,66 @@ random.sample(lottery_numbers, 6)             # => [51, 16, 34, 45, 59, 38]
 
 ## zip and Argument Unpacking
 
-TODO
+You can *zip* two lists (or iterables) together using the `zip` function.
+```python
+nums = (1, 2, 3)
+strs = ("one", "two", "three")
+pairs = list(zip(num_list, str_list))
+pairs                               # => [(1, 'one'), (2, 'two'), (3, 'three')]
+```
+
+You can also *unzip* two lists using the following trick: 
+```python
+nums2, strs2 = zip(*pairs)
+assert nums == nums2 and strs == strs2
+```
+
+The special asterisk operator (\*) performs *argument unpacking*.  In the
+example above, `*pairs` unfolds `pairs` to three different arguments: `(1,
+'one')`, `(2, 'two')`, and `(3, 'three')`.
+```python
+assert list(zip(*pairs)) == list(zip((1, 'one'), (2, 'two'), (3, 'three')))
+```
+
+
+## args and kwargs
+
+Argument unpacking is useful if you want to define a function with an unknown
+number of arguments.
+```python
+# You can define functions that take a variable number of
+# positional arguments
+def varargs(*args):
+    return args
+
+varargs(1, 2, 3)  # => (1, 2, 3)
+
+# You can define functions that take a variable number of
+# keyword arguments, as well
+def keyword_args(**kwargs):
+    return kwargs
+
+# Let's call it to see what happens
+keyword_args(big="foot", loch="ness")  # => {"big": "foot", "loch": "ness"}
+
+# You can do both at once, if you like
+def all_the_args(*args, **kwargs):
+    print(args)
+    print(kwargs)
+"""
+all_the_args(1, 2, a=3, b=4) prints:
+    (1, 2)
+    {"a": 3, "b": 4}
+"""
+
+# When calling functions, you can do the opposite of args/kwargs!
+# Use * to expand tuples and use ** to expand kwargs.
+args = (1, 2, 3, 4)
+kwargs = {"a": 3, "b": 4}
+all_the_args(*args)            # equivalent to all_the_args(1, 2, 3, 4)
+all_the_args(**kwargs)         # equivalent to all_the_args(a=3, b=4)
+all_the_args(*args, **kwargs)  # equivalent to all_the_args(1, 2, 3, 4, a=3, b=4)
+```
 
 ## Type Annotations
 
