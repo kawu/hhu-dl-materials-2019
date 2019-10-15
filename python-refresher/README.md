@@ -3,8 +3,8 @@
 This refresher is a based on the Python
 [learnxinyminutes](https://learnxinyminutes.com/docs/python3/) refresher (which
 you may want to read in full anyway). It extends it with some additional topics
-(e.g. type annotations, randomness).  Some examples and the additional topics
-in particular originate from the [Data Science from
+(e.g. type annotations, randomness).  Some examples and additional topics
+originate from the [Data Science from
 Scratch](https://www.oreilly.com/library/view/data-science-from/9781492041122/)
 book.
 
