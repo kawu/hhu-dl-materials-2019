@@ -45,9 +45,9 @@ for i in [1, 2, 3]:
     # End of the body of the "for i" loop
 ```
 
-This is pretty neat, but can lead to errors.  For instance, be careful about
-using four spaces (rather than tabs) for indentation!  Your editor will
-normally take care of that, though.
+This is pretty neat, but can lead to errors.  For instance, be careful to use
+four spaces (rather than tabs) for indentation!  Your editor will normally take
+care of that, though.
 
 Whitespace is ignored inside parentheses and brackets, which allows to make the
 code more readable and deal with long code lines.
@@ -58,6 +58,14 @@ less_readable_list = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 potentially_more_readable_list = [[1, 2, 3],
                                   [4, 5, 6],
                                   [7, 8, 9]]
+```
+
+If you want to split a line of code outside brackets, you will have to use \\.
+```python
+list_in_next_line = \
+    [[1, 2, 3],
+     [4, 5, 6],
+     [7, 8, 9]]
 ```
 
 
@@ -73,16 +81,24 @@ potentially_more_readable_list = [[1, 2, 3],
 1 + 1   # => 2
 8 - 1   # => 7
 10 * 2  # => 20
-35 / 5  # => 7.0
+35 / 5  # => 7.0 (the result of division is always a float)
 
-# Integer division rounds down for both positive and negative numbers.
+# Integer division rounds down for both positive and negative numbers
 5 // 3       # => 1
 -5 // 3      # => -2
 5.0 // 3.0   # => 1.0 # works on floats too
 -5.0 // 3.0  # => -2.0
 
-# The result of division is always a float
-10.0 / 3  # => 3.3333333333333335
+# To cast an int to float or a float to int
+int(3.0)      # => 3
+float(3)      # => 3.0
+int(1.9)      # => 1
+
+# If you want a consistent and intuitive rounding behavior, use round
+# (always gives an int)
+round(5 / 3)   # => 2
+round(-5 / 3)  # => -2
+round(1.9)     # => 2
 
 # Modulo operation
 7 % 3  # => 1
@@ -616,6 +632,9 @@ list(filled_dict.keys())  # => ["one", "two", "three"] in Python 3.7+
 # ordering.
 list(filled_dict.values())  # => [3, 2, 1]  in Python <3.7
 list(filled_dict.values())  # => [1, 2, 3] in Python 3.7+
+
+# You can also retrieve the list of the (key, value) pairs using "items()"
+list(filled_dict.items())   # => [('one', 1), ('two', 2), ('three', 3)]
 
 # Check for existence of keys in a dictionary with "in"
 "one" in filled_dict  # => True
@@ -1198,7 +1217,49 @@ print(gen_to_list)  # => [-1, -2, -3, -4, -5]
 
 ## Randomness
 
-TODO
+To generate random numbers, you can use the `random` module (note that PyTorch
+provides a separate random numbers functionality).
+```python
+import random
+
+# random.random() generates numbers uniformly in [0, 1)
+[random.random() for _ in range(4)]
+```
+
+The `random` module provides in fact *pseudorandom* numbers, that is,
+deterministic.  You can use `random.seed` to get the same sequence of random
+numbers every time.
+```python
+random.seed(0)      # Set the seed to 0
+random.random()     # => 0.8444218515250481
+random.random()     # => 0.7579544029403025
+random.seed(0)      # Reset the seed to 0
+random.random()     # => 0.8444218515250481
+random.random()     # => 0.7579544029403025
+```
+
+This property helps to make the experiments replicable.  Unfortunately, this is
+currently hard to achieve with PyTorch (setting one seed value is definitely
+not enough).
+
+Other functions provided by `random` also may be useful:
+```python
+# random.shuffle allows to shuffle in place the given list
+xs = list(range(5)) # xs is now [0, 1, 2, 3, 4]
+random.shuffle(xs)  # xs is now [2, 0, 3, 1, 4] (for instance)
+
+# To randomly pick one element from a list
+my_best_friends = ["Bob", "Alice", "Charlie"]
+random.choice(my_best_friends)                # => "Bob" for me
+
+# To select a sample of elements *without replacement*
+lottery_numbers = range(60)
+random.sample(lottery_numbers, 6)             # => [51, 16, 34, 45, 59, 38]
+
+# To select a sample *with replacement* (allowing duplicates),
+# just use random.choice
+[random.choice(range(4)) for _ in range(6)]  # => [2, 3, 0, 2, 3, 2]
+```
 
 ## zip and Argument Unpacking
 
@@ -1206,7 +1267,115 @@ TODO
 
 ## Type Annotations
 
-TODO
+Python is a *dynamically typed language*, which means it doesn't care about
+types unless we use them wrong.
+```python
+def add(x, y):
+    return x + y
+
+add(2, 2)       # => 4
+try:
+    add(2, "two")
+except TypeError:
+    print("Can't add int to a string")
+```
+
+However, it is possible to add type annotations in recent versions of Python.
+For instance, you can specify that `x`, `y`, and the result all should be
+`int`s.
+```python
+def add(x: int, y: int) -> int:
+    return x + y
+```
+
+In contrast to statically typed languages, this still doesn't prevent the user
+from executing `add(2, "two")`.  However, type annotations help to understand
+the code, and they make it possible for the editor (or a code analysis tool) to
+catch errors by checking if it respects the types, improve hinting, etc.
+```python
+# Dot product of two vectors.  Or maybe it takes lists as argumemts too?
+def dot_product(x, y): ...
+
+# Dot product of two vectors, returns an int.  Much more readable to me.
+def dot_product(x: Vector, y: Vector) -> int: ...
+```
+
+PyTorch itself uses type annotations quite extensively.  You don't have to use
+them to use PyTorch, but it should help you to understand what's going on.
+
+Having to think about types forces you to design cleaner functions and interfaces.
+```python
+from typing import Union
+
+# Some ugly function, but you don't know that from the def header
+def secretly_ugly_function(value, operation): ...
+
+# Just ugly function, you can immediately see that some refactoring would
+# be welcome
+def ugly_function(value: int,
+                  operation: Union[str, int, float, bool]) -> int:
+    ...
+# Here the operation is allowed to be a string, int, float, or bool.
+# It's likely that it's is difficult to use, but it becomes far more clear
+# when the types are made explicit.
+```
+
+### How to Write Type Annotations
+
+You can use built in types like int, float, str, list, etc.
+```python
+def total(xs: list) -> float
+    return sum(xs)
+```
+
+You can be explicit about the types of objects a particular collection
+contains.
+```python
+from typing import List     # Note capital L
+
+def total(xs: List[float]) -> float:
+    return sum(xs)
+```
+
+You can also type-annotate variables.
+```python
+# Somewhat redundant, it's clear that x is an int.
+x: int = 5
+
+# Here it's not clear what the type of values is
+values = []
+
+# So it may be better to specify it explicitely
+values: List[int] = []
+```
+
+If a variable can contain `None`, use `Optional`,
+```python
+from typing import Optional
+
+def maximum(xs: List[int]) -> Optional[int]:
+    """Return the maximum element in the list, or None if the list is empty."""
+    ... 
+```
+
+Finally, there are also types corresponding to most/all the standard
+collections available in Python.
+```python
+# Dictionary which maps integers to strings
+int_to_str_dict: Dict[int, str] = {1: "one", 2: "two"}
+
+# Tuples; just use as many types between the square brackets as 
+# there are elements in the tuple
+int_str_pair: Tuple[int, str] = (1, "one")
+int_float_str_pair: Tuple[int, float, str] = (1, 1.0 "one")
+
+# Complex types are also not too hard to define.
+complex_dict: Dict[Tuple[str, int], List[int]] = {
+    ("one", 1): [1],
+    ("two", 2): [1, 2],
+    ("thr", 3): [1, 2, 3]
+}
+```
 
 
 ## Variables and Collections
