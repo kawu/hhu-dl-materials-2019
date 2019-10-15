@@ -1117,7 +1117,7 @@ if __name__ == '__main__':
 ```
 -->
 
-## Iterables and Generators
+## Iterables
 
 <!---
 unique_words = set(word  for line in page  for word in line.split())
@@ -1156,7 +1156,45 @@ next(our_iterator)  # Raises StopIteration
 # You can grab all the elements of an iterator by calling list() on it.
 list(filled_dict.keys())  # => Returns ["one", "two", "three"]
 
+"""
+"range(number)" returns an iterable of numbers
+from zero to the given number
+prints:
+    0
+    1
+    2
+    3
+"""
+for i in range(4):
+    print(i)
 
+"""
+"range(lower, upper)" returns an iterable of numbers
+from the lower number to the upper number
+prints:
+    4
+    5
+    6
+    7
+"""
+for i in range(4, 8):
+    print(i)
+
+"""
+"range(lower, upper, step)" returns an iterable of numbers
+from the lower number to the upper number, while incrementing
+by step. If step is not indicated, the default value is 1.
+prints:
+    4
+    6
+"""
+for i in range(4, 8, 2):
+    print(i)
+```
+
+## Generators
+
+```python
 # Generators help you make lazy code.
 def double_numbers(iterable):
     for i in iterable:
@@ -1246,7 +1284,7 @@ assert nums == nums2 and strs == strs2
 ```
 
 The special asterisk operator (\*) performs *argument unpacking*.  In the
-example above, `*pairs` unfolds `pairs` to three different arguments: `(1,
+example above, `*pairs` unfolds `pairs` to three subsequent arguments: `(1,
 'one')`, `(2, 'two')`, and `(3, 'three')`.
 ```python
 assert list(zip(*pairs)) == list(zip((1, 'one'), (2, 'two'), (3, 'three')))
@@ -1652,9 +1690,7 @@ prints:
 for animal in ["dog", "cat", "mouse"]:
     # You can use format() to interpolate formatted strings
     print("{} is a mammal".format(animal))
--->
 
-```python
 """
 "range(number)" returns an iterable of numbers
 from zero to the given number
@@ -1690,6 +1726,7 @@ prints:
 for i in range(4, 8, 2):
     print(i)
 
+```python
 """
 To loop over a list, and retrieve both the index and the value of each item in the list
 prints:
@@ -1714,6 +1751,8 @@ while x < 4:
     print(x)
     x += 1  # Shorthand for x = x + 1
 ```
+-->
+
 
 <!---
 # Handle exceptions with a try/except block
