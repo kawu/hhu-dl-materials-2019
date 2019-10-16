@@ -397,7 +397,7 @@ print_msg()                           # => prints 'whatever'
 # There are also some higher-order functions (`map`, `filter`), 
 # although Python encourages to use comprehension instead.
 list(map(add_10, [1, 2, 3]))          # => [11, 12, 13]
-[add_10(x) for x in [1, 2, 3]         # The same using list comprehension
+[add_10(x) for x in [1, 2, 3]]        # The same using list comprehension
 ```
 
 
