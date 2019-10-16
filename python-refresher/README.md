@@ -1423,7 +1423,7 @@ def total(xs: List[float]) -> float:
     return sum(xs)
 ```
 
-You can also type-annotate variables.
+You can also type-annotate variables (in Python 3.6+).
 ```python
 # Somewhat redundant, it's clear that x is an int.
 x: int = 5
