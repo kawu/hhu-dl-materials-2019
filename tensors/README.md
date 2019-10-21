@@ -1,21 +1,23 @@
 # Tensors
 
-This document covers the basic tensor operations you should get familar with
-today.
+This document covers the basic tensor operations you should get familiar with.
+
+You can also go through the lengthier but certainly much more complete PyTorch
+[documentation on tensors](https://pytorch.org/docs/stable/tensors.html).
 
 
 ## Tensor Object
 
-Tensors can be understood as multi-dimensional arrays containing values of a
-certain type (integer, float).
+Tensors can be understood as multi-dimensional arrays (or matrices) containing
+values of a certain type (integer, float, bool).
 * 0-order tensor is a single value 
 * 1-order tensor is a vector of values (one dimensional array)
-* 2-order tensor is a matrix of values (two dimentional array)
+* 2-order tensor is a matrix of values (two dimensional array)
 and so on.
 
 For instance: 
 ```python
-# First import the torch module from the PyTorch framework
+# First import the torch module of the PyTorch framework
 import torch
 
 # Create a tensor which contains a single value `13`
@@ -33,10 +35,12 @@ matrix_1_to_10        # => tensor([[1, 2, 3],
                       #            [7, 8, 9]])
 ```
 
-You can also create tensors of higher dimensions (e.g. ,,cubes'' of values):
+You can also create tensors of higher dimensions (e.g. ,,cubes'' of values),
+but we will not need this functionality today.
+<!---
 ```python
 ```
-But we will not need this functionality today.
+-->
 
 ### Shape
 
@@ -65,11 +69,204 @@ irregular_tensor = torch.tensor(
 # => ValueError: expected sequence of length 3 at dim 1 (got 4)
 ```
 
+### dtype and device
 
-## Access
+So far, we were creating tensors of integers.  You can also create tensors of
+floats.
+```python
+# It's enough that one of the values is a floating-point number
+float_vect = torch.tensor([1, 2, 2.5])
+float_vect                # => tensor([1.0000, 2.0000, 2.5000])
+
+# You can use the `dtype` attribute to enforce that the values be integers
+int_vect = torch.tensor([1, 2, 2.5], dtype=torch.int64)
+int_vect                  # => tensor([1, 2, 2])
+
+# ... or floats
+ints_as_floats_vect = torch.tensor([1, 2, 3], dtype=torch.float)
+ints_as_floats_vect       # => tensor([1., 2., 3.])
+```
+
+TODO: bools, the `a = torch.randn(4, 2) < 0` syntax.
+
+The target device (CPU, GPU) can be specified for each tensor separetely using
+the `device` attribute.
+```pyhon
+# To run on CPU 
+torch.tensor(0, device=torch.device("cpu"))
+
+# To run on GPU (this will probably throw an exception on lab computers,
+# where PyTorch was probably not compiled with CUDA enabled)
+torch.tensor(0, device=torch.device("cuda:0"))
+```
+We will be using CPUs throughout the course.  PyTorch defaults to CPUs, so you
+don't really have to specify the device explicitly each time you create a
+tensor (it won't hurt, though).
+
+### Randomness
+
+The `torch` module provides its own set of functions which allow to create
+random tensors.  The main one is
+[randn](https://pytorch.org/docs/stable/torch.html?highlight=randn#torch.randn),
+which creates a tensor of the given shape with values drawn from the normal
+distirubion (with mean `0` and variance `1`).
+```python
+# To get reproducible runs, set the randomness seed manually
+torch.manual_seed(0)
+
+# To create a 3x3 matrix, provide the shape as subsequent positional arguments
+torch.randn(3, 3)
+# tensor([[ 1.5410, -0.2934, -2.1788],
+#         [ 0.5684, -1.0845, -1.3986],
+#         [ 0.4033,  0.8380, -0.7193]])
+
+# Or a collection
+torch.manual_seed(0)
+torch.randn([3, 3])
+# tensor([[ 1.5410, -0.2934, -2.1788],
+#         [ 0.5684, -1.0845, -1.3986],
+#         [ 0.4033,  0.8380, -0.7193]])
+
+# Are you actually getting the same numbers?
+```
+
+*Note*: The way you initialize the parameters is actually pretty important.
+Differet initialization strategies work best for different architectures, and
+the best strategies have been often determined empirically (based on trial and
+error).  This is not particularly elegant, but hey, deep learning is a lot
+about finding the right balance between accuracy and speed, not necessarily
+elegance.
+
+<!---
+The `randn` function accepts many of the same keyword arguments as the `tensor`
+function.
+-->
+
+
+### requires\_grad
+
+In your typical PyTorch model, some of the tensors represent the parameters of
+the model, others are the result of intermediate calculations.  For those that
+represent parameters, use `requires_grad=True` when you create them.
+```python
+# A tensor parameter vector with five 0 floats
+param_vect = torch.tensor([0.0 for _ in range(5)], requires_grad=True)
+param_vect                # => tensor([0., 0., 0., 0., 0.], requires_grad=True)
+
+# But typically you will want to randomly initialize your parameter tensor
+param_vect = torch.randn([5], requires_grad=True)
+param_vect		  # => tensor([-0.4062, -0.0975,  1.2838, -1.4413,  0.5867], requires_grad=True)
+```
+
+The reasons for using `requires_grad=True` are shortly explained below, in the
+[Backpropagation](#backpropagation) section.
+
+
+<!---
+### View
+
+*NOTE*: This part concerns internal representation of tensors.  This will be
+quite useful during future sessions, but you can skip it on first reading.
+
+TODO
+-->
+
+
+## Tensor Operations
+
+Below you can find a list of basic tensor operations that are sufficient to
+build a large variety of different architectures (for example, a feed-forward
+network).
+
+### Basic element-wise operations
+
+You can use the basic arithmetic operations on tensors: `+`, `-`, `*`, `/`.
+They all work element-wise, i.e, the arguments have to have exactly the same
+shape.
+```python
+# For one element tensors, this is pretty natural
+x = torch.tensor(13)
+assert x + 2 == 15          # Note the automatic cast from ints to int tensors
+
+# For vectors
+v = torch.tensor([1, 2, 3])
+w = torch.tensor([1, 2, 1])
+v * w                       # => tensor(1, 4, 3)
+
+# For matrices
+m1 = torch.tensor(
+    [[1, 0],
+     [0, 1]], dtype=torch.float)
+m2 = torch.tensor(
+    [[2, 2],
+     [2, 2]], dtype=torch.float)
+print(m1 / m2)
+# tensor([[0.5000, 0.0000],
+#         [0.0000, 0.5000]])
+```
+
+<!---
+### Dot Product
+-->
+
+### Sum
+
+You can sum all the elements in the given tensor using
+[torch.sum](https://pytorch.org/docs/stable/torch.html#torch.sum).
+```python
+id = torch.tensor(
+    [[1, 0],
+     [0, 1]])
+torch.sum(id)             # => tensor(2)
+```
+
+### Power
+
+The [torch.pow](https://pytorch.org/docs/stable/torch.html#torch.sum) serves to
+raise all the values in the tensor to the given power.
+```python
+v = torch.tensor([1, 2, 3])
+torch.pow(v, 2)           # => tensor([1, 4, 9])
+```
+
+### Sigmoid
+
+PyTorch provides a variety of non-linear functions
+([sigmoid](https://pytorch.org/docs/stable/torch.html#torch.sigmoid),
+[tanh](https://pytorch.org/docs/stable/torch.html#torch.tanh)).  They all apply
+element-wise.  For instance, if you apply sigmoid to a vector, you actually
+apply it to each of its elements individually.
+```python
+v = torch.tensor([1, 2, 3], dtype=torch.float) 
+torch.sigmoid(v)           # => tensor([0.7311, 0.8808, 0.9526])
+
+# We can apply sigmoid element-wise explicitely (this way is slower, though)
+assert all(
+    torch.sigmoid(v) ==
+    torch.tensor([torch.sigmoid(x) for x in v]))
+```
+
+### Matrix-vector product
+
+The [torch.mv](https://pytorch.org/docs/stable/torch.html#torch.mv) function
+serves to perform a matrix-vector product.
+```python
+# Identity matrix of shape [2, 2]
+id = torch.tensor(
+    [[1, 0],
+     [0, 1]])
+
+# Example vector of shape [2]
+v = torch.tensor([2, 3])
+
+# Perform the matrix-vector product
+assert all (torch.mv(id, v) == v), "Identity matrix doesn't change the input vector"
+```
+
+### Access
 
 To access elements of tensors, you can basically treat them as lists (of lists
-(of lists)).
+(of lists (...))).
 ```python
 # Extract the first element of our vector
 vector_1_to_10[0]         # => tensor(1)
@@ -92,8 +289,6 @@ for row in matrix_1_to_10:
 # tensor([4, 5, 6])
 # tensor([7, 8, 9])
 
-# TODO: are these rows or columns!?
-
 # Extract the 3rd element of the 3rd row
 x = matrix_1_to_10[2][2]
 x                         # => tensor(9)
@@ -103,9 +298,9 @@ Whenever you access some parts or elements of tensors, you still get tensors in
 return.  This is important because PyTorch models take the form of computations
 over tensors, and the result of these these computations must typically be a
 tensor, too.  The fact that, say, `vector_1_to_10[:3]` is a tensor means that
-you can easily use it as a part of the computation of the PyTorch model.
+you can easily use it as a part of your PyTorch computation.
 
-You can extract the values from one element tensors if you want, though.
+You can extract the raw values from one element tensors if you want.
 ```python
 # You can extract the value of a one element tensor using `item()`
 x.item()                  # => 9, regular int
@@ -114,54 +309,63 @@ matrix_1_to_10.item()
 # => ValueError: only one element tensors can be converted to Python scalars
 ```
 
-### dtype and device
 
-So far, we were creating tensors of integers.  You can also create tensors of
-floats.
+## Backpropagation
+
+You will learn about backpropagation and how it works later during one of the
+theoretical sessions.  Maybe we will also implement it at some point ourselves
+(so that you can use the code to solve the theoretical exercises...).
+
+TODO: requires\_grad
+
+For now, the important things to know are:
+* PyTorch model can be seen as a function from parameters (tensors with
+`requires_grad=True`) to a *target* value.
+* Backpropagation allows to calculate the gradient of the function, i.e., the
+directions in which the individual parameters should be modified in order to
+make the *target* value larger.
+
+Typically, you don't even have to care about backpropagation. All the tensor
+operations (dot product, matrix-vector multiplication, sum, etc.) that PyTorch
+provides are *backpropagable*, i.e., you can use them transparently in your code
+and PyTorch will be able to calculate the gradients of the model parameters.
+In fact, the way the API of the PyTorch library was designed is precisely to
+make sure that, however you decide to combine the individual functions it
+provides, you can still calculate the gradient.
+
+At least, that's the idea, because in practice you can easily run into various
+problems we will probably experience ourselves later during the course.
+
+TODO: corner cases.
+
+<!---
+*Note*: backpropagation is a specific case of automatic differentiation.
+-->
+
+<!---
+To give an example, let's say we want to
+-->
+
+Let's see a minimal example.
 ```python
-# It's enough that one of the values is a floating-point number
-float_vect = torch.tensor([1, 2, 2.5])
-float_vect                # => tensor([1.0000, 2.0000, 2.5000])
+# Alias to tensor type
+TT = torch.TensorType
 
-# You can use the `dtype` attribute to enforce that the values be integers
-int_vect = torch.tensor([1, 2, 2.5], dtype=torch.int64)
-int_vect                  # => tensor([1, 2, 2])
+# Define a somewhat banal function which adds two (one element) tensors
+def add(x: TT, y: TT) -> TT:
+    return x + y
 
-# ... or floats
-ints_as_floats_vect = torch.tensor([1, 2, 3], dtype=torch.float)
-ints_as_floats_vect       # => tensor([1., 2., 3.])
+# Create two example one element tensors
+x = torch.tensor(3., requires_grad=True)
+y = torch.tensor(-5., requires_grad=True)
+assert add(x, y) == torch.tensor(-2.)
+
+# Now let's find the gradient of `f` with respect to `x` and `y`.  To do that,
+# we first use the `backward` method of the target value.
+z = add(x, y)
+z.backward()
+
+# Now we can access the gradient attributes of `x` and `y`
+x.grad    		  # => tensor(1.)
+y.grad    		  # => tensor(1.)
 ```
-
-The target device (CPU, GPU) can be specified for each tensor separetely using
-the `device` attribute.
-```pyhon
-# To run on CPU 
-torch.tensor(0, device=torch.device("cpu"))
-
-# To run on GPU (this will probably throw an exception on lab computers,
-# where PyTorch was probably not compiled with CUDA enabled)
-torch.tensor(0, device=torch.device("cuda:0"))
-```
-We will be using CPUs throughout the course.  PyTorch defaults to CPUs, so you
-don't really have to specify this explicitly each time you create a tensor (it
-won't hurt, though).
-
-
-### requires\_grad
-
-
-### Randomness
-
-
-### View
-
-*NOTE*: This part concerns internal representation of tensors.  This will be
-quite useful during future sessions, but you can skip it on first reading.
-
-TODO
-
-
-
-## Tensor Operations
-
-### Backpropagation
