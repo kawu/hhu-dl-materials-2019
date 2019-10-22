@@ -44,7 +44,7 @@ but we will not need this functionality today.
 
 ### Shape
 
-Each tensor has a *shape*, which describes its dimensions.  You can use the
+Each tensor has a *shape*, which specifies its dimensions.  You can use the
 `shape` attribute to access it.
 ```python
 value_13.shape          # => torch.Size([])
@@ -87,7 +87,9 @@ ints_as_floats_vect = torch.tensor([1, 2, 3], dtype=torch.float)
 ints_as_floats_vect       # => tensor([1., 2., 3.])
 ```
 
+<!---
 TODO: bools, the `a = torch.randn(4, 2) < 0` syntax.
+-->
 
 The target device (CPU, GPU) can be specified for each tensor separetely using
 the `device` attribute.
@@ -120,18 +122,16 @@ torch.randn(3, 3)
 #         [ 0.5684, -1.0845, -1.3986],
 #         [ 0.4033,  0.8380, -0.7193]])
 
-# Or a collection
+# You can also provide a list
 torch.manual_seed(0)
 torch.randn([3, 3])
 # tensor([[ 1.5410, -0.2934, -2.1788],
 #         [ 0.5684, -1.0845, -1.3986],
 #         [ 0.4033,  0.8380, -0.7193]])
-
-# Are you actually getting the same numbers?
 ```
 
 *Note*: The way you initialize the parameters is actually pretty important.
-Differet initialization strategies work best for different architectures, and
+Different initialization strategies work best for different architectures, and
 the best strategies have been often determined empirically (based on trial and
 error).  This is not particularly elegant, but hey, deep learning is a lot
 about finding the right balance between accuracy and speed, not necessarily
@@ -312,11 +312,12 @@ matrix_1_to_10.item()
 
 ## Backpropagation
 
-You will learn about backpropagation and how it works later during one of the
-theoretical sessions.  Maybe we will also implement it at some point ourselves
-(so that you can use the code to solve the theoretical exercises...).
+You will learn about backpropagation later during one of the theoretical
+sessions.  Maybe we will also implement it at some point ourselves.
 
+<!---
 TODO: requires\_grad
+-->
 
 For now, the important things to know are:
 * PyTorch model can be seen as a function from parameters (tensors with
@@ -326,17 +327,19 @@ directions in which the individual parameters should be modified in order to
 make the *target* value larger.
 
 Typically, you don't even have to care about backpropagation. All the tensor
-operations (dot product, matrix-vector multiplication, sum, etc.) that PyTorch
-provides are *backpropagable*, i.e., you can use them transparently in your code
-and PyTorch will be able to calculate the gradients of the model parameters.
-In fact, the way the API of the PyTorch library was designed is precisely to
-make sure that, however you decide to combine the individual functions it
-provides, you can still calculate the gradient.
+operations (addition, matrix-vector product, sum, etc.) that PyTorch provides
+are *backpropagable*, i.e., you can use them transparently in your code and
+PyTorch will be able to calculate the gradients of the model parameters.  In
+fact, the way the API of the PyTorch library was designed is precisely to make
+sure that, however you decide to combine the individual functions it provides,
+you can still calculate the gradient.
 
 At least, that's the idea, because in practice you can easily run into various
 problems we will probably experience ourselves later during the course.
 
+<!---
 TODO: corner cases.
+-->
 
 <!---
 *Note*: backpropagation is a specific case of automatic differentiation.
@@ -348,24 +351,54 @@ To give an example, let's say we want to
 
 Let's see a minimal example.
 ```python
+import torch
+
 # Alias to tensor type
 TT = torch.TensorType
 
-# Define a somewhat banal function which adds two (one element) tensors
-def add(x: TT, y: TT) -> TT:
-    return x + y
+# Target function we want to minimize
+def f(x: TT, y: TT) -> TT:
+    return (x - y + 1.0) ** 2.0
 
-# Create two example one element tensors
-x = torch.tensor(3., requires_grad=True)
-y = torch.tensor(-5., requires_grad=True)
-assert add(x, y) == torch.tensor(-2.)
+# Create two one element tensors and test our function
+x = torch.tensor(0., requires_grad=True)
+y = torch.tensor(0., requires_grad=True)
+assert f(x, y) == torch.tensor(1.)
 
 # Now let's find the gradient of `f` with respect to `x` and `y`.  To do that,
-# we first use the `backward` method of the target value.
-z = add(x, y)
+# we first use the `backward` method on the target value.
+z = f(x, y)
 z.backward()
 
-# Now we can access the gradient attributes of `x` and `y`
-x.grad    		  # => tensor(1.)
-y.grad    		  # => tensor(1.)
+# Then we access the gradient attributes of `x` and `y`
+x.grad    		  # => 2.0
+y.grad    		  # => -2.0
+
+# Now we can move in the direction opposite to the gradient, which should make
+# the value of the function `f` smaller.
+with torch.no_grad():
+    x -= x.grad * 0.1     # 0.1 is called the "learning rate"
+    y -= y.grad * 0.1
+f(x, y)                   # => tensor(0.3600, grad_fn=...)
+
+# Now you can repeat these steps in a loop, and you obtain gradient descent!
+for  i in range(0, 10):
+    # Zero-out the gradients
+    x.grad.zero_()
+    y.grad.zero_()
+    # Calculate the value of the function
+    z = f(x, y)
+    print("{iter_num}: {x}, {y} => {z}".format(
+        iter_num=i+1,
+        x=round(x.item(), 5),
+        y=round(y.item(), 5),
+        z=round(z.item(), 5))
+        )
+    # Backward computation
+    z.backward()
+    # Update the gradients
+    with torch.no_grad():
+        x -= x.grad * 0.1
+        y -= y.grad * 0.1
+
 ```
