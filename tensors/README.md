@@ -389,7 +389,7 @@ for  i in range(0, 10):
     # Calculate the value of the function
     z = f(x, y)
     print("{iter_num}: {x}, {y} => {z}".format(
-        iter_num=i+1,
+        iter_num=i,
         x=round(x.item(), 5),
         y=round(y.item(), 5),
         z=round(z.item(), 5))
