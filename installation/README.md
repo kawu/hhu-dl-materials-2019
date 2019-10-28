@@ -53,7 +53,7 @@ to verify that it works.
 
 To install IPython, just type:
 
-  pip3 install ipython
+    pip3 install ipython
 
 This will probably install `ipython` under `~/.local/bin/iptython` by default.
 You can add `~/.local/bin` to your path by adding the following to your `~/.profile`:
