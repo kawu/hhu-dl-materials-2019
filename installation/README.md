@@ -34,8 +34,8 @@ this.
 
 You can use the following commands to install PyTorch (without CUDA support):
 
-  sudo apt install python3-pip
-  pip3 install torch==1.3.0+cpu torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+    sudo apt install python3-pip
+    pip3 install torch==1.3.0+cpu torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
 
 <!---
 This command is proposed at https://pytorch.org/ if you choose `pip` and no
