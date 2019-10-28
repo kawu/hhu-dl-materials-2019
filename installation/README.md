@@ -73,7 +73,7 @@ IPython by simply typing `ipython` in the terminal.
 # VSCode
 
 You can follow the steps from this following post to install VSCode:
-https://linuxize.com/post/how-to-install-visual-studio-code-on-ubuntu-18-04/
+https://linuxize.com/post/how-to-install-visual-studio-code-on-ubuntu-18-04/.
 
 <!---
 wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
@@ -82,7 +82,7 @@ sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/v
 
 Once you are done, you can run VSCode with `code`.  A pop-up message will show
 up asking if you want to install the 'Python' extension, which you should
-definitely do.
+do.
 
 It is also recommended to install the `flake8` linter, which works well with
 PyTorch.
