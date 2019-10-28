@@ -46,7 +46,7 @@ Then, you can start a `python3` session and type:
 ```python
 >>> import torch
 ```
-To verify that it works.
+to verify that it works.
 
 
 # IPython
