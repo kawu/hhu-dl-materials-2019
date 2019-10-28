@@ -56,7 +56,8 @@ To install IPython, just type:
     pip3 install ipython
 
 This will probably install `ipython` under `~/.local/bin/iptython` by default.
-You can add `~/.local/bin` to your path by adding the following to your `~/.profile`:
+You can add `~/.local/bin` to your path by adding the following to your `~/.profile`
+(if it's not there yet):
 
 ```bash
 # set PATH so it includes user's private bin if it exists
