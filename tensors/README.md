@@ -15,7 +15,7 @@ values of a certain type (integer, float, bool).
 * 2-order tensor is a matrix of values (two dimensional array)
 and so on.
 
-For instance: 
+For instance:
 ```python
 # First import the torch module of the PyTorch framework
 import torch
@@ -41,6 +41,10 @@ but we will not need this functionality today.
 ```python
 ```
 -->
+
+**WARNING**: normally, you should not use `torch.tensor` to combine existing
+tensors, only to create new ones.  Otherwise,
+[backpropagation](#backpropagation) may not work.
 
 ### Shape
 
