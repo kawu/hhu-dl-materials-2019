@@ -209,6 +209,14 @@ print(m1 / m2)
 #         [0.0000, 0.5000]])
 ```
 
+Additionally, the arguments have to have the same `dtype`.  For instance, the
+following is not allowed:
+```python
+# This will raise an exception, because the first tensor keeps integers, the
+# second tensor keeps floats, and PyTorch won't let you add them together.
+torch.tensor([0, 1]) + torch.tensor([0.0, 1.0])
+```
+
 <!---
 ### Dot Product
 -->
