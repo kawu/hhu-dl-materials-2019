@@ -147,7 +147,7 @@ Note that the `grad_fn` attribute is set, which means that we can use the
 tensor `x` in subsequent calculations and still be able to calculate the
 gradient for the layer's parameters `layer.M` and `layer.b`.
 
-##### Module in PyTorch
+##### Modules in PyTorch
 
 The network modules in PyTorch are implemented in a similar manner in that they
 encapsulate the forward calculation with the corresponding parameters.  In
@@ -211,7 +211,7 @@ This mapping is one-to-one and the identifiers cover the range `{0, 1, 2}`:
 assert "English" == enc.decode(enc.encode("English"))
 assert "German" == enc.decode(enc.encode("German"))
 assert "French" == enc.decode(enc.encode("French"))
-assert et(range(3)) == set(enc.encode(cl) for cl in classes)
+assert set(range(3)) == set(enc.encode(cl) for cl in classes)
 ```
 
 The need for such a mapping is motivated as follows.  We want to map any given
