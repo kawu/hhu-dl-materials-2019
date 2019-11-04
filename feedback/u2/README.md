@@ -57,8 +57,8 @@ torch.sum(z).backward()
 It's still possible to create `z` in a backpropagable way, using a work-around
 with
 [view](https://pytorch.org/docs/stable/tensors.html?highlight=view#torch.Tensor.view)
-and concatenation
-[cat](https://pytorch.org/docs/stable/torch.html?highlight=cat#torch.cat):
+and [cat](https://pytorch.org/docs/stable/torch.html?highlight=cat#torch.cat)
+(concatenation):
 ```python
 x           # => tensor(2., requires_grad=True)
 x.view(1)   # => tensor([2.], grad_fn=<ViewBackward>)
