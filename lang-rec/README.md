@@ -211,13 +211,13 @@ This mapping is one-to-one and the identifiers cover the range `{0, 1, 2}`:
 assert "English" == enc.decode(enc.encode("English"))
 assert "German" == enc.decode(enc.encode("German"))
 assert "French" == enc.decode(enc.encode("French"))
-set(range(3)) == set(enc.encode(cl) for cl in classes)
+assert et(range(3)) == set(enc.encode(cl) for cl in classes)
 ```
 
 The need for such a mapping is motivated as follows.  We want to map any given
 name (sequence of characters) to a vector with `m` elements.  Each entry in the
 resulting vector is to represent the score for a particular language (the
-higher it is, the more likely the name is to belong to the corresonding
+higher the score, the more likely the name is to belong to the corresonding
 language).  We therefore need to relate the names (strings) with positions in
 the score vector, so that we know that, for instance, the score at the first
 position corresponds to English, the score at the second position corresponds
