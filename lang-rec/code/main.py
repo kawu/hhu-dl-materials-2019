@@ -12,10 +12,10 @@ from ffn import FFN
 
 
 def char_set_in(data_set: DataSet) -> set:
-    """Retrieve the set of chars in the dataest."""
+    """Retrieve the set of chars in the dataset."""
     name_list = [name for (name, lang) in data_set]
     char_matrix = [list(name) for name in name_list]
-    flatten = lambda l: [item for sublist in l for item in sublist]                                                             
+    flatten = lambda l: [item for sublist in l for item in sublist]
     char_set = set(flatten(char_matrix))
     return char_set
 
@@ -26,7 +26,8 @@ def char_set_in_alt(data_set: DataSet):
         char
         for (name, lang) in data_set
         for char in name
-        )
+    )
+
 
 class LangRec(Module):
 
@@ -54,12 +55,11 @@ class LangRec(Module):
         self.enc = Encoding(lang_set)
         # FFN
         self.register("ffn",
-            FFN(idim=emb_size, hdim=hid_size, odim=lang_num))
+                      FFN(idim=emb_size, hdim=hid_size, odim=lang_num))
 
     # TODO: Implement this method.
     def encode(self, lang: Lang) -> int:
         """Encode the given language as an integer."""
-
 
     # TODO: Implement this method.
     def forward(self, name: Name) -> TT:
@@ -191,16 +191,22 @@ def train(
                 print(t+1, loss.item())
 
 
-# Training and development dataset
-train_set = names.load_data("split/dev80.csv")
-dev_set = names.load_data("split/dev20.csv")
-print("Train size:", len(train_set))
-print("Dev size:", len(dev_set))
+# The main script of tha application, put in the `main` function
+# so you can `run main` from IPython before filling in all the TODOs.
+def main():
 
-# Language recognition model
-lang_rec = LangRec(
-    train_set,
-    # TODO: How to choose the embedding size?
-    emb_size=10,
-    hid_size=100
-)
+    # Training and development dataset
+    train_set = names.load_data("split/dev80.csv")
+    dev_set = names.load_data("split/dev20.csv")
+    print("Train size:", len(train_set))
+    print("Dev size:", len(dev_set))
+
+    # Language recognition model
+    lang_rec = LangRec(
+        train_set,
+        # TODO: How to choose the embedding size?
+        emb_size=10,
+        hid_size=100
+    )
+
+    # TODO: fill in the rest of the script here
