@@ -66,22 +66,16 @@ z = torch.cat([x.view(1), y.view(1)])
 torch.sum(z).backward()
 ```
 
-<!---
-To give an example, let's say you have two vectors `v` and `w` of the same size
-and you want to create a matrix where `v` is the first row and `w` is the
-second row:
+In case of many solutions to Ex. 2, the issue looked basically like this:
 ```python
-v = torch.tensor([0, 1, 2], requrires_grad=True)
-w = torch.tensor([2, 1, 0], requrires_grad=True)
-torch.tensor([v, w]) # =>
+def mv(M, v):
+    result = []
+    ...
+    # Calculate the subsequent values and add them to result
+    ...
+    return torch.tensor(result)
 ```
-However, it uses a regular float (`res`) to store the result and, therefore,
-does not allow for backpropagation.
-```python
-v = torch.randn(5, requires_grad=True)
-vsum(v)   # => 
-```
--->
+
 
 <!---
 ### Arguments why backpropagation does not work
