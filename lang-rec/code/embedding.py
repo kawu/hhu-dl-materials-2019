@@ -42,7 +42,7 @@ class Embedding(Module):
         try:
             return self.emb[sym]
         except KeyError:
-            return torch.zeros(self.emb_size)         
+            return torch.zeros(self.emb_size)
         # if sym not in self.emb:
         #     self.emb[sym] = torch.zeros(self.emb_size)
         # return self.emb[sym]

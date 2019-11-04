@@ -129,7 +129,8 @@ layer.b
 # => tensor([ 0.6011, -1.3698], requires\_grad=True)
 ```
 
-# We can retrieve the set of parameters using the `params()` method.
+You can retrieve the set of parameters using the `params()` method.
+```python
 layer.params()
 # =>
 #    [tensor([[-1.8877, -0.9792,  0.6295],
@@ -166,19 +167,65 @@ ffn = FFN(idim=3, odim=2, hdim=5)
 ```
 
 If you look at the implementation, you will see that four tensor are registered
-as FFN's parameters: `M1`, `b1`, `M2`, and `b2`.  For instance:
+as FFN's parameters: `M1`, `b1`, `M2`, and `b2`.  You can access them as
+attributes, for instance:
 ```python
 ffn.b1    # => tensor([-1.0956, -0.8147,  1.8708, -1.0773, -0.7101], requires_grad=True)
 ```
-
 You can also use `ffn.params()` to retrieve the list of all its tensor
-parameters.
+parameters (this is normally only required in the training procedure).
 
 ### embedding.py
 
+This Python module provides en embedding dictionary, which allows to map
+symbols in a given, pre-computed alphabet (e.g., the set of characters that
+occur in person names) to the corresponding vectors.
+
+For instance:
+```python
+# Let's say we want to embed three characters: 'a', 'b', and 'c'
+symset = set(['a', 'b', 'c'])
+
+# Each character is to be mapped to a 3-element vector
+emb = Embedding(symset, emb_size=3)
+
+# Let's see the vector assigned to 'a'
+emb.forward('a')  # => tensor([-0.6354, -0.2746, -0.6508])
+```
+
 ### encoding.py
 
+The objective of the `Encoding` class is to create a (one-to-one) mapping
+between the languages (English, German, etc.) and the corresponding, unique
+integer values in `{0, 1, ..., m-1}`, where `m` is the number of languages.
+
+For instance:
+```python
+classes = ["English", "German", "French"]
+enc = Encoding(classes)
+enc.encode("English")   # => 0
+```
+
+This mapping is one-to-one and the identifiers cover the range `{0, 1, 2}`:
+```python
+assert "English" == enc.decode(enc.encode("English"))
+assert "German" == enc.decode(enc.encode("German"))
+assert "French" == enc.decode(enc.encode("French"))
+set(range(3)) == set(enc.encode(cl) for cl in classes)
+```
+
+The need for such a mapping is motivated as follows.  We want to map any given
+name (sequence of characters) to a vector with `m` elements.  Each entry in the
+resulting vector is to represent the score for a particular language (the
+higher it is, the more likely the name is to belong to the corresonding
+language).  We therefore need to relate the names (strings) with positions in
+the score vector, so that we know that, for instance, the score at the first
+position corresponds to English, the score at the second position corresponds
+to German, and so on.
+
 ### main.py
+
+TODO
 
 
 
