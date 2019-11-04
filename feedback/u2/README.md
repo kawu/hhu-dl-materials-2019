@@ -54,10 +54,11 @@ explanations).
 torch.sum(z).backward() 
 # => RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn
 ```
-It's still possible to create `z` in a backpropagable way, using a
-work-around method with
+It's still possible to create `z` in a backpropagable way, using a work-around
+with
 [view](https://pytorch.org/docs/stable/tensors.html?highlight=view#torch.Tensor.view)
-and [cat](https://pytorch.org/docs/stable/torch.html?highlight=cat#torch.cat):
+and concatenation
+[cat](https://pytorch.org/docs/stable/torch.html?highlight=cat#torch.cat):
 ```python
 x           # => tensor(2., requires_grad=True)
 x.view(1)   # => tensor([2.], grad_fn=<ViewBackward>)
