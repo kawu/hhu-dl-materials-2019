@@ -281,7 +281,7 @@ calculates the loss for a single (name, language) pair.  As arguments, it takes
 the `output` vector with scores (one score per language), and the `target`
 language we would like our network to predict.  The `target` language is
 represented by the unique integer (the corresponding position in the score
-vector), obtained via (`Encoding`)[#encoding]).
+vector), obtained via [`Encoding`](#encoding).
 
 Formally, the loss for a single (name, language) pair is defined as the [cross
 entropy loss](https://en.wikipedia.org/wiki/Cross_entropy) between the predicted probability distribution and the
