@@ -293,6 +293,25 @@ its arguments are higher-order tensors (hence the use of `view`), which allows
 for batching.  Don't worry about the details for now, we will get back to
 batching, `view`, and cross-entropy loss later.
 
+The `total_loss` function calculates the loss over the entire (training)
+dataset, which is simply a sum of the `single_loss`es for the individual
+dataset elements.
+
+Once you implement the `forward` and the `encode` methods of the `LangRec`
+class, you should be able calculate the losses as follows (warning, didn't test
+it!):
+```python
+# Assuming that `train_set` contains the training dataset and `lang_rec` a
+# language recognition module.  
+
+# Calculate the loss for the first training dataset element.
+(name0, lang0) = train_set[0]
+single_loss(lang_rec.forward(name0), lang_rec.encode(lang0))    # => ...
+
+# Calculate the loss over the entire training set
+total_loss(train_set, name_rec)                                 # => ...
+```
+
 ##### Training
 
 Training is performed using gradient descent.  Iteratively:
