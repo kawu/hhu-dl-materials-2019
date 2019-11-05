@@ -60,6 +60,7 @@ class LangRec(Module):
     # TODO: Implement this method.
     def encode(self, lang: Lang) -> int:
         """Encode the given language as an integer."""
+        return self.enc.encode(lang)
 
     # TODO: Implement this method.
     def forward(self, name: Name) -> TT:
@@ -72,7 +73,11 @@ class LangRec(Module):
             score vector corresponding to the name, with its individual
             elements corresponding to the scores of different languages
         """
-        pass
+        embeddings = [self.emb.forward(char) for char in name]
+        cbow = sum(embeddings)
+        scores = self.ffn.forward(cbow)
+        return scores
+
 
     # TODO: Implement this method.
     def classify(self, name: Name) -> Dict[Lang, float]:
@@ -85,7 +90,20 @@ class LangRec(Module):
             the mapping from languages to their probabilities
             for the given name.
         """
-        pass
+        # We don't want Pytorch to calculate the gradients
+        with torch.no_grad():
+            # The vector of scores for the given name
+            scores = self.forward(name)
+            # TODO: at this point, we should map the vector of scores
+            # to the vector of probabilities.  How to do that?
+            probs = torch.softmax(scores)
+            # Result dictionary
+            res = {}
+            # `ix` should be an index in the scores vector
+            for ix in range(len(probs)):
+                lang = self.enc.decode(ix)
+                res[lang] = probs[ix]
+            return res
 
 
 def single_loss(output: TT, target: int) -> TT:
