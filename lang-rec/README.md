@@ -314,7 +314,8 @@ total_loss(train_set, name_rec)                                 # => ...
 
 ##### Training
 
-Training is performed using gradient descent.  Iteratively:
+Training (`train` function in `main.py`) is performed using gradient descent.
+Iteratively:
 * Calculate the loss over the entire dataset
 * Calculate the gradients w.r.t. the loss
 * Move in the opposite direction of the gradients
