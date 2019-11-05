@@ -94,9 +94,8 @@ class LangRec(Module):
         with torch.no_grad():
             # The vector of scores for the given name
             scores = self.forward(name)
-            # TODO: at this point, we should map the vector of scores
-            # to the vector of probabilities.  How to do that?
-            probs = torch.softmax(scores)
+            # We map the vector of scores to the vector of probabilities.
+            probs = torch.softmax(scores, dim=0)
             # Result dictionary
             res = {}
             # `ix` should be an index in the scores vector
