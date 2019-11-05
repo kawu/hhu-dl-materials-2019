@@ -253,7 +253,7 @@ The `main.py` module currently contains:
   the parameters of the network module `LangRec` which minimze the `total_loss`
   over the given training dataset.
 * Helper functions to print the predictions of the model (`print_predictions`)
-  and calculate the accuracy of the model on the given datset (`accuracy`)
+  and calculate the accuracy of the model on the given dataset (`accuracy`)
 * The `main` function, with the instructions of the script
 
 ##### LangRec
@@ -292,5 +292,16 @@ and the target index instead of the target distribution.  Additionally, the
 its arguments are higher-order tensors (hence the use of `view`), which allows
 for batching.  Don't worry about the details for now, we will get back to
 batching, `view`, and cross-entropy loss later.
+
+##### Training
+
+Training is performed using gradient descent.  Iteratively:
+* Calculate the loss over the entire dataset
+* Calculate the gradients w.r.t. the loss
+* Move in the opposite direction of the gradients
+The third step is faciliated by wrapping the network in the `Module` class,
+which makes it easy to retrieve the set of parameters using the `params()`
+method.
+
 
 [design]: https://user.phil.hhu.de/~waszczuk/teaching/hhu-dl-wi19/session3/u3_eng.pdf
