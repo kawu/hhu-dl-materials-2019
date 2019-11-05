@@ -299,6 +299,7 @@ Training is performed using gradient descent.  Iteratively:
 * Calculate the loss over the entire dataset
 * Calculate the gradients w.r.t. the loss
 * Move in the opposite direction of the gradients
+
 The third step is faciliated by wrapping the network in the `Module` class,
 which makes it easy to retrieve the set of parameters using the `params()`
 method.
