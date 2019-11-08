@@ -60,7 +60,7 @@ mini_batch_size = 50    # mini-batch size
 for t in range(iter_num):
     # Sample the mini_batch
     mini_batch = random.sample(mini_batch_size, data_set)
-    # Calculate the total loss
+    # Calculate the loss over the mini-batch
     loss = total_loss(mini_batch, model)
     # Calculate the gradients
     loss.backward()
@@ -100,7 +100,7 @@ for t in range(epoch_num):
     for k in range(0, len(data_set), mini_batch_step):
         # Create the mini-batch starting from position k
         mini_batch = data_set[k:k+mini_batch_size] + ...
-        # Calculate the total loss
+        # Calculate the loss over the mini-batch
         loss = total_loss(mini_batch, model)
         # Calculate the gradients
         loss.backward()
