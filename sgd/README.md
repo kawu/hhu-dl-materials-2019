@@ -108,6 +108,14 @@ for t in range(epoch_num):
         ...
 ```
 
+**Note**: The size of the mini-batch can have an impact on the size of the
+gradients.  Thus, you may need to adapt the learning rate depending on the
+mini-batch size.
+
+**Note**: SGD relies on the total loss being defined as the sum of the losses
+for the individual dataset elements.  If you break this assumption, SGD won't
+work properly.
+
 # Optimization methods
 
 TODO
