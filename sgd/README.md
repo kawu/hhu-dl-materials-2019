@@ -59,7 +59,7 @@ iter_num = 1000         # number of SGD iterations
 mini_batch_size = 50    # mini-batch size
 for t in range(iter_num):
     # Sample the mini_batch
-    mini_batch = random.sample(mini_batch_size, data_set)
+    mini_batch = random.sample(data_set, mini_batch_size)
     # Calculate the loss over the mini-batch
     loss = total_loss(mini_batch, model)
     # Calculate the gradients
