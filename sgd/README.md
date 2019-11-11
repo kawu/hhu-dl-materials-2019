@@ -127,7 +127,7 @@ algorithms](overview-visualization).
 
 In standard (S)GD, in each iteration of the optimization procedure, the
 gradient is computed with respect to the current (mini-)batch. The parameters
-are then updated in the opposite direction of the gradient (scalled by the
+are then updated in the opposite direction of the gradient (scaled by the
 `learning_rate`):
 ```python
 ...
@@ -153,13 +153,13 @@ two basic techniques (*momentum* and *adaptive learning rates*) below.
 A pretty good explanation of momentum can be found in the [corresponding
 section of the overview](overview-momentum).
 
-SGD with momentum is pretty good, but often not enough to successfuly train a
+SGD with momentum is pretty good, but often not enough to successfully train a
 neural network.  On the other hand, it is easy to understand and
 straightforward to implement.
 
 ### Adaptive learning rates
 
-Adaptive learning rates is a technique that involes setting the learning rates
+Adaptive learning rates is a technique that involves setting the learning rates
 (the hyper-parameter we already use in the standard GD) for the individual
 parameters of the neural network separately.
 
@@ -170,7 +170,7 @@ is *Adam*.  You can find more details in the [corresponding section of the
 overview](overview-adam).  As far as I know, Adam is the default choice as far
 as training neural networks is concerned.
 
-**Note**.  You may at some point encounter options such as ,,SGD with momentum
+**Note**.  You may at some point encounter opinions such as ,,SGD with momentum
 should be used for task A, Adam for task B'', etc.  Take such statements with a
 grain of salt.  As long as you are able to train the network on the training
 dataset, and you obtain good scores (e.g., accuracy) on train (which means that
