@@ -31,7 +31,7 @@ There are (at least) two techniques for improving GD.  The first one involves
 better utilization of the gradients.  In GD, each step is based solely on the
 current gradient, regardless of the history of the previously calculated
 gradients.  This is something that [optimization
-methods](#optimization-methods) such as Momentum, Adam, or [L-BFGS](l-bfgs)
+methods](#optimization-methods) such as Momentum, Adam, or [L-BFGS][l-bfgs]
 improve upon.  The second technique is to introduce some randomization in the
 training procedure, which leads to [stochastic gradient descent (SGD)](#SGD).
 
@@ -120,9 +120,9 @@ work properly.
 # Optimization methods
 
 **Note**.  A broad, rather informal overview of different gradient optimization
-algorithms used in deep learning can be found [here](overview-sgd).  You can in
+algorithms used in deep learning can be found [here][overview-sgd].  You can in
 particular have a look at the [visualization of the SGD
-algorithms](overview-visualization).
+algorithms][overview-visualization].
 <!--- In practice, the *Adam* algorithm is typically -->
 
 In standard (S)GD, in each iteration of the optimization procedure, the
@@ -141,7 +141,7 @@ The standard SGD is known to have trouble dealing with complex models that
 arise in deep learning, which lead to complex objective function (objective
 functions are the ones that we want to minimize).  In particular, standard SGD
 is poor in dealing with ravines (see [momentum](#momentum)), [saddle
-points](saddle), or plateaus (flat regions in the parameter search space).
+points][saddle], or plateaus (flat regions in the parameter search space).
 
 SGD completely ignores the previously calculated gradients, which is one of the
 reasons behind its poor performance.  This is also the issue that the
@@ -151,7 +151,7 @@ two basic techniques (*momentum* and *adaptive learning rates*) below.
 ### Momentum
 
 A pretty good explanation of momentum can be found in the [corresponding
-section of the overview](overview-momentum).
+section of the overview][overview-momentum].
 
 SGD with momentum is pretty good, but often not enough to successfully train a
 neural network.  On the other hand, it is easy to understand and
@@ -167,14 +167,14 @@ parameters of the neural network separately.
 
 An optimization algorithm that uses both momentum and adaptive learning rates
 is *Adam*.  You can find more details in the [corresponding section of the
-overview](overview-adam).  As far as I know, Adam is the default choice as far
-as training neural networks is concerned.
+overview][overview-adam].  As far as I know, Adam is typically the default
+choice as far as training neural networks is concerned.
 
 **Note**.  You may at some point encounter opinions such as ,,SGD with momentum
 should be used for task A, Adam for task B'', etc.  Take such statements with a
 grain of salt.  As long as you are able to train the network on the training
 dataset, and you obtain good scores (e.g., accuracy) on train (which means that
-the network does not [underfit](underfitting)), you shouldn't worry about the
+the network does not [underfit][underfitting]), you shouldn't worry about the
 particular optimization algorithm you use.  It is only when you are not able to
 fit your model to the training dataset that you can consider changing the
 optimization method.
