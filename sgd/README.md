@@ -174,10 +174,10 @@ as training neural networks is concerned.
 should be used for task A, Adam for task B'', etc.  Take such statements with a
 grain of salt.  As long as you are able to train the network on the training
 dataset, and you obtain good scores (e.g., accuracy) on train (which means that
-the network does not under-fit), you shouldn't worry about the particular
-optimization algorithm you use.  It is only when you are not able to fit your
-model to the training dataset that you can consider changing the optimization
-method.
+the network does not [underfit](underfitting)), you shouldn't worry about the
+particular optimization algorithm you use.  It is only when you are not able to
+fit your model to the training dataset that you can consider changing the
+optimization method.
 
 
 
@@ -193,3 +193,4 @@ Refactoring ideas:
 [overview-visualization]: https://ruder.io/optimizing-gradient-descent/index.html#visualizationofalgorithms "Visualization of SGD algorithms"
 [overview-momentum]: https://ruder.io/optimizing-gradient-descent/index.html#momentum "SGD with Momentum"
 [saddle]: https://en.wikipedia.org/wiki/Saddle_point "Saddle point"
+[underfitting]: https://en.wikipedia.org/wiki/Overfitting#Underfitting
