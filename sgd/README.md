@@ -180,12 +180,30 @@ fit your model to the training dataset that you can consider changing the
 optimization method.
 
 
+# Exercises
 
+* Implement standard SGD with mini-batches.  Make sure that you are still able
+  to train the model on *dev80.csv* and that the resulting loss is not worse
+  than with standard GD.  Then, see if you can train the model over the entire
+  *train.csv* dataset.
+* Replace the basic optimizer with Adam from PyTorch.
+<!---
+* Simple drop-out technique: just randomly dropping some of the features on
+  input.
+* Optional Currently, our model will assign different scores to *jones*,
+  *Jones*, and *JONES*.  Propose a modification of the model which will
+  guarantee that these three versions lead to the same score distribution.
+-->
+
+
+
+<!---
 # Refactoring
 
 Refactoring ideas:
 * Optimizer
 * Training method in a separate module
+-->
 
 
 [l-bfgs]: https://en.wikipedia.org/wiki/Limited-memory_BFGS "Limited-memory BFGS"
