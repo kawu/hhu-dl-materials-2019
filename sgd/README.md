@@ -15,7 +15,7 @@ for t in range(epoch_num):
         # Update each parameter of the model based on its gradient
         for param in lang_rec.params():
             # TODO: In fact, `param.grad` should not be None, especially
-            # not in batch gradient descent!  In SGD, not all parameters 
+            # in batch gradient descent!  In SGD, not all parameters 
             # have to be involved each time we calculate the gradients.
             # We could set them to 0 manually, though.
             if param.grad is not None:
@@ -118,7 +118,42 @@ work properly.
 
 # Optimization methods
 
+**Note**.  A broad and rather informal overview of different gradient
+optimization algorithms used in deep learning can be found [here](gd-overview).
+<!--- In practice, the *Adam* algorithm is typically -->
+
+In standard (S)GD, in each iteration of the optimization procedure, the
+gradient is computed with respect to the current (mini-)batch. The parameters
+are then updated in the opposite direction of the gradient (scalled by the
+`learning_rate`):
+```python
+...
+for param in lang_rec.params():
+    param -= learning_rate * param.grad
+    param.grad.zero_()
+...
+```
+
+The standard SGD is known to have trouble dealing with complex models that
+arise in deep learning, which lead to complex objective function (objective
+functions are the ones that we want to minimize).  In particular, SGD is poor
+in dealing with the so-called [saddle points](saddle) and plateaus (flat
+regions in the parameter search space).
+
+SGD completely ignores the previously calculated gradients, which is one of the
+reasons behind its poor performance.  This is also the issue that the different
+optimization algorithms popular in deep learning try to resolve.
+
+The two basic techniques are *momentum* and *adaptive learning rates*.
+
+##### Momentum
+
 TODO
+
+##### Adaptive learning rates
+
+TODO
+
 
 
 # Refactoring
@@ -129,3 +164,5 @@ Refactoring ideas:
 
 
 [l-bfgs]: https://en.wikipedia.org/wiki/Limited-memory_BFGS "Limited-memory BFGS"
+[gd-overview]: https://ruder.io/optimizing-gradient-descent/ "Overview of GD algorithms"
+[saddle]: https://en.wikipedia.org/wiki/Saddle_point "Saddle point"
