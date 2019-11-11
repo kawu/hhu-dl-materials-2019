@@ -148,7 +148,7 @@ reasons behind its poor performance.  This is also the issue that the
 optimization algorithms popular in deep learning try to resolve.  We consider
 two basic techniques (*momentum* and *adaptive learning rates*) below.
 
-##### Momentum
+### Momentum
 
 A pretty good explanation of momentum can be found in the [corresponding
 section of the overview](overview-momentum).
@@ -157,13 +157,13 @@ SGD with momentum is pretty good, but often not enough to successfuly train a
 neural network.  On the other hand, it is easy to understand and
 straightforward to implement.
 
-##### Adaptive learning rates
+### Adaptive learning rates
 
 Adaptive learning rates is a technique that involes setting the learning rates
 (the hyper-parameter we already use in the standard GD) for the individual
 parameters of the neural network separately.
 
-##### Adam
+### Adam
 
 An optimization algorithm that uses both momentum and adaptive learning rates
 is *Adam*.  You can find more details in the [corresponding section of the
