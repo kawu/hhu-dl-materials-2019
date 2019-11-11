@@ -80,6 +80,7 @@ The choice of the size of the mini-batch is thus a trade-off between:
   since convergence is faster)
 * The variance between the subsequently calculated gradients (the lower the
   better, because otherwise convergence gets unstable, i.e., ,,jumps'' a lot)
+
 Additionally, larger mini-batch size enables better parallelization (one can
 calculate the gradient over several training examples in parallel, for
 instance).
@@ -118,8 +119,10 @@ work properly.
 
 # Optimization methods
 
-**Note**.  A broad and rather informal overview of different gradient
-optimization algorithms used in deep learning can be found [here](gd-overview).
+**Note**.  A broad, rather informal overview of different gradient optimization
+algorithms used in deep learning can be found [here](overview-sgd).  You can in
+particular have a look at the [visualization of the SGD
+algorithms](overview-visualization).
 <!--- In practice, the *Adam* algorithm is typically -->
 
 In standard (S)GD, in each iteration of the optimization procedure, the
@@ -136,23 +139,45 @@ for param in lang_rec.params():
 
 The standard SGD is known to have trouble dealing with complex models that
 arise in deep learning, which lead to complex objective function (objective
-functions are the ones that we want to minimize).  In particular, SGD is poor
-in dealing with the so-called [saddle points](saddle) and plateaus (flat
-regions in the parameter search space).
+functions are the ones that we want to minimize).  In particular, standard SGD
+is poor in dealing with ravines (see [momentum](#momentum)), [saddle
+points](saddle), or plateaus (flat regions in the parameter search space).
 
 SGD completely ignores the previously calculated gradients, which is one of the
-reasons behind its poor performance.  This is also the issue that the different
-optimization algorithms popular in deep learning try to resolve.
-
-The two basic techniques are *momentum* and *adaptive learning rates*.
+reasons behind its poor performance.  This is also the issue that the
+optimization algorithms popular in deep learning try to resolve.  We consider
+two basic techniques (*momentum* and *adaptive learning rates*) below.
 
 ##### Momentum
 
-TODO
+A pretty good explanation of momentum can be found in the [corresponding
+section of the overview](overview-momentum).
+
+SGD with momentum is pretty good, but often not enough to successfuly train a
+neural network.  On the other hand, it is easy to understand and
+straightforward to implement.
 
 ##### Adaptive learning rates
 
-TODO
+Adaptive learning rates is a technique that involes setting the learning rates
+(the hyper-parameter we already use in the standard GD) for the individual
+parameters of the neural network separately.
+
+##### Adam
+
+An optimization algorithm that uses both momentum and adaptive learning rates
+is *Adam*.  You can find more details in the [corresponding section of the
+overview](overview-adam).  As far as I know, Adam is the default choice as far
+as training neural networks is concerned.
+
+**Note**.  You may at some point encounter options such as ,,SGD with momentum
+should be used for task A, Adam for task B'', etc.  Take such statements with a
+grain of salt.  As long as you are able to train the network on the training
+dataset, and you obtain good scores (e.g., accuracy) on train (which means that
+the network does not under-fit), you shouldn't worry about the particular
+optimization algorithm you use.  It is only when you are not able to fit your
+model to the training dataset that you can consider changing the optimization
+method.
 
 
 
@@ -164,5 +189,7 @@ Refactoring ideas:
 
 
 [l-bfgs]: https://en.wikipedia.org/wiki/Limited-memory_BFGS "Limited-memory BFGS"
-[gd-overview]: https://ruder.io/optimizing-gradient-descent/ "Overview of GD algorithms"
+[overview-sgd]: https://ruder.io/optimizing-gradient-descent/ "Overview of GD algorithms"
+[overview-visualization]: https://ruder.io/optimizing-gradient-descent/index.html#visualizationofalgorithms "Visualization of SGD algorithms"
+[overview-momentum]: https://ruder.io/optimizing-gradient-descent/index.html#momentum "SGD with Momentum"
 [saddle]: https://en.wikipedia.org/wiki/Saddle_point "Saddle point"
