@@ -217,7 +217,7 @@ to e.g. `a`.  Each time we calculate the loss over a mini-batch with `ü` , the
 embedding parameters corresponding to `ü` get updated.  Similarly, each time we
 calculate the loss over a mini-batch with `a` , the embedding parameters
 corresponding to `a` get updated.   However, the latter occur much more often
-than the former, which means that we will update the `a`-related parameters 
+than the former, which means that we will update the `a`-related parameters
 many times, and the `ü`-related parameters only a few times in one training
 epoch.  Therefore, we would like the learning rates for the `a`-related
 parameters to be smaller than the learning rates for the `ü`-related
@@ -227,7 +227,8 @@ parameters.
 
 An optimization algorithm that uses both momentum and adaptive learning rates
 is *Adam*.  You can find more details about Adam in the [corresponding section
-of the overview][overview-adam].  Adam seems to be the default choice as far as
+of the overview][overview-adam].  If you want to uderstand the math behind it,
+see [the paper][paper-adam].  Adam seems to be the default choice as far as
 training neural networks is concerned.
 
 **Note**.  You may encounter opinions such as ,,SGD with momentum should be
@@ -270,9 +271,16 @@ Refactoring ideas:
 -->
 
 
+# References
+
+[1] Diederik P. Kingma, Jimmy Ba.
+
+
 [l-bfgs]: https://en.wikipedia.org/wiki/Limited-memory_BFGS "Limited-memory BFGS"
 [overview-sgd]: https://ruder.io/optimizing-gradient-descent/ "Overview of GD algorithms"
 [overview-visualization]: https://ruder.io/optimizing-gradient-descent/index.html#visualizationofalgorithms "Visualization of SGD algorithms"
 [overview-momentum]: https://ruder.io/optimizing-gradient-descent/index.html#momentum "SGD with Momentum"
+[overview-adam]: https://ruder.io/optimizing-gradient-descent/index.html#adam "Adam"
+[paper-adam]: https://arxiv.org/abs/1412.6980 "Diederik P. Kingma, Jimmy Ba.  Adam: A Method for Stochastic Optimization."
 [saddle]: https://en.wikipedia.org/wiki/Saddle_point "Saddle point"
 [underfitting]: https://en.wikipedia.org/wiki/Overfitting#Underfitting
