@@ -271,9 +271,11 @@ Refactoring ideas:
 -->
 
 
+<!---
 # References
 
 [1] Diederik P. Kingma, Jimmy Ba.
+-->
 
 
 [l-bfgs]: https://en.wikipedia.org/wiki/Limited-memory_BFGS "Limited-memory BFGS"
