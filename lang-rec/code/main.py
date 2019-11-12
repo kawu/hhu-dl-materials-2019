@@ -1,6 +1,7 @@
 from typing import Dict
 
 import torch
+import random
 
 from core import TT, Name, Lang, DataSet
 import names
@@ -172,7 +173,8 @@ def train(
         lang_rec: LangRec,
         learning_rate=1e-3,
         report_rate=10,
-        epoch_num=50
+        epoch_num=50,
+        mini_batch_size=50
 ):
     """Train the model on the given dataset w.r.t. the total_loss function.
     The model is updated in-place.
@@ -183,6 +185,7 @@ def train(
         learning_rate: hyper-parameter of the gradient descent method
         report_rate: how often to report the loss on the training set
         epoch_num: the number of epochs the training procedure
+        mini_batch_size: size of the mini-batch
     """
     # Create our optimizer
     optim = Optimizer(lang_rec.params(),
@@ -190,22 +193,14 @@ def train(
 
     # Perform gradient-descent in a loop
     for t in range(epoch_num):
-
+        # Determine the mini-batch
+        mini_batch = random.sample(data_set, mini_batch_size)
         # Calculate the total loss
-        loss = total_loss(data_set, lang_rec)
+        loss = total_loss(mini_batch, lang_rec)
         # Calculate the gradients of all parameters
         loss.backward()
         # Optimizer step
         optim.step()
-
-        # with torch.no_grad():
-        #     # Update the gradient for each parameter of the model.  Since
-        #     # the model is an instance of the Module class, we can access
-        #     # all its parameters using the params method.
-        #     for param in lang_rec.params():
-        #         if param.grad is not None:
-        #             param -= learning_rate * param.grad
-        #             param.grad.zero_()
 
         # Reporting
         if (t+1) % report_rate == 0:
