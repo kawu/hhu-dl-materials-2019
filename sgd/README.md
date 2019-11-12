@@ -208,7 +208,7 @@ parameters and high learning rates for rarely activated parameters.
 For example, imagine that a particular character (e.g., `ü`) occurs a very
 small number of times in our language recognition training dataset, in contrast
 to e.g. `a`.  Each time we calculate the loss over a mini-batch with `ü` , the
-embedding parameters corresponding `ü` get updated.  Similarly, each time we
+embedding parameters corresponding to `ü` get updated.  Similarly, each time we
 calculate the loss over a mini-batch with `a` , the embedding parameters
 corresponding to `a` get updated.   However, the latter occur much more often
 than the former, which means that we will update the `a`-related parameters 
