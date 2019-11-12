@@ -64,6 +64,11 @@ with torch.no_grad():
             param.grad.zero_()
 ```
 
+**Note**: Mathematically speaking, there's only one gradient calculated in each
+step.  However, we often speak of gradients (plural), because the
+(mathematical) gradient is structured and separated into several (phisical)
+gradient vectors, one per parameter tensor.
+
 # SGD
 
 In standard gradient descent, also called *batch gradient descent*, we
@@ -141,11 +146,6 @@ code above?  If not, what can we do to improve this?
 **Note**: The size of the mini-batch may have an impact on the size of the
 gradients.  Thus, you may need to adapt the learning rate depending on the
 mini-batch size.
-
-**Note**: Mathematically speaking, there's only one gradient calculated in each
-step.  However, we often speak of gradients (plural), because the
-(mathematical) gradient is structured and separated into several (phisical)
-gradient vectors, one per parameter tensor.
 
 <!---
 **Note**: SGD relies on the total loss being defined as the sum of the losses
