@@ -10,12 +10,14 @@ from embedding import Embedding
 from encoding import Encoding
 from ffn import FFN
 
+from optimizer import Optimizer
+
 
 def char_set_in(data_set: DataSet) -> set:
     """Retrieve the set of chars in the dataset."""
     name_list = [name for (name, lang) in data_set]
     char_matrix = [list(name) for name in name_list]
-    flatten = lambda l: [item for sublist in l for item in sublist]
+    def flatten(l): return [item for sublist in l for item in sublist]
     char_set = set(flatten(char_matrix))
     return char_set
 
@@ -78,8 +80,8 @@ class LangRec(Module):
         scores = self.ffn.forward(cbow)
         return scores
 
-
     # TODO: Implement this method.
+
     def classify(self, name: Name) -> Dict[Lang, float]:
         """Classify the given person name.
 
@@ -182,6 +184,10 @@ def train(
         report_rate: how often to report the loss on the training set
         epoch_num: the number of epochs the training procedure
     """
+    # Create our optimizer
+    optim = Optimizer(lang_rec.params(),
+                      learning_rate=learning_rate)
+
     # Perform gradient-descent in a loop
     for t in range(epoch_num):
 
@@ -189,15 +195,17 @@ def train(
         loss = total_loss(data_set, lang_rec)
         # Calculate the gradients of all parameters
         loss.backward()
+        # Optimizer step
+        optim.step()
 
-        with torch.no_grad():
-            # Update the gradient for each parameter of the model.  Since
-            # the model is an instance of the Module class, we can access
-            # all its parameters using the params method.
-            for param in lang_rec.params():
-                if param.grad is not None:
-                    param -= learning_rate * param.grad
-                    param.grad.zero_()
+        # with torch.no_grad():
+        #     # Update the gradient for each parameter of the model.  Since
+        #     # the model is an instance of the Module class, we can access
+        #     # all its parameters using the params method.
+        #     for param in lang_rec.params():
+        #         if param.grad is not None:
+        #             param -= learning_rate * param.grad
+        #             param.grad.zero_()
 
         # Reporting
         if (t+1) % report_rate == 0:
@@ -208,22 +216,22 @@ def train(
                 print(t+1, loss.item())
 
 
-# The main script of tha application, put in the `main` function
-# so you can `run main` from IPython before filling in all the TODOs.
-def main():
+# # The main script of tha application, put in the `main` function
+# # so you can `run main` from IPython before filling in all the TODOs.
+# def main():
 
-    # Training and development dataset
-    train_set = names.load_data("split/dev80.csv")
-    dev_set = names.load_data("split/dev20.csv")
-    print("Train size:", len(train_set))
-    print("Dev size:", len(dev_set))
+# Training and development dataset
+train_set = names.load_data("split/dev80.csv")
+dev_set = names.load_data("split/dev20.csv")
+print("Train size:", len(train_set))
+print("Dev size:", len(dev_set))
 
-    # Language recognition model
-    lang_rec = LangRec(
-        train_set,
-        # TODO: How to choose the embedding size?
-        emb_size=10,
-        hid_size=100
-    )
+# Language recognition model
+lang_rec = LangRec(
+    train_set,
+    # TODO: How to choose the embedding size?
+    emb_size=10,
+    hid_size=100
+)
 
-    # TODO: fill in the rest of the script here
+# TODO: fill in the rest of the script here
