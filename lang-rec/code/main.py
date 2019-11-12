@@ -11,7 +11,8 @@ from embedding import Embedding
 from encoding import Encoding
 from ffn import FFN
 
-from optimizer import Optimizer
+# from optimizer import Optimizer
+from torch.optim import Adam
 
 
 def char_set_in(data_set: DataSet) -> set:
@@ -187,9 +188,11 @@ def train(
         epoch_num: the number of epochs the training procedure
         mini_batch_size: size of the mini-batch
     """
-    # Create our optimizer
-    optim = Optimizer(lang_rec.params(),
-                      learning_rate=learning_rate)
+    # # Create our optimizer
+    # optim = Optimizer(lang_rec.params(),
+    #                   learning_rate=learning_rate)
+    optim = Adam(lang_rec.params(),
+                 lr=learning_rate)
 
     # Perform gradient-descent in a loop
     for t in range(epoch_num):
@@ -201,6 +204,8 @@ def train(
         loss.backward()
         # Optimizer step
         optim.step()
+        # Zero-out the gradients
+        optim.zero_grad()
 
         # Reporting
         if (t+1) % report_rate == 0:
