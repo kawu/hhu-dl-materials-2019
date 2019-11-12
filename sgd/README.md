@@ -190,7 +190,7 @@ SGD with momentum is pretty good, but often not enough to successfully train a
 neural network.  On the other hand, it is easy to understand and
 straightforward to implement.
 
-**Exercise** (advanced). Implement SGD with momentum based on the [description
+**Exercise** (advanced): Implement SGD with momentum based on the [description
 in the overview](overview-momentum).  In particular, replace the `Optimizer`
 class with a version that keeps track of the momentums.  It should have the
 same interface as `Optimizer` (i.e., `__init__` should take the list of
@@ -233,7 +233,7 @@ particular optimization algorithm you use.  It is only when you are not able to
 fit your model to the training dataset that you can consider changing the
 optimization method.
 
-**Exercise**. Use the `Optimizer` from PyTorch, set it up to use `Adam`, and
+**Exercise**: Use the `Optimizer` from PyTorch, set it up to use `Adam`, and
 substitue it for the optimizer currently used in the code.  Verify that
 training still works, i.e., that you can obtain a similar (or lower) level of
 loss over the training set at the end of the training process.
