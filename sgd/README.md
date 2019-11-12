@@ -273,7 +273,7 @@ Refactoring ideas:
 
 # Local minima (postscript)
 
-The objective functions (we minimize) that arise in deep learning are complex
+The objective functions (we minimize) that arise in deep learning are complex.
 In particular, there can be many local minima, and we have no guarantee that
 SGD will find the global one.  In the past, this has been considered as a
 serious issue of neural networks, but currently the problem is not considered
