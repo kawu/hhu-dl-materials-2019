@@ -14,7 +14,7 @@ for t in range(epoch_num):
     with torch.no_grad():
         # Update each parameter of the model in the opposite direction
         # of its gradient
-        for param in lang_rec.params():
+        for param in model.params():
             if param.grad is not None:
                 param -= learning_rate * param.grad
                 param.grad.zero_()
