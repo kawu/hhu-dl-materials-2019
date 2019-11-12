@@ -216,8 +216,8 @@ def train(
 # def main():
 
 # Training and development dataset
-train_set = names.load_data("split/dev80.csv")
-dev_set = names.load_data("split/dev20.csv")
+train_set = names.load_data("split/train.csv")
+dev_set = names.load_data("split/dev.csv")
 print("Train size:", len(train_set))
 print("Dev size:", len(dev_set))
 
