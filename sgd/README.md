@@ -179,7 +179,7 @@ for param in model.params():
 The standard SGD is known to have trouble dealing with complex models that
 arise in deep learning, which lead to complex objective function (objective
 functions are the ones that we want to minimize).  In particular, standard SGD
-is poor in dealing with ravines (see [momentum](#momentum)), [saddle
+is poor in dealing with ravines (see [momentum][overview-momentum]), [saddle
 points][saddle], or plateaus (flat regions in the parameter search space).
 
 SGD completely ignores the previously calculated gradients, which is one of the
@@ -197,7 +197,7 @@ neural network.  On the other hand, it is easy to understand and
 straightforward to implement.
 
 **Exercise** (advanced): Implement SGD with momentum based on the [description
-in the overview](overview-momentum).  In particular, replace the `Optimizer`
+in the overview][overview-momentum].  In particular, replace the `Optimizer`
 class with a version that keeps track of the momentums.  It should have the
 same interface as `Optimizer` (i.e., `__init__` should take the list of
 parameter tensors and `step()` should take no arguments).
