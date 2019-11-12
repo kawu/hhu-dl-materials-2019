@@ -271,6 +271,16 @@ Refactoring ideas:
 -->
 
 
+# Local minima (postscript)
+
+The objective functions (we minimize) that arise in deep learning are complex
+In particular, there can be many local minima, and we have no guarantee that
+SGD will find the global one.  In the past, this has been considered as a
+serious issue of neural networks, but currently the problem is not considered
+as particularly serious anymore.  Have a look at [this
+discussion][local-minima] for more information on the topic.
+
+
 <!---
 # References
 
@@ -286,3 +296,4 @@ Refactoring ideas:
 [paper-adam]: https://arxiv.org/abs/1412.6980 "Diederik P. Kingma, Jimmy Ba.  Adam: A Method for Stochastic Optimization."
 [saddle]: https://en.wikipedia.org/wiki/Saddle_point "Saddle point"
 [underfitting]: https://en.wikipedia.org/wiki/Overfitting#Underfitting
+[local-minima]: https://datascience.stackexchange.com/questions/22853/local-minima-vs-saddle-points-in-deep-learning
