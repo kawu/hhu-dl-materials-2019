@@ -191,6 +191,8 @@ def train(
     # # Create our optimizer
     # optim = Optimizer(lang_rec.params(),
     #                   learning_rate=learning_rate)
+
+    # Use the Adam optimizer provided by PyTorch
     optim = Adam(lang_rec.params(),
                  lr=learning_rate)
 
@@ -220,7 +222,8 @@ def train(
 # # so you can `run main` from IPython before filling in all the TODOs.
 # def main():
 
-# Training and development dataset
+# Training and development dataset (you can find those on the webpage:
+# https://user.phil.hhu.de/~waszczuk/teaching/hhu-dl-wi19/names/split.zip
 train_set = names.load_data("split/train.csv")
 dev_set = names.load_data("split/dev.csv")
 print("Train size:", len(train_set))
@@ -234,4 +237,15 @@ lang_rec = LangRec(
     hid_size=100
 )
 
-# TODO: fill in the rest of the script here
+# Perform training (500 iterations)
+train(train_set, lang_rec, report_rate=100, epoch_num=500,
+      mini_batch_size=50, learning_rate=0.001)
+
+# See the loss on the development set.
+print("loss(dev):", total_loss(dev_set, lang_rec).item())
+
+# Train again (2500 iterations) and check the loss over dev again.
+# Normally it should get smaller.
+train(train_set, lang_rec, report_rate=100, epoch_num=1000,
+      mini_batch_size=50, learning_rate=0.001)
+print("loss(dev):", total_loss(dev_set, lang_rec).item())
