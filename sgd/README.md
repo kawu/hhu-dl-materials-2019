@@ -142,6 +142,11 @@ code above?  If not, what can we do to improve this?
 gradients.  Thus, you may need to adapt the learning rate depending on the
 mini-batch size.
 
+**Note**: Mathematically speaking, there's only one gradient calculated in each
+step.  However, we often speak of gradients (plural), because the
+(mathematical) gradient is structured and separated into several (phisical)
+gradient vectors, one per parameter tensor.
+
 <!---
 **Note**: SGD relies on the total loss being defined as the sum of the losses
 for the individual dataset elements.  If you break this assumption, SGD won't
