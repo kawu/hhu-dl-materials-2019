@@ -218,9 +218,10 @@ embedding parameters corresponding to `ü` get updated.  Similarly, each time we
 calculate the loss over a mini-batch with `a` , the embedding parameters
 corresponding to `a` get updated.   However, the latter occur much more often
 than the former, which means that we will update the `a`-related parameters 
-many times, and `ü`-related parameters only a few times, in one training epoch.
-Therefore, we would like the learning rates for the `a`-related parameters to
-be smaller than the learning rates for the `ü`-related parameters.
+many times, and the `ü`-related parameters only a few times, in one training
+epoch.  Therefore, we would like the learning rates for the `a`-related
+parameters to be smaller than the learning rates for the `ü`-related
+parameters.
 
 ### Adam
 
