@@ -48,16 +48,16 @@ or Adam.
 -->
 
 **Exercise**: Encapsulate the parameter updating aspect of GD in a new
-`Optimizer` class (as in PyTorch).  During initialization, the `Optimizer`
+`Optimizer` class (as in PyTorch).  For initialization, the `Optimizer`
 should take the list of parameters to update in each step of GD.  It should
-also provide one method, `step()` (with no arguments) which updates the
+also provide one method, `step()` (with no arguments), which updates the
 parameters w.r.t to their gradients:
 ```python
     # Update the parameters
     with torch.no_grad():
         # Update each parameter of the model in the opposite direction
         # of its gradient
-        for param in lang_rec.params():
+        for param in self.params:
             if param.grad is not None:
                 param -= learning_rate * param.grad
                 param.grad.zero_()
