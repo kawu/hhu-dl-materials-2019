@@ -83,6 +83,9 @@ def benchmark(with_gradient: bool = False):
     vector = torch.randn(25,dtype=torch.float, requires_grad=True)
     matrix = torch.randn(5000,25,dtype=torch.float, requires_grad=True)
 
+    # TODO: to do proper benchmarking we should probably repeat the
+    # experiment below a number of times
+
     start_time = timeit.default_timer()
     y = mv(matrix, vector)
     if with_gradient:
