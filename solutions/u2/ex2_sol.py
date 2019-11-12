@@ -4,6 +4,8 @@ import torch
 torch.manual_seed(0)
 
 
+# Note: this is just one of many possible solutions which enable
+# backpropagation.
 def mv(M, v):
     """Multiply the tensor matrix M by the tensor vector v.
 
@@ -13,8 +15,6 @@ def mv(M, v):
 
     Result: vector of shape [n]
     """
-    # The solution below is one of many possible
-
     # Some assertions concerning the shapes of the arguments
     assert M.dim() == 2
     assert v.dim() == 1
@@ -71,9 +71,8 @@ print(v.grad)
 # However, there's another reason for not using the custom `mv`.  In our custom
 # code, backpropagation procedure is determined automatically, while in
 # `torch.mv` it is implemented manually for the sake of efficiency and
-# numerical precision.
-#
-# We will get back to the latter topic in a couple of sessions.
+# numerical precision.  We will get back to the latter topic in a couple of
+# sessions.
 ##############################################################################
 
 
