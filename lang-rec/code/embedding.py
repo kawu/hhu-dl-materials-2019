@@ -35,7 +35,11 @@ class Embedding(Module):
         self.emb = dict()
         self.emb_size = emb_size
         for sym in alphabet:
-            self.emb[sym] = torch.randn(emb_size)
+            # NOTE: `requires_grad=True` was lacking in the previous version
+            # which made the embedding parameters silently ignored in
+            # backpropagation.  Consequently, these parameters where
+            # fixed throughout the entire training process.
+            self.emb[sym] = torch.randn(emb_size, requires_grad=True)
 
     def forward(self, sym) -> TT:
         """Embed the given symbol."""
@@ -43,9 +47,6 @@ class Embedding(Module):
             return self.emb[sym]
         except KeyError:
             return torch.zeros(self.emb_size)
-        # if sym not in self.emb:
-        #     self.emb[sym] = torch.zeros(self.emb_size)
-        # return self.emb[sym]
 
     # We implement the params method manually because we don't use
     # the Module register method to register the tensor parameters
