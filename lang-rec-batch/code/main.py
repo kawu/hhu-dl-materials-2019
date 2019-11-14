@@ -1,4 +1,4 @@
-from typing import Set, Dict, Iterator
+from typing import Set, Dict, Iterator, Sequence
 
 import torch
 import random
@@ -9,7 +9,7 @@ import names
 from module import Module
 from embedding import Embedding
 from encoding import Encoding
-from ffn import FFN
+from ffn import FFN1
 from utils import avg
 
 # from optimizer import Optimizer
@@ -31,6 +31,18 @@ def ngrams(x: str, n: int) -> Iterator[str]:
     """
     for i in range(len(x)-n+1):
         yield x[i:i+n]
+
+
+def from_rows(xs: Iterator[TT]) -> TT:
+    """Stack the given vector `xs` rows of a single tensor.
+
+    >>> x = torch.randn(10)
+    >>> X = from_rows([x, x, x])
+    >>> print(X.size())
+    torch.Size([3, 10])
+    """
+    xs = tuple(x.view(1, -1) for x in xs)
+    return torch.cat(xs, dim=0)
 
 
 class LangRec(Module):
@@ -60,13 +72,12 @@ class LangRec(Module):
         self.enc = Encoding(lang_set)
         # Scoring FFN sub-module
         self.register("ffn",
-                      FFN(idim=emb_size,
-                          hdim=hid_size,
-                          odim=len(lang_set))
+                      FFN1(idim=emb_size,
+                           hdim=hid_size,
+                           odim=len(lang_set))
                       )
         # Additional check to verify that all the registered
-        # parameters actually require gradients.  This allows
-        # to identify the "bug" in the embedding module.
+        # parameters actually require gradients.
         assert all([param.requires_grad is True for param in self.params()])
 
     def preprocess(self, name: Name) -> Name:
@@ -94,18 +105,22 @@ class LangRec(Module):
         """Encode the given language as an integer."""
         return self.enc.encode(lang)
 
-    def forward(self, name: Name) -> TT:
+    def forward(self, names: Iterator[Name]) -> TT:
         """The forward calculation of the name's language recognition model.
 
         Args:
-            name: a person name
+            names: a sequence person name
 
         Returns:
-            score vector corresponding to the name, with its individual
+            TODO: update description
+            score matrix corresponding to the name, with its individual
             elements corresponding to the scores of different languages
         """
-        embeddings = [self.emb.forward(feat) for feat in self.features(name)]
-        cbow = sum(embeddings)
+        embeddings = [
+            [self.emb.forward(feat) for feat in self.features(name)]
+            for name in names
+        ]
+        cbow = from_rows(map(sum, embeddings))
         scores = self.ffn.forward(cbow)
         return scores
 
@@ -122,7 +137,7 @@ class LangRec(Module):
         # We don't want Pytorch to calculate the gradients
         with torch.no_grad():
             # The vector of scores for the given name
-            scores = self.forward(name)
+            scores = self.forward([name])[0]
             # We map the vector of scores to the vector of probabilities.
             probs = torch.softmax(scores, dim=0)
             # Result dictionary
@@ -152,7 +167,7 @@ def single_loss(output: TT, target: int) -> TT:
     """
     # Additional checks
     assert len(output.shape) == 1          # output is a vector
-    assert 0 <= target <= output.shape[0]  # target is not out of range
+    assert 0 <= target < output.shape[0]  # target is not out of range
     # Return the cross entropy between the output score vector and
     # the target ID.
     return torch.nn.CrossEntropyLoss()(
@@ -164,19 +179,52 @@ def single_loss(output: TT, target: int) -> TT:
     # reasons (the backpropagation algo wouldn't work).
 
 
+def batch_loss(outputs: TT, targets: Sequence[int]) -> TT:
+    """Calculate the loss between the predicted scores and
+    the target class index.
+
+    Args:
+        outputs: matrix of scores predicated by the model
+        target: the index of the target class
+    """
+    # Additional checks
+    assert len(outputs.shape) == 2
+    assert all(
+        0 <= target < outputs.shape[1]
+        for target in targets
+    )
+    # Return the cross entropy between the output score matrix and
+    # the target IDs.
+    return torch.nn.CrossEntropyLoss()(
+        outputs, torch.tensor(targets)
+    )
+
+
 def total_loss(data_set: DataSet, lang_rec: LangRec):
     """Calculate the total loss of the model on the given dataset."""
     # The variable to keep the loss
-    loss = torch.tensor(0.0)
-    for (name, lang) in data_set:
-        # First calculate the ID of the target language
-        # lang_id = one_hot_inv(lang_rec.enc.encode(lang))
-        lang_id = lang_rec.encode(lang)
-        # Predict the scores
-        scores = lang_rec.forward(name)
-        # Update the loss
-        loss += single_loss(scores, lang_id)
-    return loss
+    target_lang_ids = [
+        lang_rec.encode(lang)
+        for (_, lang) in data_set
+    ]
+    names = (name for (name, _) in data_set)
+    predicted_scores = lang_rec.forward(names)
+    return batch_loss(predicted_scores, target_lang_ids)
+
+
+# def total_loss(data_set: DataSet, lang_rec: LangRec):
+#     """Calculate the total loss of the model on the given dataset."""
+#     # The variable to keep the loss
+#     loss = torch.tensor(0.0)
+#     for (name, lang) in data_set:
+#         # First calculate the ID of the target language
+#         # lang_id = one_hot_inv(lang_rec.enc.encode(lang))
+#         lang_id = lang_rec.encode(lang)
+#         # Predict the scores
+#         scores = lang_rec.forward(name)
+#         # Update the loss
+#         loss += single_loss(scores, lang_id)
+#     return loss
 
 
 def print_predictions(lang_rec: LangRec, data_set: DataSet, show_max=5):
@@ -283,7 +331,7 @@ def main():
     print("Dev size:", len(dev_set))
 
     # Size of n-grams
-    ng_size = 1
+    ng_size = 2
     # Numer of epochs (one training)
     epoch_num = 10
     # Reporting rate (freq?)
@@ -291,7 +339,7 @@ def main():
     # Initial learning rate
     init_lr = 0.01
     # Mini-batch size
-    mb_size = 50
+    mb_size = 256
 
     # Number of trials per each hyper-param combination to get (more)
     # reliable results
