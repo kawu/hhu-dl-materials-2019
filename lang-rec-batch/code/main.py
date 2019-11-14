@@ -9,7 +9,8 @@ import names
 from module import Module
 from embedding import Embedding
 from encoding import Encoding
-from ffn import FFN1
+from ffn import FFN
+import utils
 from utils import avg
 
 # from optimizer import Optimizer
@@ -31,18 +32,6 @@ def ngrams(x: str, n: int) -> Iterator[str]:
     """
     for i in range(len(x)-n+1):
         yield x[i:i+n]
-
-
-def from_rows(xs: Iterator[TT]) -> TT:
-    """Stack the given vector `xs` rows of a single tensor.
-
-    >>> x = torch.randn(10)
-    >>> X = from_rows([x, x, x])
-    >>> print(X.size())
-    torch.Size([3, 10])
-    """
-    xs = tuple(x.view(1, -1) for x in xs)
-    return torch.cat(xs, dim=0)
 
 
 class LangRec(Module):
@@ -72,9 +61,9 @@ class LangRec(Module):
         self.enc = Encoding(lang_set)
         # Scoring FFN sub-module
         self.register("ffn",
-                      FFN1(idim=emb_size,
-                           hdim=hid_size,
-                           odim=len(lang_set))
+                      FFN(idim=emb_size,
+                          hdim=hid_size,
+                          odim=len(lang_set))
                       )
         # Additional check to verify that all the registered
         # parameters actually require gradients.
@@ -109,18 +98,20 @@ class LangRec(Module):
         """The forward calculation of the name's language recognition model.
 
         Args:
-            names: a sequence person name
+            names: a sequence of person names; calculating the scores for
+                several names at the same time is faster thanks to better
+                parallelization
 
         Returns:
-            TODO: update description
-            score matrix corresponding to the name, with its individual
-            elements corresponding to the scores of different languages
+            score matrix in which each row corresponds to a single name, with
+            its individual elements corresponding to the scores of different
+            languages
         """
         embeddings = [
             [self.emb.forward(feat) for feat in self.features(name)]
             for name in names
         ]
-        cbow = from_rows(map(sum, embeddings))
+        cbow = utils.from_rows(map(sum, embeddings))
         scores = self.ffn.forward(cbow)
         return scores
 
@@ -167,7 +158,7 @@ def single_loss(output: TT, target: int) -> TT:
     """
     # Additional checks
     assert len(output.shape) == 1          # output is a vector
-    assert 0 <= target < output.shape[0]  # target is not out of range
+    assert 0 <= target < output.shape[0]   # target is not out of range
     # Return the cross entropy between the output score vector and
     # the target ID.
     return torch.nn.CrossEntropyLoss()(
@@ -202,29 +193,17 @@ def batch_loss(outputs: TT, targets: Sequence[int]) -> TT:
 
 def total_loss(data_set: DataSet, lang_rec: LangRec):
     """Calculate the total loss of the model on the given dataset."""
-    # The variable to keep the loss
+    # Calculate the target language identifiers over the entire dataset
     target_lang_ids = [
         lang_rec.encode(lang)
         for (_, lang) in data_set
     ]
+    # Determine the names to run our network on
     names = (name for (name, _) in data_set)
+    # Predict the scores for all the names in parallel
     predicted_scores = lang_rec.forward(names)
+    # Calculate the loss
     return batch_loss(predicted_scores, target_lang_ids)
-
-
-# def total_loss(data_set: DataSet, lang_rec: LangRec):
-#     """Calculate the total loss of the model on the given dataset."""
-#     # The variable to keep the loss
-#     loss = torch.tensor(0.0)
-#     for (name, lang) in data_set:
-#         # First calculate the ID of the target language
-#         # lang_id = one_hot_inv(lang_rec.enc.encode(lang))
-#         lang_id = lang_rec.encode(lang)
-#         # Predict the scores
-#         scores = lang_rec.forward(name)
-#         # Update the loss
-#         loss += single_loss(scores, lang_id)
-#     return loss
 
 
 def print_predictions(lang_rec: LangRec, data_set: DataSet, show_max=5):
