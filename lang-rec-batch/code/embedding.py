@@ -1,13 +1,11 @@
+from typing import Iterator
+
 import torch
+import torch.nn as nn
 
 from core import TT
 from module import Module
-
-
-# TODO: There's a bug in this module (the Embedding class does not work
-# exactly as specified in the description of the exercise).  In this case,
-# this won't probably prevent you from getting good results, but can be an
-# issue in other applications.
+from encoding import Encoding
 
 
 class Embedding(Module):
@@ -54,3 +52,58 @@ class Embedding(Module):
     def params(self):
         """The list of parameters of the embedding dictionary."""
         return list(self.emb.values())
+
+
+class EmbeddingSum(Module):
+
+    """A lookup table that stores embeddings of a fixed dictionary and size,
+    combined with summing (CBOW).
+
+    EmbeddingSum is an optimized variant of the Embedding class combined
+    with summing (CBOW).  It is intended to be used over bags of features
+    rather than single features.  It is based on torch.nn.Embedding
+    (look it up in PyTorch docs).
+
+    >>> import torch
+    >>> symset = set(['a', 'b', 'c'])
+    >>> emb = EmbeddingSum(symset, emb_size=10)
+    >>> emb.forward(['a', 'b']) #doctest: +ELLIPSIS
+    tensor(...)
+    >>> emb.forward(['a', 'b']).shape
+    torch.Size([10])
+    """
+
+    def __init__(self, alphabet: set, emb_size: int):
+        """Create a random embedding dictionary.
+
+        Arguments:
+        * alphabet: set of symbols to embed (characters, words, POS tags, ...)
+        * emb_size: embedding size (each symbol is mapped to a vector
+            of size emb_size)
+        """
+        self.emb_size = emb_size
+        self.enc = Encoding(alphabet)
+        self.emb = nn.EmbeddingBag(self.enc.class_num, emb_size, mode='sum')
+
+    def forward(self, syms: Iterator) -> TT:
+        """Embed the given bag (sequence) of symbols and compute the sum.
+
+        Returns:
+            Single vector, which is the sum of the embeddings of the given
+            symbols.
+        """
+        ixs = []
+        for sym in syms:
+            try:
+                ixs.append(self.enc.encode(sym))
+            except KeyError:
+                pass
+        if len(ixs) > 0:
+            ix_tensor = torch.LongTensor(ixs).view(1, -1)
+            return self.emb(ix_tensor)[0]
+        else:
+            return torch.zeros(self.emb_size)
+
+    def params(self):
+        """The list of parameters of the embedding dictionary."""
+        return [self.emb.weight]
