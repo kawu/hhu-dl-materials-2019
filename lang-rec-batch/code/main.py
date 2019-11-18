@@ -7,7 +7,7 @@ import math
 from core import TT, Name, Lang, DataSet
 import names
 from module import Module
-from embedding import Embedding
+from embedding import EmbeddingSum
 from encoding import Encoding
 from ffn import FFN
 import utils
@@ -55,7 +55,7 @@ class LangRec(Module):
         self.ngram_size = ngram_size
         # Calculate the embedding alphabet and create the embedding sub-module
         feat_set = self.alphabet(data_set)
-        self.register("emb", Embedding(feat_set, emb_size))
+        self.register("emb", EmbeddingSum(feat_set, emb_size))
         # Encoding (mapping between langs and ints)
         lang_set = set(lang for (_, lang) in data_set)
         self.enc = Encoding(lang_set)
@@ -108,10 +108,12 @@ class LangRec(Module):
             languages
         """
         embeddings = [
-            [self.emb.forward(feat) for feat in self.features(name)]
+            # [self.emb.forward(feat) for feat in self.features(name)]
+            self.emb.forward(self.features(name))
             for name in names
         ]
-        cbow = utils.from_rows(map(sum, embeddings))
+        # cbow = utils.from_rows(map(sum, embeddings))
+        cbow = utils.from_rows(embeddings)
         scores = self.ffn.forward(cbow)
         return scores
 

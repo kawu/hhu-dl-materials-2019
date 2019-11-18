@@ -11,6 +11,16 @@ def avg(xs):
     return sum(xs) / len(xs)
 
 
+def round_tt(x: TT, n_digits: int) -> TT:
+    """Round the given tensor to `n_digits` decimal places.
+
+    >>> x = torch.tensor([1.11111111])
+    >>> all(round(x, 5) == torch.tensor([1.11111]))
+    True
+    """
+    return torch.round(x * 10**n_digits) / (10**n_digits)
+
+
 def from_rows(xs: Iterator[TT]) -> TT:
     """Stack the given vectors `xs` as rows in a single tensor.
 
