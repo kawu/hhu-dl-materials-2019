@@ -48,13 +48,45 @@ Some problems:
 
 ### Grid search output
 
-Here's the output of the reference solution:
+Here's my output of the reference (bigram-based) solution (with
+`mini_batch_size` set to `256`), slightly reformatted:
+```
+Train size: 16059
+Dev size: 2008
 
-TODO
+# emb_size=10, hid_size=10
+# AVG: loss(train)=0.809, acc(train)=0.774, loss(dev)=0.955, acc(dev)=0.742
 
+# emb_size=10, hid_size=50
+# AVG: loss(train)=0.772, acc(train)=0.782, loss(dev)=1.053, acc(dev)=0.726
+
+# emb_size=10, hid_size=100
+# AVG: loss(train)=0.84, acc(train)=0.767, loss(dev)=1.249, acc(dev)=0.689
+
+# emb_size=50, hid_size=10
+# AVG: loss(train)=0.778, acc(train)=0.782, loss(dev)=0.993, acc(dev)=0.733
+
+# emb_size=50, hid_size=50
+# AVG: loss(train)=0.487, acc(train)=0.863, loss(dev)=1.084, acc(dev)=0.726
+
+# emb_size=50, hid_size=100
+# AVG: loss(train)=0.368, acc(train)=0.899, loss(dev)=1.342, acc(dev)=0.7
+
+# emb_size=100, hid_size=10
+# AVG: loss(train)=0.799, acc(train)=0.778, loss(dev)=1.003, acc(dev)=0.735
+
+# emb_size=100, hid_size=50
+# AVG: loss(train)=0.444, acc(train)=0.874, loss(dev)=1.062, acc(dev)=0.735
+
+# emb_size=100, hid_size=100
+# AVG: loss(train)=0.293, acc(train)=0.919, loss(dev)=1.374, acc(dev)=0.71
+```
+
+<!---
 TODO: Can we observe that it's not possible to perform greed search to find the
 optimal configuration?
 TODO: mention overfitting
+-->
 
 
 # Bigram-based model
