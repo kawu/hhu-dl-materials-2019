@@ -9,7 +9,7 @@ https://user.phil.hhu.de/~waszczuk/teaching/hhu-dl-wi19/session4/u4_eng.pdf
 * embedding size
 * size of the hidden layer
 
-**Goal**: select the values so as to minimize the loss/maximize the accuracy on
+**Method**: select the values so as to minimize the loss/maximize the accuracy on
 the dev set.
 
 Ideas that came up:
