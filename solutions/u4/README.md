@@ -1,0 +1,86 @@
+# Homework
+
+https://user.phil.hhu.de/~waszczuk/teaching/hhu-dl-wi19/session4/u4_eng.pdf
+
+TODO: update link
+TODO: add ToC
+
+
+# Hyper-parameter search 
+
+**Task**: determine adequate values of the architecture hyper-parameters:
+* embedding size
+* size of the hidden layer
+
+**Goal**: select the values so as to minimize the loss/maximize the accuracy on
+the dev set.
+
+Ideas that came up:
+* Manually check several different configurations
+  * Sometimes we don't have the necessary resources (time, computation
+    power) to do a more systematic search
+  * The choice of the configurations can be tricky -- the results often don't
+    follow our intuition
+* Greedy search: iteratively change the values of single hyper-parameters as
+  long as loss/accuracy on the dev set improves
+  * Computationally cheap, but doesn't guarantee to find the optimal parameters
+* Grid search: if the hyper-parameter search space is small
+* Random search: sampling random configurations (from a pre-defined domain)
+* Bayesian optimization
+
+Reference solution:
+* Domains (coarse-grained): [10, 50, 100] for both hyper-parameters
+<!---
+    * Reasonable max for the embedding size: the number of distinct features
+      (n-grams)
+    * Empirical wisdom (didn't use): input size >= size of the hidden layer >=
+      output size (number of classes)
+-->
+* Grid search, since the hyper-parameter space is small
+* Several runs for each configuration, to get more reliable results
+
+Warnings:
+* We can over-fit to the dev set
+  * Alternative: cross-validation, but it's even more costly
+* You should *not* try fixing the random seeds.  On the contrary, to get
+  reliable results, it's best to perform several training runs for each
+  configuration.  Some configurations can lead to a higher variance of the
+  results.
+* Different configurations can require different SGD parameters (i.e., the
+  number of epochs).  Be sure to check that the models do not under-fit because
+  of that before drawing conclusions from the results.
+
+<!---
+Some problems:
+* 
+-->
+
+### Grid search output
+
+Here's the output of the reference solution:
+
+TODO
+
+TODO: Can one observe that it's not possible to 
+
+
+# Bigram-based model
+
+Have a look at the implementation of the LangRec class.  TODO: link
+
+### Bug
+
+The ,,bug'' in the Embedding class was that the Embedding vectors had no
+`requires_grad=True` specified.  As a result, they were silently ignored in
+backpropagation.  Consequently, these parameters where fixed throughout the
+entire training process.
+
+TODO: add link to were the problem was.
+
+Testing (assertions, unit tests, etc.) is your main (only?) friend in the
+hopeless fight against such issues, which can be really nasty and truly hard to
+spot.
+
+In particular, this issue can be identified using an additional assertion in
+the LangRec class.
+TODO: add link.
