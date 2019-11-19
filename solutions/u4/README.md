@@ -86,9 +86,44 @@ Dev size: 2008
 Took around 25 minuts with the batching-enabled model.
 -->
 
+And here are the results without getting the [bug](#bug) resolved (also with
+`mini_batch_size` set to `256`):
+```
+Train size: 16059
+Dev size: 2008
+
+# emb_size=10, hid_size=10
+# AVG: loss(train)=25609.8, acc(train)=0.523, loss(dev)=3203.211, acc(dev)=0.525
+
+# emb_size=10, hid_size=50
+# AVG: loss(train)=23537.178, acc(train)=0.566, loss(dev)=3043.654, acc(dev)=0.557
+
+# emb_size=10, hid_size=100
+# AVG: loss(train)=22942.052, acc(train)=0.589, loss(dev)=3069.881, acc(dev)=0.569
+
+# emb_size=50, hid_size=10
+# AVG: loss(train)=21590.642, acc(train)=0.612, loss(dev)=2724.381, acc(dev)=0.61
+
+# emb_size=50, hid_size=50
+# AVG: loss(train)=17110.131, acc(train)=0.686, loss(dev)=2402.759, acc(dev)=0.658
+
+# emb_size=50, hid_size=100
+# AVG: loss(train)=15741.201, acc(train)=0.713, loss(dev)=2539.168, acc(dev)=0.665
+
+# emb_size=100, hid_size=10
+# AVG: loss(train)=21103.902, acc(train)=0.62, loss(dev)=2681.766, acc(dev)=0.616
+
+# emb_size=100, hid_size=50
+# AVG: loss(train)=16263.19, acc(train)=0.702, loss(dev)=2332.248, acc(dev)=0.668
+
+# emb_size=100, hid_size=100
+# AVG: loss(train)=14729.386, acc(train)=0.726, loss(dev)=2470.791, acc(dev)=0.666
+```
+
 <!---
-TODO: Note the running time with the non-batching version.
-TODO: Results are quite different without resolving the bug!
+The bug-based version:
+CPU times: user 38min 2s, sys: 24.9 s, total: 38min 27s
+Wall time: 38min 28s
 -->
 
 <!---
