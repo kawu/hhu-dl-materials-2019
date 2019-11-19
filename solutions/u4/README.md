@@ -83,6 +83,15 @@ Dev size: 2008
 ```
 
 <!---
+Took around 25 minuts with the batching-enabled model.
+-->
+
+<!---
+TODO: Note the running time with the non-batching version.
+TODO: Results are quite different without resolving the bug!
+-->
+
+<!---
 TODO: Can we observe that it's not possible to perform greed search to find the
 optimal configuration?
 TODO: mention overfitting
