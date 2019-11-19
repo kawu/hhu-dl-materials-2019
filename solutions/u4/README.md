@@ -25,14 +25,8 @@ Ideas that came up:
 * Random search: sampling random configurations (from a pre-defined domain)
 * Bayesian optimization
 
-Reference solution:
+[Reference solution](main.py#L300-L350):
 * Domains (coarse-grained): [10, 50, 100] for both hyper-parameters
-<!---
-    * Reasonable max for the embedding size: the number of distinct features
-      (n-grams)
-    * Empirical wisdom (didn't use): input size >= size of the hidden layer >=
-      output size (number of classes)
--->
 * Grid search, since the hyper-parameter space is small
 * Several runs for each configuration, to get more reliable results
 
