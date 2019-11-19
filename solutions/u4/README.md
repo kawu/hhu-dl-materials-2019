@@ -2,9 +2,6 @@
 
 https://user.phil.hhu.de/~waszczuk/teaching/hhu-dl-wi19/session4/u4_eng.pdf
 
-TODO: update link
-TODO: add ToC
-
 
 # Hyper-parameter search 
 
@@ -61,7 +58,9 @@ Here's the output of the reference solution:
 
 TODO
 
-TODO: Can one observe that it's not possible to 
+TODO: Can we observe that it's not possible to perform greed search to find the
+optimal configuration?
+TODO: mention overfitting
 
 
 # Bigram-based model
