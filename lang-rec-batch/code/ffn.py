@@ -124,13 +124,29 @@ class Linear(Module):
         """
         # Explicitely check that the dimensions match
         assert X.shape[1] == self.isize()
-        # Calculate the output for each input row separately
-        ys = []
-        for x in X:
-            y = torch.mv(self.M, x) + self.b
-            ys.append(y)
-        # Stack the outputs together
-        return utils.stack(ys)
+
+        # Solution 3: using transposition of the parameter matrix + placing the
+        # input matrix on the left.  That's almost as good as we can do, but
+        # it's still possible to avoid the transposition.  Also, remember that
+        # you still need to account for the bias vector.
+        return torch.mm(X, self.M.t())
+
+        # Solution 2: using transposition of the input matrix
+        # # Transpose the input matrix
+        # X = X.t()
+        # # Perform the linear transformation
+        # Y = torch.mm(self.M, X)
+        # # Return the output matrix, after transposition
+        # return Y.t()
+
+        # Solution 1: sequential (not what we want)
+        # # Calculate the output for each input row separately
+        # ys = []
+        # for x in X:
+        #     y = torch.mv(self.M, x) + self.b
+        #     ys.append(y)
+        # # Stack the outputs together
+        # return utils.stack(ys)
 
     def isize(self):
         """Input size"""

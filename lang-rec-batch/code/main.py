@@ -107,6 +107,12 @@ class LangRec(Module):
             its individual elements corresponding to the scores of different
             languages
         """
+        # TODO EX2 (a): the following lines need to be adapted to the EmbeddingSum,
+        # which processes features in groups.  You will also need to make
+        # trivial modifications in the code in two or three other places
+        # (imports, initialization).
+        # TODO EX2 (b): you can further try to modify the EmbeddingSum class so
+        # that it works over batches of feature groups.
         embeddings = [
             [self.emb.forward(feat) for feat in self.features(name)]
             for name in names
