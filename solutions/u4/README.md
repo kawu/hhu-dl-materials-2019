@@ -66,21 +66,21 @@ TODO: Can one observe that it's not possible to
 
 # Bigram-based model
 
-Have a look at the implementation of the LangRec class.  TODO: link
+Have a look at the implementation of the [LangRec class](main.py#L36-L142) and
+the [ngram function](main.py#L19-L33).
 
 ### Bug
 
-The ,,bug'' in the Embedding class was that the Embedding vectors had no
-`requires_grad=True` specified.  As a result, they were silently ignored in
-backpropagation.  Consequently, these parameters where fixed throughout the
-entire training process.
+The bug in the Embedding class was that the Embedding vectors had [no
+`requires_grad=True` specified](embedding.py#L42).  As a result, embedding
+vectors were silently ignored in backpropagation.  Consequently, these
+parameters were fixed throughout the entire training process.
 
-TODO: add link to were the problem was.
+Testing (assertions, unit tests, etc.) is your main friend in the hopeless
+fight against such issues, which can be really nasty and truly hard to spot.
+Better PyTorch API would be another way to prevent such problems.
 
-Testing (assertions, unit tests, etc.) is your main (only?) friend in the
-hopeless fight against such issues, which can be really nasty and truly hard to
-spot.
-
-In particular, this issue can be identified using an additional assertion in
-the LangRec class.
-TODO: add link.
+This issue in particular can be identified using an [additional
+assertion](main.py#L67-L70) in the LangRec class.  PyTorch optimizer could
+enforce this, too, but it doesn't for some reason (perhaps to allow the user to
+switch gradient updating off for selected model parameters).
