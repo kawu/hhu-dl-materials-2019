@@ -121,8 +121,9 @@ x1 = torch.randn(3, 3, requires_grad=True)
 y1 = torch.randn(3, 3, requires_grad=True)
 (x1 + y1).sum().backward()
 
-x2 = torch.randn(3, 3, requires_grad=True)
-y2 = torch.randn(3, 3, requires_grad=True)
+# We use `clone` and `detach` to get the exact, separate copies of x1 and y1.
+x2 = x1.clone().detach().requires_grad_(True)
+y2 = y1.clone().detach().requires_grad_(True)
 add(x2, y2).sum().backward()
 
 assert (x1.grad == x2.grad).all()
