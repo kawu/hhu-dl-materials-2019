@@ -135,8 +135,8 @@ assert (y1.grad == y2.grad).all()
 Let's see another example: the sigmoid (logistic) function.
 
 Let `x` be the input tensor, to which we apply the (element-wise) sigmoid
-function.  Let `y` be the result of this application.  Let also `z` be the loss
-value.
+function.  Let `y` be the result of this application.  Finally, let `z` be the
+loss value.
 
 The derivative of sigmoid, `y = sigmoid(x) = 1 / (1 + exp(-x))`, is:
 ```
