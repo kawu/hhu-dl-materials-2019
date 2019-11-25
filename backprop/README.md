@@ -50,7 +50,7 @@ However, you may want to perform the exercises below iteractivelly in IPython.
 -->
 
 
-# Example
+# Examples
 
 ### Addition
 
@@ -174,3 +174,19 @@ diff = x1.grad - x2.grad
 assert (-1e-7 < diff).all()
 assert (diff  < 1e-7).all()
 ```
+
+# Exercises
+
+### Sum
+
+Re-implement `torch.sum` as a custom autograd function.
+
+### Dot product
+
+Re-implement `torch.dot` as a custom autograd function.
+
+### Matrix-vector product
+
+Re-implement `torch.mv` as a custom autograd function.
+
+**WARNING**. This one is a difficult exercises!
