@@ -21,7 +21,7 @@ writing custom autograd functions can be found at:
 https://pytorch.org/docs/stable/notes/extending.html
 
 Some code fragments were borrowed from:
-https://pytorch.org/tutorials/beginner/examples\_autograd/two\_layer\_net\_custom\_function.html
+https://pytorch.org/tutorials/beginner/examples_autograd/two_layer_net_custom_function.html
 
 
 ### Preparation
@@ -110,8 +110,8 @@ assert x1.grad == x2.grad
 assert y1.grad == y2.grad
 ```
 
-Finally, since addition is element-wise, this should work also for complex
-tensors, not only one-element tensors!  Let's check that:
+The nice part is that, since addition is element-wise, this should work also
+for complex tensors, and not only for one-element tensors!  Let's see:
 ```python
 x1 = torch.randn(3, 3, requires_grad=True)
 y1 = torch.randn(3, 3, requires_grad=True)
@@ -127,6 +127,52 @@ assert (y1.grad == y2.grad).all()
 
 ### Sigmoid
 
-TODO: ctx is a context object that can be used to stash information for
-backward computation.  You can cache arbitrary objects for use in the backward
-pass using the `ctx.save_for_backward` method.
+Let's see another example: the sigmoid (logistic) function.
+
+Let `x` be the input tensor, to which we apply (element-wise) the sigmoid
+function.  Let `y` be the result of this application.  Let also `z` be the loss
+value.
+
+The derivative of sigmoid, `y = sigmoid(x)`, is `dy/dx = y * (1 - y)`.  From
+the chain rule we have `dz/dx = dz/dy * dy/dx`.  Since in the backward
+computation we already know `dz/dy`, we need to know `y` (i.e., the result of
+the forward computation) to calculate `dz/dx`.
+
+In both `forward` and `backward` methods, `ctx` is a context object that can be
+used to stash information for the backward computation.  You can cache
+arbitrary objects for use in the backward pass using the
+`ctx.save_for_backward` method.  In our case, we can use it to stash `y` for
+subsequent backward computation.  All this gives:
+```python
+class Sigmoid(Function):
+
+    @staticmethod
+    def forward(ctx, x: TT) -> TT:
+        y = 1 / (1 + torch.exp(-x))
+        ctx.save_for_backward(y)
+        return y
+        
+    @staticmethod
+    def backward(ctx, dzdy: TT) -> TT:
+        y, = ctx.saved_tensors
+        return dzdy * y * (1 - y)
+
+# Alias
+sigmoid = Sigmoid.apply
+```
+
+To test it:
+```python
+x1 = torch.randn(3, 3, requires_grad=True)
+torch.sigmoid(x1).sum().backward()
+
+x2 = x1.clone().detach().requires_grad_(True)
+sigmoid(x2).sum().backward()
+
+# Check if the difference between the two gradients is sufficiently similar
+# (clearly the backward method of the PyTorch sigmoid is better in terms
+# of numerical precision).
+diff = x1.grad - x2.grad
+assert (-1e-7 < diff).all()
+assert (diff  < 1e-7).all()
+```
