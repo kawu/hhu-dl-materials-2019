@@ -183,7 +183,7 @@ z2 = sigmoid(x2).sum()
 z2.backward()
 
 # Check if the results of the forward computations are equal
-assert (z1 < x2).all()
+assert (z1 == z2).all()
 
 # Check if the two gradients are sufficiently similar (clearly the backward
 # method of the PyTorch sigmoid is better in terms of numerical precision).
