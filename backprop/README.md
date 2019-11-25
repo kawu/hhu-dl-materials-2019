@@ -202,9 +202,9 @@ the order of computations is as follows:
 * Backward: `dc/dx` and `dc/dy` are calculated using `backward` from `add`
   <!--- (from `x`, `y`, and `dc/da`) -->
 
-All this generalizes to (almost) arbitrary experssions, via the abstraction
-called a *computation graph*.  More information on it can be found on
-http://colah.github.io/posts/2015-08-Backprop and, hopefully, in the script.
+All this generalizes to arbitrary tensor-based computations, via the
+abstraction called a *computation graph*.  More information on it can be found
+on http://colah.github.io/posts/2015-08-Backprop and, hopefully, in the script.
 
 <!---
 TODO: computation graph?
