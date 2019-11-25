@@ -177,7 +177,24 @@ assert (diff  < 1e-7).all()
 
 ### Composition
 
-TODO: compose addition with sigmoid?
+As we can combine neural functions (packaged into neural modules), the
+underlying forward and backward methods compose as well.
+
+For instance, if we perform `sigmoid(add(x, y)).sum().backward()` for two
+given tensors `x` and `y`, the order of computations is as follows:
+* Forward: `a = add(x, y)`
+* Forward: `b = sigmoid(a)`
+* Forward: `c = b.sum()`
+* At this point, `c.backward()` is used
+* Backward: `dc/db` is calculated using `backward` from `sum`
+  <!--- (from `b`, `c`) -->
+* Backward: `dc/da` is calculated using `backward` from `sigmoid`
+  <!--- (from `a`, `b`, and `dc/db`) -->
+* Backward: `dc/dx` and `dc/dy` are calculated using `backward` from `add`
+  <!--- (from `x`, `y`, and `dc/da`) -->
+
+TODO: computation graph?
+
 
 # Exercises
 
