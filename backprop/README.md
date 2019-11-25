@@ -204,7 +204,7 @@ the order of computations is as follows:
 
 All this generalizes to (almost) arbitrary experssions, via the abstraction
 called a *computation graph*.  More information on it can be found on
-http://colah.github.io/posts/2015-08-Backprop/ and, hopefully, in the script.
+http://colah.github.io/posts/2015-08-Backprop and, hopefully, in the script.
 
 <!---
 TODO: computation graph?
