@@ -1,7 +1,7 @@
 # Backpropagation
 
 *Backpropagation* is an algorithm that allows to methodically compute the
-gradients of a complex expression using the chain-rule, while caching
+gradients of a complex expression using the chain rule, while caching
 intermediary results.
 
 This page provides examples and exercises on how to implement custom,
@@ -138,10 +138,16 @@ Let `x` be the input tensor, to which we apply the (element-wise) sigmoid
 function.  Let `y` be the result of this application.  Let also `z` be the loss
 value.
 
-The derivative of sigmoid, `y = sigmoid(x)`, is `dy/dx = y * (1 - y)`.  From
-the chain rule we have `dz/dx = dz/dy * dy/dx`.  Since in the backward
-computation we already know `dz/dy`, we need to also know `y` (i.e., the result
-of the forward computation) to calculate `dz/dx`.
+The derivative of sigmoid, `y = sigmoid(x) = 1 / (1 + exp(-x))`, is:
+```
+dy/dx = y * (1 - y)
+```
+From the chain rule we have:
+```
+dz/dx = dz/dy * dy/dx
+```
+Since in the backward computation we already know `dz/dy`, we need to also know
+`y` (i.e., the result of the forward computation) to calculate `dz/dx`.
 
 In the `forward` and `backward` methods, `ctx` is a context object that can be
 used to stash information for the backward computation.  You can cache
