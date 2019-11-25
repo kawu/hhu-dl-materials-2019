@@ -1,14 +1,14 @@
 # Back-propagation
 
 This page provides exercises and examples on how to implement custom
-back-propagable functions in PyTorch.  Such functions are called in PyTorch
-*autograd* functions (which presumably stands for *automatic gradient*
+back-propagable functions in PyTorch.  Such functions are called
+*autograd* functions in PyTorch (which presumably stands for *automatic gradient*
 computation, for which backpropagation is used).  You will very rarely need to
 manually implement autograd functions (in contrast to, e.g., batching that we
 have seen last week).  Nevertheless, there are situations where this is
 necessary.  For instance:
 * You may want to use a primitive function not implemented in PyTorch yet
-  (by *primitive* I mean a function that is not easily experssible as a
+  (by *primitive* I mean a function that is not easily expressible as a
   composition of already available functions)
 * Automatically derived backward calculation may be not optimal for certain
   combinations of neural functions
