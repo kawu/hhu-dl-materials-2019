@@ -19,8 +19,8 @@ for instance:
 ### Useful links
 
 The PyTorch documentation page which contains more detailed information about
-writing custom autograd functions can be found at:
-https://pytorch.org/docs/stable/notes/extending.html
+writing custom autograd functions can be found at
+https://pytorch.org/docs/stable/notes/extending.html.
 
 For a popular presentation of backpropagation and computation graph, see
 http://colah.github.io/posts/2015-08-Backprop.
