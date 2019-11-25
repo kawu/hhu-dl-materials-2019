@@ -86,10 +86,15 @@ sigmoid = Sigmoid.apply
 
 # Some tests to check if this works as intended
 x1 = torch.randn(3, 3, requires_grad=True)
-torch.sigmoid(x1).sum().backward()
+z1 = torch.sigmoid(x1).sum()
+z1.backward()
 
 x2 = x1.clone().detach().requires_grad_(True)
-sigmoid(x2).sum().backward()
+z2 = sigmoid(x2).sum()
+z2.backward()
+
+# Check if the results of the forward computations are equal
+assert (z1 == z2).all()
 
 # Check if sufficiently similar (clearly the backward method of the
 # PyTorch sigmoid is better in terms of numerical precision).
