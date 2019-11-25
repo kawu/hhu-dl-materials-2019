@@ -193,7 +193,9 @@ given tensors `x` and `y`, the order of computations is as follows:
 * Backward: `dc/dx` and `dc/dy` are calculated using `backward` from `add`
   <!--- (from `x`, `y`, and `dc/da`) -->
 
+<!---
 TODO: computation graph?
+-->
 
 
 # Exercises

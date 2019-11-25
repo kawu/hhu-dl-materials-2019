@@ -137,7 +137,6 @@ assert (x1.grad - x2.grad == 0).all()
 # def dot0(x: TT, y: TT) -> TT:
 #     return torch.sum(x * y)
 
-
 class Product(Function):
 
     @staticmethod
@@ -213,3 +212,46 @@ assert (diff  < 1e-5).all()
 
 assert (x1.grad - x2.grad == 0).all()
 assert (y1.grad - y2.grad == 0).all()
+
+
+################################################################
+# Matrix-vector product
+################################################################
+
+
+class MatrixVectorProduct(Function):
+
+    @staticmethod
+    def forward(ctx, m: TT, v: TT) -> TT:
+        ctx.save_for_backward(m, v)
+        return torch.mv(m, v)
+        
+    @staticmethod
+    def backward(ctx, dzdy: TT) -> Tuple[TT, TT]:
+        m, v = ctx.saved_tensors
+        # Make a "column vector" from dzdy
+        dzdy = dzdy.view(dzdy.shape[0], -1)
+        dzdm = torch.mm(dzdy, v.view(-1, v.shape[0]))
+        dzdv = (dzdy * m).sum(dim=0)
+        return dzdm, dzdv
+
+# Alias
+mv = MatrixVectorProduct.apply
+
+# Checks
+m1 = torch.randn(5, 3, requires_grad=True)
+v1 = torch.randn(3, requires_grad=True)
+z1 = torch.mv(m1, v1)
+z1.sum().backward()
+
+m2 = m1.clone().detach().requires_grad_(True)
+v2 = v1.clone().detach().requires_grad_(True)
+z2 = mv(m2, v2)
+z2.sum().backward()
+
+diff = z1 - z2
+assert (-1e-10 < diff).all()
+assert (diff  < 1e-10).all()
+
+assert (m1.grad - m2.grad == 0).all()
+assert (v1.grad - v2.grad == 0).all()
