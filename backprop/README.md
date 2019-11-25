@@ -153,8 +153,7 @@ subsequently, `dz/dx`.
 In the `forward` and `backward` methods, `ctx` is a context object that can be
 used to stash information for the backward computation.  You can cache
 arbitrary objects for use in the backward pass using the
-`ctx.save_for_backward` method.  In our case, we can use it to stash `y` for
-the subsequent backward computation.  All this leads to:
+`ctx.save_for_backward` method.  In our case, we can use it to stash `y`:
 ```python
 class Sigmoid(Function):
 
