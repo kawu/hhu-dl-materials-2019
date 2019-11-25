@@ -175,14 +175,18 @@ sigmoid = Sigmoid.apply
 To test it:
 ```python
 x1 = torch.randn(3, 3, requires_grad=True)
-torch.sigmoid(x1).sum().backward()
+z1 = torch.sigmoid(x1).sum()
+z1.backward()
 
 x2 = x1.clone().detach().requires_grad_(True)
-sigmoid(x2).sum().backward()
+z2 = sigmoid(x2).sum()
+z2.backward()
 
-# Check if the difference between the two gradients is sufficiently similar
-# (clearly the backward method of the PyTorch sigmoid is better in terms
-# of numerical precision).
+# Check if the results of the forward computations are equal
+assert (z1 < x2).all()
+
+# Check if the two gradients are sufficiently similar (clearly the backward
+# method of the PyTorch sigmoid is better in terms of numerical precision).
 diff = x1.grad - x2.grad
 assert (-1e-7 < diff).all()
 assert (diff  < 1e-7).all()
