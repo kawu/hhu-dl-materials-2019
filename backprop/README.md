@@ -147,7 +147,8 @@ From the chain rule we have:
 dz/dx = dz/dy * dy/dx
 ```
 Since in the backward computation we already know `dz/dy`, we need to also know
-`y` (i.e., the result of the forward computation) to calculate `dz/dx`.
+`y` (i.e., the result of the forward computation) to calculate `dy/dx` and,
+subsequently, `dz/dx`.
 
 In the `forward` and `backward` methods, `ctx` is a context object that can be
 used to stash information for the backward computation.  You can cache
