@@ -16,8 +16,8 @@ TT = torch.TensorType
 class Addition(Function):
 
     @staticmethod
-    def forward(ctx, x: TT, y: TT) -> TT:
-        return x + y
+    def forward(ctx, x1: TT, x2: TT) -> TT:
+        return x1 + x2
         
     @staticmethod
     def backward(ctx, dzdy: TT) -> Tuple[TT, TT]:
@@ -96,3 +96,78 @@ sigmoid(x2).sum().backward()
 diff = x1.grad - x2.grad
 assert (-1e-7 < diff).all()
 assert (diff  < 1e-7).all()
+
+
+################################################################
+# Sum
+################################################################
+
+
+class Sum(Function):
+
+    @staticmethod
+    def forward(ctx, x: TT) -> TT:
+        ctx.save_for_backward(x)
+        return x.sum()
+        
+    @staticmethod
+    def backward(ctx, dzdy: TT) -> TT:
+        x, = ctx.saved_tensors
+        return torch.full_like(x, dzdy)
+
+# Alias
+tsum = Sum.apply
+
+# Checks
+x1 = torch.randn(1000, 1000, requires_grad=True)
+torch.sum(x1).backward()
+
+x2 = x1.clone().detach().requires_grad_(True)
+tsum(x2).backward()
+
+assert (x1.grad - x2.grad == 0).all()
+
+
+################################################################
+# Dot product
+################################################################
+
+
+# Dot product (composition of PyTorch functions)
+def dot0(x: TT, y: TT) -> TT:
+    return torch.sum(x * y)
+
+
+class Product(Function):
+
+    @staticmethod
+    def forward(ctx, x1: TT, x2: TT) -> TT:
+        ctx.save_for_backward(x1, x2)
+        return x1 + x2
+        
+    @staticmethod
+    def backward(ctx, dzdy: TT) -> Tuple[TT, TT]:
+        x1, x2 = ctx.saved_tensors
+        return dzdy*x2, dzdy*x1
+
+# Alias
+prod = Product.apply
+
+# Dot product (composition of custom functions)
+def dot(x: TT, y: TT) -> TT:
+    return tsum(prod(x, y))
+
+# Checks
+x1 = torch.randn(10, requires_grad=True)
+y1 = torch.randn(10, requires_grad=True)
+torch.dot(x1, y1).backward()
+
+x2 = x1.clone().detach().requires_grad_(True)
+y2 = y1.clone().detach().requires_grad_(True)
+dot(x2, y2).backward()
+
+# diff = x1.grad - x2.grad
+# assert (-1e-7 < diff).all()
+# assert (diff  < 1e-7).all()
+assert (x1.grad - x2.grad == 0).all()
+assert (y1.grad - y2.grad == 0).all()

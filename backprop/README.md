@@ -175,15 +175,31 @@ assert (-1e-7 < diff).all()
 assert (diff  < 1e-7).all()
 ```
 
+### Composition
+
+TODO: compose addition with sigmoid?
+
 # Exercises
+
+**Note**: for all the exercises, you can use the functions already provided in
+PyTorch in the forward computation.  For instance, in the `sum` exercise below,
+you can use `torch.sum` in the `forward` method.  We focus here on the
+implementations of the `backward` methods.
+
+**Note**: to solve some of the exercises below, you may need primitive
+functions from the PyTorch library that we didn't use yet.
 
 ### Sum
 
-Re-implement `torch.sum` as a custom autograd function.
+Re-implement `torch.sum` as a custom autograd function.  Verify that the
+backpropagation results are the same as with the `torch.sum` function.
 
 ### Dot product
 
 Re-implement `torch.dot` as a custom autograd function.
+
+**Hint**: it may be simpler to express the dot product as a composition of two
+more primitive functions and implement their autograd variants instead.
 
 ### Matrix-vector product
 
