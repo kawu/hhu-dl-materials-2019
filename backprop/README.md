@@ -242,8 +242,10 @@ backpropagation results are the same as with the `torch.sum` function.
 
 Re-implement `torch.dot` as a custom autograd function.
 
-**Hint**: it may be simpler to express the dot product as a composition of two
-more primitive functions and implement their autograd variants instead.
+**Hint**: it may be simpler to first express the dot product as a composition
+of two more primitive functions and implement their autograd variants instead.
+However, the dot product implemented as a primitive autograd function is more
+efficient.
 
 ### Matrix-vector product
 
