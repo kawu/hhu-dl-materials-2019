@@ -249,9 +249,10 @@ v2 = v1.clone().detach().requires_grad_(True)
 z2 = mv(m2, v2)
 z2.sum().backward()
 
-diff = z1 - z2
-assert (-1e-10 < diff).all()
-assert (diff  < 1e-10).all()
+# diff = z1 - z2
+# assert (-1e-10 < diff).all()
+# assert (diff  < 1e-10).all()
 
+assert (z1 - z2 == 0).all()
 assert (m1.grad - m2.grad == 0).all()
 assert (v1.grad - v2.grad == 0).all()

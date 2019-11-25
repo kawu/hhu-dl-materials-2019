@@ -224,4 +224,4 @@ more primitive functions and implement their autograd variants instead.
 
 Re-implement `torch.mv` as a custom autograd function.
 
-**WARNING**. This one is a difficult exercises!
+**WARNING**. This one may be more difficult to solve.
