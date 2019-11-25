@@ -1,12 +1,14 @@
-# Back-propagation
+# Backpropagation
 
-This page provides exercises and examples on how to implement custom
-back-propagable functions in PyTorch.  Such functions are called
-*autograd* functions in PyTorch (which presumably stands for *automatic gradient*
-computation, for which backpropagation is used).  You will very rarely need to
-manually implement autograd functions (in contrast to, e.g., batching that we
-have seen last week).  Nevertheless, there are situations where this is
-necessary.  For instance:
+*Backpropagation* is an algorithm that allows to methodically compute the
+gradients of a complex expression using the chain-rule, while caching
+intermediary results.
+
+This page provides examples and exercises on how to implement custom,
+backpropagation-enabled functions in PyTorch.  Such functions are called
+*autograd* functions in PyTorch.  You will rarely need to manually implement
+such functions.  Nevertheless, there are situations where this is necessary,
+for instance:
 * You may want to use a primitive function not implemented in PyTorch yet
   (by *primitive* I mean a function that is not easily expressible as a
   composition of already available functions)
@@ -20,18 +22,19 @@ The PyTorch documentation page which contains more detailed information about
 writing custom autograd functions can be found at:
 https://pytorch.org/docs/stable/notes/extending.html
 
+<!---
 Some code fragments were borrowed from:
 https://pytorch.org/tutorials/beginner/examples_autograd/two_layer_net_custom_function.html
+-->
 
 
 ### Preparation
 
 The commands and code fragments shown below are intended to be used
-iteractivelly in IPython.  Besides, the entire code for this session (with the
-missing place-holders for the exercise solutions) is placed in the
+iteractivelly in IPython.  The code for this session can be also found in the
 [backprop.py](backprop.py) file.
 
-First, we will use the following preamble:
+We will use the following preamble:
 ```python
 from typing import Tuple
 
@@ -64,7 +67,7 @@ class Addition(Function):
     @staticmethod
     def forward(ctx, x1: TT, x2: TT) -> TT:
         y = x1 + x2
-        return x1 + x2
+        return y
         
     @staticmethod
     def backward(ctx, dzdy: TT) -> Tuple[TT, TT]:
@@ -177,11 +180,14 @@ assert (diff  < 1e-7).all()
 
 ### Composition
 
-As we can combine neural functions (packaged into neural modules), the
-underlying forward and backward methods compose as well.
+As we can combine neural functions (packaged in neural modules), the underlying
+forward and backward methods compose as well.
 
-For instance, if we perform `sigmoid(add(x, y)).sum().backward()` for two
-given tensors `x` and `y`, the order of computations is as follows:
+Let `x` and `y` be two tensors of the same shape.  Then, if we perform:
+```python
+sigmoid(add(x, y)).sum().backward()
+```
+the order of computations is as follows:
 * Forward: `a = add(x, y)`
 * Forward: `b = sigmoid(a)`
 * Forward: `c = b.sum()`
@@ -192,6 +198,10 @@ given tensors `x` and `y`, the order of computations is as follows:
   <!--- (from `a`, `b`, and `dc/db`) -->
 * Backward: `dc/dx` and `dc/dy` are calculated using `backward` from `add`
   <!--- (from `x`, `y`, and `dc/da`) -->
+
+All this generalizes to (almost) arbitrary experssions, via the abstraction
+called a *computation graph*.  More information on it can be found on
+http://colah.github.io/posts/2015-08-Backprop/ and, hopefully, in the script.
 
 <!---
 TODO: computation graph?
