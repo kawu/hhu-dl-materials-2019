@@ -94,8 +94,8 @@ sigmoid(x2).sum().backward()
 # Check if sufficiently similar (clearly the backward method of the
 # PyTorch sigmoid is better in terms of numerical precision).
 diff = x1.grad - x2.grad
-assert (-1e-7 < diff).all()
-assert (diff  < 1e-7).all()
+assert (-1e-5 < diff).all()
+assert (diff  < 1e-5).all()
 
 
 ################################################################
@@ -133,9 +133,9 @@ assert (x1.grad - x2.grad == 0).all()
 ################################################################
 
 
-# Dot product (composition of PyTorch functions)
-def dot0(x: TT, y: TT) -> TT:
-    return torch.sum(x * y)
+# # Dot product (composition of PyTorch functions)
+# def dot0(x: TT, y: TT) -> TT:
+#     return torch.sum(x * y)
 
 
 class Product(Function):
@@ -143,7 +143,7 @@ class Product(Function):
     @staticmethod
     def forward(ctx, x1: TT, x2: TT) -> TT:
         ctx.save_for_backward(x1, x2)
-        return x1 + x2
+        return x1 * x2
         
     @staticmethod
     def backward(ctx, dzdy: TT) -> Tuple[TT, TT]:
@@ -160,14 +160,56 @@ def dot(x: TT, y: TT) -> TT:
 # Checks
 x1 = torch.randn(10, requires_grad=True)
 y1 = torch.randn(10, requires_grad=True)
-torch.dot(x1, y1).backward()
+z1 = torch.dot(x1, y1)
+z1.backward()
 
 x2 = x1.clone().detach().requires_grad_(True)
 y2 = y1.clone().detach().requires_grad_(True)
-dot(x2, y2).backward()
+z2 = dot(x2, y2)
+z2.backward()
 
-# diff = x1.grad - x2.grad
-# assert (-1e-7 < diff).all()
-# assert (diff  < 1e-7).all()
+diff = z1 - z2
+assert (-1e-5 < diff).all()
+assert (diff  < 1e-5).all()
+
+assert (x1.grad - x2.grad == 0).all()
+assert (y1.grad - y2.grad == 0).all()
+
+
+################################################################
+# Dot product in one pass
+################################################################
+
+
+class DotProduct(Function):
+
+    @staticmethod
+    def forward(ctx, x1: TT, x2: TT) -> TT:
+        ctx.save_for_backward(x1, x2)
+        return (x1 * x2).sum()
+        
+    @staticmethod
+    def backward(ctx, dzdy: TT) -> Tuple[TT, TT]:
+        x1, x2 = ctx.saved_tensors
+        return dzdy*x2, dzdy*x1
+
+# Alias
+dot = DotProduct.apply
+
+# Checks
+x1 = torch.randn(10, requires_grad=True)
+y1 = torch.randn(10, requires_grad=True)
+z1 = torch.dot(x1, y1)
+z1.backward()
+
+x2 = x1.clone().detach().requires_grad_(True)
+y2 = y1.clone().detach().requires_grad_(True)
+z2 = dot(x2, y2)
+z2.backward()
+
+diff = z1 - z2
+assert (-1e-5 < diff).all()
+assert (diff  < 1e-5).all()
+
 assert (x1.grad - x2.grad == 0).all()
 assert (y1.grad - y2.grad == 0).all()
