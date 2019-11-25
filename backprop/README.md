@@ -214,8 +214,9 @@ the order of computations is as follows:
   <!--- (from `x`, `y`, and `dc/da`) -->
 
 All this generalizes to arbitrary tensor-based computations, via the
-abstraction called a *computation graph*.  More information on it can be found
-on http://colah.github.io/posts/2015-08-Backprop and, hopefully, in the script.
+abstraction called a *computation graph*.  More information on this can be
+found on http://colah.github.io/posts/2015-08-Backprop and, hopefully, in the
+script.
 
 <!---
 TODO: computation graph?
