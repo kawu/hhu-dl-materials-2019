@@ -62,24 +62,24 @@ implemenations work as intended.
 class Addition(Function):
 
     @staticmethod
-    def forward(ctx, x: TT, y: TT) -> TT:
-        return x + y
+    def forward(ctx, x1: TT, x2: TT) -> TT:
+        y = x1 + x2
+        return x1 + x2
         
     @staticmethod
     def backward(ctx, dzdy: TT) -> Tuple[TT, TT]:
         return dzdy, dzdy
 ```
-In the `forward` pass, we receive two tensors that we want to add together: `x`
-and `y`.  We simply add them together (we could use `with torch.no_grad()` to
-make sure that the default autograd calculation for `+` is not used; but we
-overwrite it below anyway).
+In the `forward` pass, we receive two tensors that we want to add together:
+`x1` and `x2`.  To get the result of the forward method, we simply add them and
+return the result.
 
 In the `backward` pass we receive a Tensor containing the gradient of the loss
-`z` (whatever it is!) w.r.t the addition output `y`.  We call it `dzdy`.  Now,
-we need to calculate the gradients for `x` and `y` and return them as a tuple,
-in the same order as their order as arguments in the `forward` method.  Using
-the chain rule, we can determine that this is just `dzdy` for both `x` and `y`
-(take a moment to verify this!).
+`z` (whatever it is!) w.r.t the addition result `y`.  We call it `dzdy`.  Now,
+we need to calculate the gradients for `x1` and `x2` and return them as a
+tuple, in the same order as in the `forward` method.  Using the chain rule, we
+can determine that this is just `dzdy` for both `x1` and `x2` (take a moment to
+verify this!).
 
 The addition function is now available via `Addition.apply`.  For brevity, it
 is recommended to use an alias for custom autograd functions.  In this case:
@@ -87,10 +87,8 @@ is recommended to use an alias for custom autograd functions.  In this case:
 add = Addition.apply
 ```
 
-We can check that our custom addition behaves as the one provided in PyTorch.
-First, create two one-element tensors with 1.0 and 2.0, and then perform the
-backward computation (which means that the objective is to minimize/maximize 
-their sum).
+We can now check that our custom addition behaves as the one provided in
+PyTorch.
 ```python
 x1 = torch.tensor(1.0, requires_grad=True)
 y1 = torch.tensor(2.0, requires_grad=True)
@@ -135,14 +133,14 @@ value.
 
 The derivative of sigmoid, `y = sigmoid(x)`, is `dy/dx = y * (1 - y)`.  From
 the chain rule we have `dz/dx = dz/dy * dy/dx`.  Since in the backward
-computation we already know `dz/dy`, we need to know `y` (i.e., the result of
-the forward computation) to calculate `dz/dx`.
+computation we already know `dz/dy`, we need to also know `y` (i.e., the result
+of the forward computation) to calculate `dz/dx`.
 
-In both `forward` and `backward` methods, `ctx` is a context object that can be
+In the `forward` and `backward` methods, `ctx` is a context object that can be
 used to stash information for the backward computation.  You can cache
 arbitrary objects for use in the backward pass using the
 `ctx.save_for_backward` method.  In our case, we can use it to stash `y` for
-subsequent backward computation.  All this gives:
+the subsequent backward computation.  All this leads to:
 ```python
 class Sigmoid(Function):
 
