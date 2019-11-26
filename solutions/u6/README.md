@@ -28,7 +28,7 @@ EmbeddingBag](embedding.py#L102-L103) provided by PyTorch.
 
 To make the EmbeddingSum work over batches effectively, the training dataset
 would have to be pre-processed so as to already contain the [feature
-indices](embedding.py#L102).  However, it is not clear how much speed up this
+indices](embedding.py#L102).  However, it is not clear how much speed-up this
 modification would bring.  It is likely that most of the computation time is
 spent in the [forward/backward pass](main.py#L123) of the FFN module which
 calculates the scores, in which case further optimization of the EmbeddingSum
