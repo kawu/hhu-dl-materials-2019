@@ -108,9 +108,12 @@ class Linear(Module):
             idim: size of the input vector
             odim: size of the output vector
         """
-        # HINT: are the parameters any different when we process
-        # input vectors in batches?
-        self.register("M", torch.randn(odim, idim))
+        # Pay attention to the order of dimensions (idim, odim).  This is
+        # related to how we multiply the matrix M by the input vector
+        # (see the forward method).
+        self.register("M", torch.randn(idim, odim))
+        # We use `torch.randn` for simplicity, the Linear class in PyTorch
+        # uses a different initialization method (see the docs).
         self.register("b", torch.randn(odim))
 
     # TODO: re-implement this method.
@@ -125,11 +128,14 @@ class Linear(Module):
         # Explicitely check that the dimensions match
         assert X.shape[1] == self.isize()
 
-        # Solution 3: using transposition of the parameter matrix + placing the
-        # input matrix on the left.  That's almost as good as we can do, but
-        # it's still possible to avoid the transposition.  Also, remember that
-        # you still need to account for the bias vector.
-        return torch.mm(X, self.M.t())
+        # Solution 4:
+        return torch.mm(X, self.M) + self.b
+
+        # # Solution 3: using transposition of the parameter matrix + placing the
+        # # input matrix on the left.  That's almost as good as we can do, but
+        # # it's still possible to avoid the transposition.  Also, remember that
+        # # you still need to account for the bias vector.
+        # return torch.mm(X, self.M.t())
 
         # Solution 2: using transposition of the input matrix
         # # Transpose the input matrix
@@ -150,11 +156,11 @@ class Linear(Module):
 
     def isize(self):
         """Input size"""
-        return self.M.shape[1]
+        return self.M.shape[0]
 
     def osize(self):
         """Output size"""
-        return self.M.shape[0]
+        return self.M.shape[1]
 
 
 class FFN(Module):
