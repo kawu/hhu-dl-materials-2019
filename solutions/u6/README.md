@@ -18,7 +18,7 @@ https://user.phil.hhu.de/~waszczuk/teaching/hhu-dl-wi19/session6/u6_eng.pdf
 
 **(a)**: Have a look at the [forward](main.py#L116-L124) method of the
 `LangRec` class, which contains the essential modifications, or at the corresponding
-[diff](../../../../commit/353297ff43a7826bb0f5d7710f88aa7e0e5a0520##diff-27b1afc4ec2e27f1b130d69e5c421b28).
+[diff](../../../../commit/353297ff43a7826bb0f5d7710f88aa7e0e5a0520#diff-27b1afc4ec2e27f1b130d69e5c421b28).
 
 **(b)**: Making the EmbeddingSum class work over batches of feature groups
 would not necessarily improve the performance of the current solution.  In the
