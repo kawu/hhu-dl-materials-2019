@@ -27,3 +27,19 @@ class WordEmbedder(ABC, nn.Module):
     def embedding_size(self) -> int:
         """Return the size of the embedding vectors."""
         pass
+
+
+# TODO: Implement this as a part of Ex.~2.
+class AtomEmbedder(WordEmbedder):
+
+    """Word embedding class which considers each word as
+    an atomic entity.
+    """
+
+    # TODO: implement this
+    def forward(self, word: Word) -> TT:
+        pass
+
+    # TODO: implement this
+    def embedding_size(self) -> int:
+        pass
