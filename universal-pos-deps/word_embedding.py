@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, Set
 
 from abc import ABC, abstractmethod
 
@@ -21,7 +21,7 @@ class WordEmbedder(ABC, nn.Module):
         """Embed the given words."""
         # Default implementation.  Re-implement for speed
         # in a sub-class.
-        return torch.stack(self.forward(word) for word in words)
+        return torch.stack([self.forward(word) for word in words])
 
     @abstractmethod
     def embedding_size(self) -> int:
@@ -31,7 +31,7 @@ class WordEmbedder(ABC, nn.Module):
 
 # TODO: Implement this as a part of Ex.~2.  HINT: use the
 # Embedding class implemented in neural/embedding.py.
-class AtomEmbedder(WordEmbedder):
+class AtomicEmbedder(WordEmbedder):
     """Word embedding class which considers each word as an atomic entity.
     Put differently, each word receives its own embedding vector.
 
@@ -44,7 +44,7 @@ class AtomEmbedder(WordEmbedder):
     Retrieve the embedding for "cat":
     >>> cat_emb = emb("cat")
     >>> cat_emb.shape
-    torch.Shape([10])
+    torch.Size([10])
 
     Given that the embedder is case-insensitive, it should give the same
     embedding to both "cat" and "Cat":
@@ -53,16 +53,32 @@ class AtomEmbedder(WordEmbedder):
     You can apply it to a sequence of words at the same time. You don't
     have to implement anything to obtain this behavior, since the default
     implementation of `forwards` is provided by the abstract WordEmbedder
-    class.
-    >>> many_embs = emb.forwards(["cat", "Cat"])
+    class:
+    >>> many_embs = emb.forwards(["cat", "cats"])
     >>> assert (many_embs[0] == cat_emb).all()
 
-    And of course each embedding should be accounted for during training.
+    Each embedding should be accounted for during training.
     In particular:
     >>> assert emb("cat").requires_grad is True
+
+    TODO: the embedder should also work on out-of-vocabulary words
+    (it should then return a zero tensor).  Implement the corresponding
+    doctest below.
     """
 
     # TODO: implement the initialization method
+    def __init__(self, vocab: Set[Word], emb_size: int,
+                 case_insensitive=False):
+        """Create the word embedder for the given vocabulary.
+
+        Arguments:
+            vocab: vocabulary of words to embed
+            emb_size: the size of embedding vectors
+            case_insensitive: should the embedder be case-insensitive?
+        """
+        # The following line is required in each custom neural Module.
+        super(AtomicEmbedder, self).__init__()
+        # TODO: implement the remaining of the __init__ method.
 
     # TODO: implement this method:
     def forward(self, word: Word) -> TT:
