@@ -6,7 +6,6 @@ import torch.nn as nn
 from neural.types import TT
 
 
-# TODO: Implement this class
 class Embedding(nn.Module):
 
     """A simple lookup table that stores embeddings
@@ -23,12 +22,12 @@ class Embedding(nn.Module):
     The `forwards` method allows to embed symbols in batches:
     >>> emb.forwards(['a', 'b', 'a', 'c']).shape
     torch.Size([4, 10])
-    >>> (emb.forwards([['a', 'b', 'a', 'c']])[0] == emb('a')).all()
-    True
+    >>> assert (emb.forwards(['a', 'b', 'a', 'c'])[0] == emb('a')).all()
 
     Embeddings are automatically registered as parameters of the model.
     In particular:
     >>> emb('a').requires_grad is True
+    True
     """
 
     def __init__(self, alphabet: set, emb_size: int):
@@ -43,18 +42,21 @@ class Embedding(nn.Module):
         super(Embedding, self).__init__()
         # Keep the embedding size
         self.emb_size = emb_size
-        # TODO: implement the remaining of the initialization method,
-        # using `nn.Embedding`
+        # Create the mapping from alphabet/vocabulary to indices
+        self.obj_to_ix = {}
+        for ix, obj in enumerate(alphabet):
+            self.obj_to_ix[obj] = ix
+        # Create the nn.Embedding module
+        self.emb = nn.Embedding(len(self.obj_to_ix), emb_size)
 
-    # TODO: Implement this method
     def embedding_size(self) -> int:
         """Return the embedding size."""
-        pass
+        return self.emb_size
 
-    # TODO: Implement this method
     def forward(self, sym) -> TT:
         """Embed the given symbol."""
-        pass
+        ix = self.obj_to_ix[sym]
+        return self.emb(torch.tensor(ix, dtype=torch.long))
 
     def forwards(self, syms: Iterator) -> TT:
         """Embed the given sequence of symbols."""
