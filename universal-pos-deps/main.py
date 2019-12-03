@@ -60,6 +60,16 @@ word_set = set(
 # Number of words
 print("Number of words:", len(word_set))
 
+# Determine the POS tagset
+tagset = set(
+    pos
+    for sent in train_set
+    for (_word, pos) in sent
+)
+
+# Tagset
+print("Tagset:", tagset)
+
 # TODO: finish the implementation of the model:
 # * Create the word embedding neural module
 # * Calculate the POS tagset
