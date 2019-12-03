@@ -55,10 +55,7 @@ class MemPosDataSet(PosDataSet):
     """
 
     def __init__(self, file_path: str):
-        self.data_set = list(
-            sent
-            for sent in load_data(file_path)
-        )
+        self.data_set = list(load_data(file_path))
 
     def __iter__(self):
         for elem in self.data_set:
