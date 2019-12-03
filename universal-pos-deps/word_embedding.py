@@ -29,17 +29,45 @@ class WordEmbedder(ABC, nn.Module):
         pass
 
 
-# TODO: Implement this as a part of Ex.~2.
+# TODO: Implement this as a part of Ex.~2.  HINT: use the
+# Embedding class implemented in neural/embedding.py.
 class AtomEmbedder(WordEmbedder):
+    """Word embedding class which considers each word as an atomic entity.
+    Put differently, each word receives its own embedding vector.
 
-    """Word embedding class which considers each word as
-    an atomic entity.
+    For example, let's take a small vocabulary:
+    >>> vocab = set(["cat", "cats", "Cat"])
+
+    And create a case-insensitive word embedder:
+    >>> emb = AtomicEmbedder(vocab, emb_size=10, case_insensitive=True)
+
+    Retrieve the embedding for "cat":
+    >>> cat_emb = emb("cat")
+    >>> cat_emb.shape
+    torch.Shape([10])
+
+    Given that the embedder is case-insensitive, it should give the same
+    embedding to both "cat" and "Cat":
+    >>> assert (emb("cat") == emb("Cat")).all()
+
+    You can apply it to a sequence of words at the same time. You don't
+    have to implement anything to obtain this behavior, since the default
+    implementation of `forwards` is provided by the abstract WordEmbedder
+    class.
+    >>> many_embs = emb.forwards(["cat", "Cat"])
+    >>> assert (many_embs[0] == cat_emb).all()
+
+    And of course each embedding should be accounted for during training.
+    In particular:
+    >>> assert emb("cat").requires_grad is True
     """
 
-    # TODO: implement this
+    # TODO: implement the initialization method
+
+    # TODO: implement this method:
     def forward(self, word: Word) -> TT:
         pass
 
-    # TODO: implement this
+    # TODO: implement this method:
     def embedding_size(self) -> int:
         pass
