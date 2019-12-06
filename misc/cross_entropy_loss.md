@@ -16,8 +16,10 @@ representation of the two distributions:
   the target probability distribution with value `1`.  All the other
   probabilities are assumed to be `0`.
 
+<!---
 **Note**: the second point is actually an significant restriction, because it
 prevents from dealing with uncertainty in training data.
+-->
 
 
 ## Example
