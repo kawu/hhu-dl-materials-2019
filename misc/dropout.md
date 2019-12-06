@@ -19,10 +19,11 @@ dropout(x)      # => tensor([0.0000, 2.6667, 0.0000, 5.3333, 0.0000])
 
 As you can see, dropout not only zeroes the elements, it also rescales the
 tensor so that it has, roughly, the same size (sum of elements) as on input.
-You can see this using the following code:
+You can check this using the following code:
 ```python
 # Average function
-def avg(xs): return sum(xs) / len(xs)
+def avg(xs):
+    return sum(xs) / len(xs)
 # Sum of elements on input
 x.sum()     # => tensor(15.)
 # Average sum of elements with dropout
@@ -41,7 +42,7 @@ dropout(x).shape    # => torch.Size([3, 3, 3])
 ## Training vs evaluation
 
 Dropout must be only applied in the training mode.  If you forget
-about this detail, your final results will be significantly worse!
+about this detail, your final results may be significantly worse!
 
 Recall [the section on the evaluation mode](module.md#evaluation-mode) in the
 document about PyTorch modules.  In the evaluation mode, dropout is equivalent
@@ -52,7 +53,8 @@ assert (x == dropout(x))    # dropout(x) just returns x
 ```
 
 Note that, in practice, `dropout` is virtually never the top-level module of
-your PyTorch program, so you should not use `dropout.eval()`!
+your PyTorch program, so you should not use `dropout.eval()`, but rather
+`main_module.eval()`, where `main_module` is the top-level PyTorch module.
 
 ## Larger example
 
@@ -83,12 +85,13 @@ initialization function.  This is required because `Dropout` is a PyTorch
 module and needs to have access to the evaluation mode information, in
 particular.
 ```python
-# Creat an FFN and set evaluation mode on
+# Creat an random FFN
 ffn = FFN(100, 50, 10, dropout=0.5)
 # Create a random input tensor
 x = torch.randn(100)
-# We can be pretty sure that the result will be different
-# because of dropout in different FFN applications
+# We can be pretty sure that the result will be different in different FFN
+# applications because of dropout (pointless exercise: what is the probability
+# that the assertion below fails?)
 assert (ffn(x) != ffn(x)).all()
 # However, if we turn the evaluation mode on, the results
 # are guaranteed to be the same, becuase dropout does not
