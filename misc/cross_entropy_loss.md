@@ -28,6 +28,7 @@ It's important to note that [CrossEntropyLoss](CEL) works in batches.  It takes
 two arguments:
 * tensor with predicted scores
 * tensor with target classes (represented by integers)
+
 both of which should have the same leading dimension.  The size of this
 dimension corresponds to the size of the batch.
 
