@@ -52,7 +52,8 @@ A Module encapsulates the model parameters, which you can retrieve using the
 method.
 ```python
 ffn = FFN(10, 5, 3)
-ffn.parameters()
+ffn.parameters()        # Generator of parameters
+list(ffn.parameters())  # To actually see the parameters
 ```
 
 #### Application
