@@ -16,8 +16,10 @@ representation of the two distributions:
   the target probability distribution with value `1`.  All the other
   probabilities are assumed to be `0`.
 
+<!---
 **Note**: the second point is actually an significant restriction, because it
 prevents from dealing with uncertainty in training data.
+-->
 
 
 ## Example
@@ -26,6 +28,7 @@ It's important to note that [CrossEntropyLoss](CEL) works in batches.  It takes
 two arguments:
 * tensor with predicted scores
 * tensor with target classes (represented by integers)
+
 both of which should have the same leading dimension.  The size of this
 dimension corresponds to the size of the batch.
 
