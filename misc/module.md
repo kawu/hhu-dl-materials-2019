@@ -1,7 +1,9 @@
-# [PyTorch Module](https://pytorch.org/docs/stable/nn.html?highlight=module#torch.nn.Module)
+# PyTorch Module
 
-PyTorch `Module` has mostly the same role as the custom `Module` class we used
-before (see e.g. the [solution to
+[PyTorch
+Module](https://pytorch.org/docs/stable/nn.html?highlight=module#torch.nn.Module)
+has mostly the same role as the custom `Module` class we used before (see e.g.
+the [solution to
 P6](https://github.com/kawu/hhu-dl-materials/blob/master/solutions/u6/module.py)):
 it serves to encapsulate the forward calculation of a network component
 together with the corresponding parameters.
@@ -100,13 +102,14 @@ ffn.eval()      # Set to evaluation mode
 assert ffn.training == ffn.lin1.training
                 # The mode of `ffn.lin1` should get updated, too
 ```
-You should never change the mode of the submodule, because this will not
-propagate the mode information to all other module components!
+
+**WARNING**: You should never change the mode of the submodule, because this
+will not propagate the mode information to other module components!
 ```python
 ffn.lin1.train()    # Set `ffn.lin1` to training mode
-ffn.lin1.taining    # => True
-ffn.taining         # => False
+ffn.lin1.training   # => True
+ffn.training        # => False
 ```
 
 Why should you care about the evaluation mode?  It's important for
-[dropout](dropout)!
+[dropout](dropout.md)!
