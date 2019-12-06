@@ -1,8 +1,8 @@
 # Dropout
 
 [Dropout](https://pytorch.org/docs/stable/nn.html#torch.nn.Dropout), applied to
-a tensor, randomly zeroes some of its elements.  Applying dropout over the
-intermediate results of a PyTorch calculation helps to avoid over-fitting.
+a tensor, randomly zeroes some of the tensor's elements.  Applying dropout to
+intermediate results of a PyTorch calculation helps to avoid overfitting.
 
 ## Example
 
