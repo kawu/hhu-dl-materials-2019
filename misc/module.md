@@ -86,9 +86,10 @@ Note how the last dimension in the example above gets reduced from `10` to `3`
 
 #### Evaluation mode
 
-The forward calculation and the parameters is not all that a PyTorch Module
-encapsulates.  Each module also keeps track of the current mode (training vs
-evaluation) of the *entire model* (i.e., the main module + all the submodules).
+The forward calculation and the parameters are not the only things that a
+PyTorch Module encapsulates.  Each module also keeps track of the current mode
+(training vs evaluation) of the *entire model* (i.e., the main module + all the
+submodules).
 
 To retrieve the current mode:
 ```python
