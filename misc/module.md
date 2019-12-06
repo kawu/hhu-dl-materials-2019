@@ -11,9 +11,9 @@ together with the corresponding parameters.
 
 ## Usage
 
-* Use `super(ClassName, self).__init__()` at the beginning of the initalization
-  method of **each class** that (directly or not) inherits from the PyTorch
-  Module, where `ClassName` is the name of the current class.
+* Use `super(ClassName, self).__init__()` at the beginning of the
+  initialization method of **each class** that (directly or not) inherits from
+  the PyTorch Module, where `ClassName` is the name of the current class.
 * Always add submodules in the initialization method.
 * In case you want to use a [raw
   tensor](https://pytorch.org/docs/stable/tensors.html#torch.Tensor) as a
