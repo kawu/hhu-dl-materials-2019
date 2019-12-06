@@ -26,7 +26,7 @@ together with the corresponding parameters.
 
 ## Example: FFN
 
-A feed-forward network (with ReLU actication) can be defined as follows:
+A feed-forward network (with ReLU activation) can be defined as follows:
 ```python
 import torch
 import torch.nn as nn
