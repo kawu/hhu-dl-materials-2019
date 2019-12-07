@@ -22,6 +22,7 @@ together with the corresponding parameters.
   object. Then, you have to additionally
   [register](https://pytorch.org/docs/master/nn.html#torch.nn.Module.register_parameter)
   it.
+  (**TODO**: this may be actually not necessary?)
 
 
 ## Example: FFN
