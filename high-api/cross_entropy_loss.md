@@ -44,7 +44,7 @@ Which means that in `s1` the first class (`NOUN`) and in `s2` the third class
 You can apply softmax to get proper distributions (but, as mentioned above,
 there's usually no need to do that in the code).
 ```python
-from torch.nn.functional import softmax
+from torch import softmax
 softmax(s1, dim=0)     # => tensor([0.6652, 0.2447, 0.0900])
 softmax(s2, dim=0)     # => tensor([0.2447, 0.0900, 0.6652])
 ```
