@@ -9,7 +9,7 @@ size `n`) and outputs a sequence of modified vectors (of size `m`).
 
 Let's assume that the input embedding vectors have the size 5 and that we want
 to transform them with an LSTM to vectors of size 3.  The first step is to
-create the LSTM module:
+create an LSTM module:
 ```python
 import torch
 import torch.nn as nn
@@ -17,7 +17,7 @@ import torch.nn as nn
 lstm = nn.LSTM(input_size=5, hidden_size=3)
 ```
 
-Let's create a sequence of 10 random input vectors which represent the
+Let's create a sequence (matrix) of 10 random input vectors which represent the
 embedding vectors of the subsequent words in the input sentence.  Each vector
 must have the size of 5 (the input size of the LSTM).
 ```python
@@ -31,8 +31,8 @@ lstm(xs)    # => RuntimeError: input must have 3 dimensions, got 2
 ```
 This is because PyTorch LSTM requires that you submit the input sequences in
 batches.  The third required dimension is thus the size of the batch.
-If we insist that we just want to transform the single `xs` sequence, we can
-transform it to a single element batch.
+If we insist that we just want to apply the LSTM to the single `xs` sequence,
+we can transform it to a single-element batch.
 
 If you look at the `input` section of the [LSTM
 documentation](https://pytorch.org/docs/stable/nn.html?highlight=lstm#torch.nn.LSTM),
@@ -43,7 +43,7 @@ input_size)`.  The batch dimension is thus the second one.  We can transform
 ```python
 xs.view(10, 1, 5).shape     # => torch.Size([10, 1, 5])
 ```
-You can also provide `-1` as one of the dimensions, to make PyTorch infer it
+You can also provide `-1` for one of the dimensions, to make PyTorch infer it
 automatically:
 ```python
 xs.view(10, 1, -1).shape     # => torch.Size([10, 1, 5])
