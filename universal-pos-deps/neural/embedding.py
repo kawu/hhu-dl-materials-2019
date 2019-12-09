@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, Dict
 
 import torch
 import torch.nn as nn
@@ -43,7 +43,7 @@ class Embedding(nn.Module):
         # Keep the embedding size
         self.emb_size = emb_size
         # Create the mapping from alphabet/vocabulary to indices
-        self.obj_to_ix = {}
+        self.obj_to_ix = {}  # type: Dict
         for ix, obj in enumerate(alphabet):
             self.obj_to_ix[obj] = ix
         # Create the nn.Embedding module

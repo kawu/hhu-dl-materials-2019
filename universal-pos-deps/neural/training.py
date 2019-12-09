@@ -1,18 +1,18 @@
-from typing import Optional, Callable
+from typing import Optional, Callable, Union
 
 import torch
 import torch.nn as nn
-from torch.utils.data import IterableDataset, DataLoader
+from torch.utils.data import Dataset, IterableDataset, DataLoader
 
 from neural.types import TT
 
 
-def batch_loader(data_set: IterableDataset,
+def batch_loader(data_set: Union[IterableDataset, Dataset],
                  batch_size: bool,
-                 shuffle=True) -> DataLoader:
+                 shuffle=False) -> DataLoader:
     """Create a batch data loader from the given data set.
 
-    Using PyTorch DataSets and DataLoaders is especially useful when working
+    Using PyTorch Datasets and DataLoaders is especially useful when working
     with large datasets, which cannot be stored in the computer memory (RAM)
     all at once.
 
@@ -95,7 +95,8 @@ def train(
 
     # Create batched loader
     batches = batch_loader(
-        train_set, batch_size=batch_size, shuffle=True)
+        # Use no shuffling, it doesn't work with iterable datasets
+        train_set, batch_size=batch_size, shuffle=False)
 
     # Perform SGD in a loop
     for t in range(epoch_num):

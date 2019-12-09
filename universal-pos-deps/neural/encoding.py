@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, Dict
 
 
 class Encoding:
@@ -22,8 +22,8 @@ class Encoding:
     def __init__(self, objects: Iterator):
         obj_set = set(ob for ob in objects)
         self.obj_num = len(obj_set)
-        self.obj_to_ix = {}
-        self.ix_to_obj = {}
+        self.obj_to_ix = {}  # type: Dict
+        self.ix_to_obj = {}  # type: Dict
         for (ix, ob) in enumerate(obj_set):
             self.obj_to_ix[ob] = ix
             self.ix_to_obj[ix] = ob
