@@ -61,6 +61,9 @@ At this point, we can calculate the loss:
 loss = CrossEntropyLoss()
 # Stack the predicted scores into one batch tensor
 scores = torch.stack([s1, s2])
+# The leading batch dimension should be the same:
+# the size of the batch (here: 2)
+assert scores.shape[0] == targets.shape[0]
 # Calculate the actual loss
 loss(scores, targets)   # => tensor(0.4076)
 ```
