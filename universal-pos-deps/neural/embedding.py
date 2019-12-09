@@ -55,14 +55,17 @@ class Embedding(nn.Module):
 
     def forward(self, sym) -> TT:
         """Embed the given symbol."""
-        ix = self.obj_to_ix[sym]
-        return self.emb(torch.tensor(ix, dtype=torch.long))
+        try:
+            ix = self.obj_to_ix[sym]
+            return self.emb(torch.tensor(ix, dtype=torch.long))
+        except KeyError:
+            return torch.zeros(self.emb_size)
 
     def forwards(self, syms: Iterator) -> TT:
         """Embed the given sequence of symbols."""
         # TODO: This is a default implementation, which is correct but
-        # sub-optimal in terms of speed.  You can improve it by applying
-        # nn.Embedding to a batch of symbols at the same time.
+        # potentially sub-optimal in terms of speed.  You can improve it
+        # by applying nn.Embedding to a batch of symbols at the same time.
         embs = []
         for sym in syms:
             embs.append(self.forward(sym))

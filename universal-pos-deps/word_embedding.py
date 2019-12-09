@@ -7,6 +7,7 @@ import torch.nn as nn
 
 from data import Word
 from neural.types import TT
+from neural.embedding import Embedding
 
 
 class WordEmbedder(ABC, nn.Module):
@@ -61,12 +62,10 @@ class AtomicEmbedder(WordEmbedder):
     In particular:
     >>> assert emb("cat").requires_grad is True
 
-    TODO: the embedder should also work on out-of-vocabulary words
-    (it should then return a zero tensor).  Implement the corresponding
-    doctest below.
+    For out-of-vocabulary words, the embedder should return 0:
+    >>> assert (emb("dog") == 0).all()
     """
 
-    # TODO: implement the initialization method
     def __init__(self, vocab: Set[Word], emb_size: int,
                  case_insensitive=False):
         """Create the word embedder for the given vocabulary.
@@ -78,12 +77,25 @@ class AtomicEmbedder(WordEmbedder):
         """
         # The following line is required in each custom neural Module.
         super(AtomicEmbedder, self).__init__()
-        # TODO: implement the remaining of the __init__ method.
+        # Keep info about the case sensitivity
+        self.case_insensitive = case_insensitive
+        # Calculate the modified vocabulary
+        vocab = set(self.preprocess(x) for x in vocab)
+        # Initialize the generic embedding module
+        self.emb = Embedding(vocab, emb_size)
 
-    # TODO: implement this method:
+    def preprocess(self, word: Word) -> Word:
+        """Preprocessing function"""
+        # We use word.lower() to make the embedder case-insensitive
+        if self.case_insensitive:
+            return word.lower()
+        else:
+            return word
+
     def forward(self, word: Word) -> TT:
-        pass
+        """Embed the given word as a vector."""
+        return self.emb(self.preprocess(word))
 
-    # TODO: implement this method:
     def embedding_size(self) -> int:
-        pass
+        """Return the embedding size of the word embedder."""
+        return self.emb.embedding_size()
