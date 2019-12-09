@@ -14,15 +14,21 @@ together with the corresponding parameters.
 * Use `super(ClassName, self).__init__()` at the beginning of the
   initialization method of **each class** that (directly or not) inherits from
   the PyTorch Module, where `ClassName` is the name of the current class.
-* Always add submodules in the initialization method.
+* Always add submodules in the initialization method.  Simply assign them to
+  the object's attributes (see the [example below](#example_ffn)).
 * In case you want to use a [raw
   tensor](https://pytorch.org/docs/stable/tensors.html#torch.Tensor) as a
   module's parameter, wrap it in the
   [Parameter](https://pytorch.org/docs/master/nn.html#torch.nn.Parameter)
-  object. Then, you have to additionally
-  [register](https://pytorch.org/docs/master/nn.html#torch.nn.Module.register_parameter)
-  it.
-  (**TODO**: this may be actually not necessary?)
+  object.  Then you can treat it as a sub-module and assign to an attribute in
+  the initialization method.
+
+<!---
+Then, you have to additionally
+[register](https://pytorch.org/docs/master/nn.html#torch.nn.Module.register_parameter)
+it.
+(**TODO**: this may be actually not necessary?)
+-->
 
 
 ## Example: FFN
@@ -36,6 +42,9 @@ import torch.nn.functional as F
 class FFN(nn.Module):
     def __init__(self, idim: int, hdim: int, odim: int):
         super(FFN, self).__init__()
+        # Below, we create two `nn.Linear` sub-modules and assign them
+        # to the attributes `lin1` and `lin2`.  They get automatically
+        # registered as the FFN's sub-modules.
         self.lin1 = nn.Linear(idim, hdim)
         self.lin2 = nn.Linear(hdim, odim)
 
