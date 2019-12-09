@@ -22,7 +22,12 @@ def load_data(file_path: str) -> Iterator[Sent]:
         for tok_list in parse_incr(data_file):
             sent = []
             for tok in tok_list:
-                sent.append((tok["form"], tok["upostag"]))
+                form = tok["form"]
+                upos = tok["upostag"]
+                # P8 -> Ex3: discard tokens which are not part of the
+                # selected tokenization.  We assume that tokenization is done.
+                if upos != '_':
+                    sent.append((form, upos))
             yield sent
 
 
