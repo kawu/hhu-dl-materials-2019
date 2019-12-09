@@ -101,3 +101,163 @@ assert (z1 == z2).all()
 diff = x1.grad - x2.grad
 assert (-1e-5 < diff).all()
 assert (diff  < 1e-5).all()
+
+
+################################################################
+# Sum
+################################################################
+
+
+class Sum(Function):
+
+    @staticmethod
+    def forward(ctx, x: TT) -> TT:
+        ctx.save_for_backward(x)
+        return x.sum()
+        
+    @staticmethod
+    def backward(ctx, dzdy: TT) -> TT:
+        x, = ctx.saved_tensors
+        return torch.full_like(x, dzdy)
+
+# Alias
+tsum = Sum.apply
+
+# Checks
+x1 = torch.randn(1000, 1000, requires_grad=True)
+torch.sum(x1).backward()
+
+x2 = x1.clone().detach().requires_grad_(True)
+tsum(x2).backward()
+
+assert (x1.grad - x2.grad == 0).all()
+
+
+################################################################
+# Dot product
+################################################################
+
+
+# # Dot product (composition of PyTorch functions)
+# def dot0(x: TT, y: TT) -> TT:
+#     return torch.sum(x * y)
+
+class Product(Function):
+
+    @staticmethod
+    def forward(ctx, x1: TT, x2: TT) -> TT:
+        ctx.save_for_backward(x1, x2)
+        return x1 * x2
+        
+    @staticmethod
+    def backward(ctx, dzdy: TT) -> Tuple[TT, TT]:
+        x1, x2 = ctx.saved_tensors
+        return dzdy*x2, dzdy*x1
+
+# Alias
+prod = Product.apply
+
+# Dot product (composition of custom functions)
+def dot(x: TT, y: TT) -> TT:
+    return tsum(prod(x, y))
+
+# Checks
+x1 = torch.randn(10, requires_grad=True)
+y1 = torch.randn(10, requires_grad=True)
+z1 = torch.dot(x1, y1)
+z1.backward()
+
+x2 = x1.clone().detach().requires_grad_(True)
+y2 = y1.clone().detach().requires_grad_(True)
+z2 = dot(x2, y2)
+z2.backward()
+
+diff = z1 - z2
+assert (-1e-5 < diff).all()
+assert (diff  < 1e-5).all()
+
+assert (x1.grad - x2.grad == 0).all()
+assert (y1.grad - y2.grad == 0).all()
+
+
+################################################################
+# Dot product in one pass
+################################################################
+
+
+class DotProduct(Function):
+
+    @staticmethod
+    def forward(ctx, x1: TT, x2: TT) -> TT:
+        ctx.save_for_backward(x1, x2)
+        return (x1 * x2).sum()
+        
+    @staticmethod
+    def backward(ctx, dzdy: TT) -> Tuple[TT, TT]:
+        x1, x2 = ctx.saved_tensors
+        return dzdy*x2, dzdy*x1
+
+# Alias
+dot = DotProduct.apply
+
+# Checks
+x1 = torch.randn(10, requires_grad=True)
+y1 = torch.randn(10, requires_grad=True)
+z1 = torch.dot(x1, y1)
+z1.backward()
+
+x2 = x1.clone().detach().requires_grad_(True)
+y2 = y1.clone().detach().requires_grad_(True)
+z2 = dot(x2, y2)
+z2.backward()
+
+diff = z1 - z2
+assert (-1e-5 < diff).all()
+assert (diff  < 1e-5).all()
+
+assert (x1.grad - x2.grad == 0).all()
+assert (y1.grad - y2.grad == 0).all()
+
+
+################################################################
+# Matrix-vector product
+################################################################
+
+
+class MatrixVectorProduct(Function):
+
+    @staticmethod
+    def forward(ctx, m: TT, v: TT) -> TT:
+        ctx.save_for_backward(m, v)
+        return torch.mv(m, v)
+        
+    @staticmethod
+    def backward(ctx, dzdy: TT) -> Tuple[TT, TT]:
+        m, v = ctx.saved_tensors
+        # Make a "column vector" from dzdy
+        dzdy = dzdy.view(dzdy.shape[0], -1)
+        dzdm = torch.mm(dzdy, v.view(-1, v.shape[0]))
+        dzdv = (dzdy * m).sum(dim=0)
+        return dzdm, dzdv
+
+# Alias
+mv = MatrixVectorProduct.apply
+
+# Checks
+m1 = torch.randn(5, 3, requires_grad=True)
+v1 = torch.randn(3, requires_grad=True)
+z1 = torch.mv(m1, v1)
+z1.sum().backward()
+
+m2 = m1.clone().detach().requires_grad_(True)
+v2 = v1.clone().detach().requires_grad_(True)
+z2 = mv(m2, v2)
+z2.sum().backward()
+
+# diff = z1 - z2
+# assert (-1e-10 < diff).all()
+# assert (diff  < 1e-10).all()
+
+assert (z1 - z2 == 0).all()
+assert (m1.grad - m2.grad == 0).all()
+assert (v1.grad - v2.grad == 0).all()
