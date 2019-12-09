@@ -46,7 +46,7 @@ about this detail, your final results may be significantly worse!
 
 Recall [the section on the evaluation mode](module.md#evaluation-mode) in the
 document about PyTorch modules.  In the evaluation mode, dropout is equivalent
-to an identity function (`lambda x: return x`):
+to an identity function (`lambda x: x`):
 ```python
 dropout.eval()
 assert (x == dropout(x))    # dropout(x) just returns x
