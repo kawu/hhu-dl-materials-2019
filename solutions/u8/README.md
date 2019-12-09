@@ -28,7 +28,7 @@ See also https://universaldependencies.org/format.html#words-tokens-and-empty-no
 
 In our English dataset, '\_' is mostly assigned to contractions such as
 "don't", "cannot", "aren't", etc.  It makes sense to simply discard them during
-data loading.  The tokenizer should not have trouble identifying them.
+data loading.  The tokenizer should have no trouble identifying them.
 
 Note, however, that this solution may not be optimal for some other (UD)
 languages, where tokenization is not so obvious.
