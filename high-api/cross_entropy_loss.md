@@ -12,9 +12,8 @@ representation of the two distributions:
   rather than **probabilities**.  It is impliciately assumed that
   [softmax][softmax] is applied to convert the scores to probabilities, but you
   rarely need to actually do that explicitely.
-* The target distribution takes the form of a single number: the position in
-  the target probability distribution with value `1`.  All the other
-  probabilities are assumed to be `0`.
+* The target distribution takes the form of a single number: the index of the 
+  class with probability `1`.  All the other classes have probability `0`.
 
 <!---
 **Note**: the second point is actually an significant restriction, because it
