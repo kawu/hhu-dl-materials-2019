@@ -118,9 +118,12 @@ assert ffn.training == ffn.lin1.training
 **WARNING**: You should never change the mode of the submodule, because this
 will not propagate the mode information to other module components!
 ```python
-ffn.lin1.train()    # Set `ffn.lin1` to training mode
-ffn.lin1.training   # => True
+ffn.eval()          # Set everything to evaluation mode
 ffn.training        # => False
+ffn.lin1.training   # => False
+ffn.lin1.train()    # Set `ffn.lin1` to training mode
+ffn.training        # => False
+ffn.lin1.training   # => True (!!!)
 ```
 
 Why should you care about the evaluation mode?  It's important for
