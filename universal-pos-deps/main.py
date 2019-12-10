@@ -1,5 +1,6 @@
 from typing import Sequence, Iterable, Set
 
+import torch
 import torch.nn as nn
 
 from neural.types import TT
@@ -19,50 +20,68 @@ class PosTagger(nn.Module):
     * Simple linear layer is used for scoring
     """
 
-    # TODO: implement this method
+    # DONE: implement this method
     def __init__(self, word_emb: WordEmbedder, tagset: Set[POS]):
-        pass
+        super(PosTagger, self).__init__()
+        # Keep the word embedder, so that it get registered
+        # as a sub-module of the POS tagger.
+        self.word_emb = word_emb
+        # Keep the tagset
+        self.tagset = tagset
+        # We use the liner layer to score the embedding vectors
+        self.linear_layer = nn.Linear(
+            self.word_emb.embedding_size(),
+            len(tagset)
+        )
+        # To normalize the output of the linear layer
+        # (do we need it? we will see)
+        self.normalizer = nn.Sigmoid()
 
-    # TODO: implement this method
     def forward(self, sent: Sequence[Word]) -> TT:
         """Calculate the score vectors for the individual words."""
-        # TODO: Embed all the words and create the embedding matrix
-        embs = None
+        # Embed all the words and create the embedding matrix
+        embs = self.word_emb.forwards(sent)
         # The first dimension should match the number of words
         assert embs.shape[0] == len(sent)
-        # TODO: The second dimension should match...?
-        assert embs.shape[1] == -1
-        # TODO: Calculate the matrix with the scores
-        scores = None
+        # The second dimension should match the embedding size
+        assert embs.shape[1] == self.word_emb.embedding_size()
+        # Calculate the matrix with the scores
+        scores = self.linear_layer(embs)
         # The first dimension should match the number of words
         assert scores.shape[0] == len(sent)
-        # TODO: The second dimension should match...?
-        assert scores.shape[1] == -1
+        # The second dimension should match the size of the tagset
+        assert scores.shape[1] == len(self.tagset)
+        # TODO: do we need do apply some normalizer (sigmoid, softmax?)
         # Finally, return the scores
         return scores
 
-    # TODO: implement this method
+    # DONE (modulo testing): implement this method
     def tag(self, sent: Sequence[Word]) -> Sequence[POS]:
         """Predict the POS tags in the given sentence."""
-        # POS tagging is to be carried out based on the resulting scores
-        scores = self.forward(sent)
-        # Create a list for predicted POS tags
-        predictions = []
-        # For each word, we must select the POS tag corresponding to the
-        # index with the highest score
-        for score_vect in scores:
-            # TODO: determine the position with the highest score
-            ix = None
-            # TODO: assert the index is within the range of POS tag indices
-            assert 0 <= ix < None
-            # TODO: determine the corresponding POS tag
-            pos = None
-            # Append the new prediction
-            predictions.append(pos)
-        # We should have as many predicted POS tags as input words
-        assert len(sent) == len(predictions)
-        # Return the predicted POS tags
-        return predictions
+        # TODO: does it make sense to use `tag` as part of training?
+        with torch.no_grad():
+            # POS tagging is to be carried out based on the resulting scores
+            scores = self.forward(sent)
+            # Create a list for predicted POS tags
+            predictions = []
+            # For each word, we must select the POS tag corresponding to the
+            # index with the highest score
+            for score_vect in scores:
+                # Determine the position with the highest score
+                _, ix = torch.max(score_vect, 0)
+                # Make sure `ix` is a 0d tensor
+                assert ix.dim() == 0
+                ix = ix.item()
+                # Assert the index is within the range of POS tag indices
+                assert 0 <= ix < len(self.tagset)
+                # Determine the corresponding POS tag
+                pos = list(self.tagset)[ix]
+                # Append the new prediction
+                predictions.append(pos)
+            # We should have as many predicted POS tags as input words
+            assert len(sent) == len(predictions)
+            # Return the predicted POS tags
+            return predictions
 
 
 def accuracy(tagger: PosTagger, data_set: Iterable[Sent]) -> float:
