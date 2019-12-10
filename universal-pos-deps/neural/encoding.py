@@ -33,3 +33,7 @@ class Encoding:
 
     def decode(self, ix: int):
         return self.ix_to_obj[ix]
+
+    def size(self):
+        """Return the number of objects in the encoding."""
+        return self.obj_num
