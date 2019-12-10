@@ -2,6 +2,8 @@
 
 https://user.phil.hhu.de/~waszczuk/teaching/hhu-dl-wi19/session8/u8_eng.pdf
 
+The corresponding code with the solutions to the exercises can be found at: https://github.com/kawu/hhu-dl-materials/tree/master/universal-pos-deps
+
 # Exercise 1
 
 (Partially) solved in class.
