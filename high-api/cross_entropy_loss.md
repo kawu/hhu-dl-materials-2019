@@ -12,9 +12,8 @@ representation of the two distributions:
   rather than **probabilities**.  It is impliciately assumed that
   [softmax][softmax] is applied to convert the scores to probabilities, but you
   rarely need to actually do that explicitely.
-* The target distribution takes the form of a single number: the position in
-  the target probability distribution with value `1`.  All the other
-  probabilities are assumed to be `0`.
+* The target distribution takes the form of a single number: the index of the 
+  class with probability `1`.  All the other classes have probability `0`.
 
 <!---
 **Note**: the second point is actually an significant restriction, because it
@@ -45,7 +44,7 @@ Which means that in `s1` the first class (`NOUN`) and in `s2` the third class
 You can apply softmax to get proper distributions (but, as mentioned above,
 there's usually no need to do that in the code).
 ```python
-from torch.nn.functional import softmax
+from torch import softmax
 softmax(s1, dim=0)     # => tensor([0.6652, 0.2447, 0.0900])
 softmax(s2, dim=0)     # => tensor([0.2447, 0.0900, 0.6652])
 ```
@@ -62,6 +61,9 @@ At this point, we can calculate the loss:
 loss = CrossEntropyLoss()
 # Stack the predicted scores into one batch tensor
 scores = torch.stack([s1, s2])
+# The leading batch dimension should be the same:
+# the size of the batch (here: 2)
+assert scores.shape[0] == targets.shape[0]
 # Calculate the actual loss
 loss(scores, targets)   # => tensor(0.4076)
 ```
