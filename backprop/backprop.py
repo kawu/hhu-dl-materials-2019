@@ -112,12 +112,17 @@ class Sum(Function):
 
     @staticmethod
     def forward(ctx, x: TT) -> TT:
+        # Save the input tensor (although its shape would be enough)
         ctx.save_for_backward(x)
         return x.sum()
         
     @staticmethod
     def backward(ctx, dzdy: TT) -> TT:
+        # Restore the input tensor
         x, = ctx.saved_tensors
+        # Create a tensor with the same shape as the input tensor
+        # and with all values equal to dzdy.  Note how this generalizes
+        # the `backward` method from the `Addition` class.
         return torch.full_like(x, dzdy)
 
 # Alias
@@ -135,14 +140,15 @@ assert (x1.grad - x2.grad == 0).all()
 
 ################################################################
 # Dot product
+#
+# Represented as a coposition of two autograd functions:
+# * Sum (see above)
+# * Product (see below)
+#
 ################################################################
 
-
-# # Dot product (composition of PyTorch functions)
-# def dot0(x: TT, y: TT) -> TT:
-#     return torch.sum(x * y)
-
 class Product(Function):
+    """Element-wise product (multiplication)"""
 
     @staticmethod
     def forward(ctx, x1: TT, x2: TT) -> TT:
@@ -152,12 +158,14 @@ class Product(Function):
     @staticmethod
     def backward(ctx, dzdy: TT) -> Tuple[TT, TT]:
         x1, x2 = ctx.saved_tensors
+        # The line below implements the product rule
+        # (https://en.wikipedia.org/wiki/Product_rule)
         return dzdy*x2, dzdy*x1
 
 # Alias
 prod = Product.apply
 
-# Dot product (composition of custom functions)
+# Dot product (composition of custom autograd functions)
 def dot(x: TT, y: TT) -> TT:
     return tsum(prod(x, y))
 
@@ -182,6 +190,9 @@ assert (y1.grad - y2.grad == 0).all()
 
 ################################################################
 # Dot product in one pass
+#
+# 
+#
 ################################################################
 
 
@@ -194,7 +205,15 @@ class DotProduct(Function):
         
     @staticmethod
     def backward(ctx, dzdy: TT) -> Tuple[TT, TT]:
+        # This method combines the `backward` methods from `Sum` and `Product`.
+        # Note how the code is the same as in the `Product.backward`.  The
+        # difference is that the `dzdy` tensor is a single-element tensor.
+        assert dzdy.dim() == 0
         x1, x2 = ctx.saved_tensors
+        # So when we multiply, e.g., `dzdy` by `x2`, we actually multilpy `dzdy`
+        # by each element in `x2`.
+        assert (dzdy * x2).shape == x2.shape
+        # Return the results
         return dzdy*x2, dzdy*x1
 
 # Alias
@@ -233,10 +252,26 @@ class MatrixVectorProduct(Function):
         
     @staticmethod
     def backward(ctx, dzdy: TT) -> Tuple[TT, TT]:
+        # Restore the inputs stored in the forward method
         m, v = ctx.saved_tensors
+        # The shape of `dzdy` should be the same as the shape of the output of
+        # matrix-vector product (the number of rows in `m`):
+        assert dzdy.dim() == 1
+        assert dzdy.shape[0] == m.shape[0]
         # Make a "column vector" from dzdy
-        dzdy = dzdy.view(dzdy.shape[0], -1)
-        dzdm = torch.mm(dzdy, v.view(-1, v.shape[0]))
+        dzdy = dzdy.view(-1, 1)
+        assert dzdy.shape == torch.Size([m.shape[0], 1])
+        # The two partial derivatives below are calculated based on the idea
+        # that the result of matrix-vector multiplication is a vector of dot
+        # products between the individual rows in `m` and the input vector `v`.
+        # Hence, the line immediately below performs a calculation equivalent
+        # to the one implemented in the backward method of the DotProduct.
+        # Here, however, it does it for all the rows of the input matrix `m`
+        # in parallel.
+        dzdm = torch.mm(dzdy, v.view(1, -1))
+        # To obtain `dzdv`, multiply each row in `m` by the corresponding
+        # value in `dzdy`.  Then, sum the rows of the resulting matrix.
+        # It is probably best to verify this on paper.
         dzdv = (dzdy * m).sum(dim=0)
         return dzdm, dzdv
 
