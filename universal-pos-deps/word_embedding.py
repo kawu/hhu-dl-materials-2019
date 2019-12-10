@@ -1,4 +1,4 @@
-from typing import Iterator, Set
+from typing import Iterable, Set
 
 from abc import ABC, abstractmethod
 
@@ -18,7 +18,7 @@ class WordEmbedder(ABC, nn.Module):
         pass
 
     # @abstractmethod
-    def forwards(self, words: Iterator[Word]) -> TT:
+    def forwards(self, words: Iterable[Word]) -> TT:
         """Embed the given words."""
         # Default implementation.  Re-implement for speed
         # in a sub-class.
