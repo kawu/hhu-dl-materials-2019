@@ -37,7 +37,12 @@ See also https://universaldependencies.org/format.html#words-tokens-and-empty-no
 In our English dataset, '\_' is mostly assigned to contractions such as
 "don't", "cannot", "aren't", etc.  It makes sense to simply discard them during
 data loading.  The tokenizer should have no trouble identifying and splitting
-them into component words.
+them into component words.  Note also that the component words (e.g., "cannot"
+-> "can" and "not") are already present in our UD files, so we don't have to
+split such contractions ourselves.
 
 Note, however, that this solution may not be optimal for some other (UD)
-languages, where tokenization is not so obvious.
+languages, where tokenization is not so obvious.  In particular, there's one
+occurrence of "des" in our training dataset, which is a part of a French proper
+name ("Vicaire des Ardennes").  "des" in French is ambiguous ("des" vs "des" vs
+"de+les").
