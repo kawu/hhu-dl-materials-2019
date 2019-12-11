@@ -44,5 +44,4 @@ split such contractions ourselves.
 Note, however, that this solution may not be optimal for some other (UD)
 languages, where tokenization is not so obvious.  In particular, there's one
 occurrence of "des" in our training dataset, which is a part of a French proper
-name ("Vicaire des Ardennes").  "des" in French is ambiguous ("des" vs "des" vs
-"de+les").
+name ("Vicaire des Ardennes").  "des" in French is ambiguous ("des" vs "de+les").
