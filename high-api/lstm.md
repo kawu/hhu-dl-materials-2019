@@ -74,7 +74,7 @@ hs.shape        # => torch.Size([10, 2, 3)]
 #### Dynamic sequence lengths
 
 The issue with the example above is that, typically, the sequences in the input
-batch have different lengths.  This is because these sequences correspond to
+batch have different lengths.  For instance, these sequences can correspond to
 different sentences, with different numbers of words.
 
 A
