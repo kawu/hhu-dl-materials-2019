@@ -72,7 +72,7 @@ hs.shape        # => torch.Size([10, 2, 3)]
 ```
 
 
-## Parameters
+## Hyperparameters
 
 TODO:
 * Layers
