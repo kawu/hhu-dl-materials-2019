@@ -58,7 +58,7 @@ targets = torch.LongTensor([0, 2])
 At this point, we can calculate the loss:
 ```python
 # Create the cross entropy loss object
-loss = CrossEntropyLoss()
+loss = torch.CrossEntropyLoss()
 # Stack the predicted scores into one batch tensor
 scores = torch.stack([s1, s2])
 # The leading batch dimension should be the same:
