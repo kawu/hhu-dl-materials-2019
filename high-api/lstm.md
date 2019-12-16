@@ -123,7 +123,7 @@ padded_hid.shape              # => torch.Size([2, 10, 3])
 padded_len                    # => tensor([10,  8])
 ```
 where `padded_hid` contains two output hidden vectors of length `10` each
-(the shorter padded with `0` tensors), and `padded_len` contains the actual 
+(the shorter is padded with `0` tensors), and `padded_len` contains the actual 
 length of the individual sequences.
 
 <!---
