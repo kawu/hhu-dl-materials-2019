@@ -122,8 +122,12 @@ padded_hid, padded_len = rnn.pad_packed_sequence(packed_hid, batch_first=True)
 padded_hid.shape              # => torch.Size([2, 10, 3])
 padded_len                    # => tensor([10,  8])
 ```
-where `padded_hid` contains the output hidden vectors padded with `0`s, and
-`padded_len` contains the length of the individual sequences.  For instance:
+where `padded_hid` contains two output hidden vectors of length `10` each
+(the shorter padded with `0` tensors), and `padded_len` contains the actual 
+length of the individual sequences.
+
+<!---
+For instance:
 ```python
 # The hidden output tensor corresponding the the `ys` input sequence
 hid_for_ys = padded_hid[1]
@@ -132,6 +136,7 @@ hid_for_ys[9] == 0           # => tensor([True, True, True])
 hid_for_ys[8] == 0           # => tensor([True, True, True])
 hid_for_ys[7] == 0           # => tensor([False, False, False])
 ```
+-->
 
 In general, you can convert the padded representation into a regular list of
 variable-length tensors using, for example:
