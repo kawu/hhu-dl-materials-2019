@@ -1,4 +1,4 @@
-from typing import Sequence, Iterable, Set
+from typing import Sequence, Iterable, Set, List
 
 import torch
 import torch.nn as nn
@@ -20,7 +20,7 @@ class PosTagger(nn.Module):
     * Simple linear layer is used for scoring
     """
 
-    # DONE: implement this method
+    # TODO EX6: adapt this method to use LSTM
     def __init__(self, word_emb: WordEmbedder, tagset: Set[POS]):
         super(PosTagger, self).__init__()
         # Keep the word embedder, so that it get registered
@@ -28,7 +28,8 @@ class PosTagger(nn.Module):
         self.word_emb = word_emb
         # Keep the tagset
         self.tagset = tagset
-        # We use the liner layer to score the embedding vectors
+        # We use the linear layer to score the embedding vectors
+        # TODO EX6: account for LSTM
         self.linear_layer = nn.Linear(
             self.word_emb.embedding_size(),
             len(tagset)
@@ -36,7 +37,10 @@ class PosTagger(nn.Module):
         # To normalize the output of the linear layer
         # (do we need it? we will see)
         self.normalizer = nn.Sigmoid()
+        # TODO EX6: add LSTM submodule
+        pass
 
+    # TODO EX6: adapt this method to use LSTM
     def forward(self, sent: Sequence[Word]) -> TT:
         """Calculate the score vectors for the individual words."""
         # Embed all the words and create the embedding matrix
@@ -44,7 +48,10 @@ class PosTagger(nn.Module):
         # The first dimension should match the number of words
         assert embs.shape[0] == len(sent)
         # The second dimension should match the embedding size
+        # TODO EX6: account for LSTM
         assert embs.shape[1] == self.word_emb.embedding_size()
+        # TODO EX6: apply LSTM to word embeddings
+        pass
         # Calculate the matrix with the scores
         scores = self.linear_layer(embs)
         # The first dimension should match the number of words
@@ -108,8 +115,8 @@ def total_loss(tagger: PosTagger, data_set: Iterable[Sent]) -> TT:
     """Calculate the total total, cross entropy loss over the given dataset."""
     # Create two lists for target indices (corresponding to POS tags we
     # want our mode to predict) and the actually predicted scores.
-    target_ixs = []
-    pred_scores = []
+    target_ixs = []     # type: List[int]
+    pred_scores = []    # type: List[TT]
     # Loop over the dataset in order to determine the target POS tags
     # and the predictions
     for sent in data_set:
@@ -121,7 +128,7 @@ def total_loss(tagger: PosTagger, data_set: Iterable[Sent]) -> TT:
     pass
     # Make sure the dimensions match
     assert target_ixs.shape[0] == pred_scores.shape[0]
-    # TODO: assert that target_ixs_shape is a vector (1d tensor)
+    # TODO: assert that target_ixs is a vector (1d tensor)
     # TODO: In particular, the second dimension of the predicted scores
     # should correspond to the size of the tagset, i.e.?
     assert pred_scores.shape[1] == None
@@ -160,7 +167,7 @@ tagset = set(
 print("Tagset:", tagset)
 
 # Create the word embedding module
-word_emb = AtomicEmbedder(word_set, 50)
+word_emb = AtomicEmbedder(word_set, 10)
 
 # Create the tagger
 tagger = PosTagger(word_emb, tagset)
