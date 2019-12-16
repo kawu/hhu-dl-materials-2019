@@ -71,7 +71,17 @@ hs, _ = lstm(batch)
 hs.shape        # => torch.Size([10, 2, 3)]
 ```
 
-#### Dynamic sequence lengths
+
+## Parameters
+
+TODO:
+* Layers
+* BiLSTMs
+* Dropout
+* ...
+
+
+## Dynamic sequence lengths
 
 The issue with the example above is that, typically, the sequences in the input
 batch have different lengths.  For instance, these sequences can correspond to
@@ -162,11 +172,3 @@ ys = torch.randn((8, 5))
 packed_inp = rnn.pack_sequence([xs, ys], enforce_sorted=False)
 ```
 Otherwise, you will get an exception.
-
-#### Parameters
-
-TODO:
-* Layers
-* BiLSTMs
-* Dropout
-* ...
