@@ -138,7 +138,7 @@ hid_for_ys[7] == 0           # => tensor([False, False, False])
 ```
 -->
 
-In general, you can convert the padded representation into a regular list of
+You can convert the padded representation into a regular list of
 variable-length tensors using, for example:
 ```python
 hs = []
