@@ -74,11 +74,40 @@ hs.shape        # => torch.Size([10, 2, 3)]
 
 ## Hyperparameters
 
-TODO:
-* Layers
-* BiLSTMs
-* Dropout
-* ...
+#### Number of layers
+
+An LSTM can have several layers.  For instance, a two-layer LSTM is a
+composition of two regular (single-layer) LSTMs, where the output of the first
+LSTM becomes the input of the second LSTM.
+
+<!---
+TODO: why stacking LSTMs on top of each other is useful?
+-->
+
+You can specify the number of layers using the `num_layers` parameter (by
+default, `num_layers=1`).  For instance, two-layer LSTM can be created using:
+```python
+lstm = nn.LSTM(input_size=..., hidden_size=..., num_layers=2)
+```
+
+#### BiLSTM
+
+By default, `nn.LSTM` is a unidirectional, left-to-right LSTM.  It is possible
+to create a bidirectional LSTM (BiLSTM) manually from two unidirectional LSTMs.
+However, the PyTorch LSTM class allows to do that with the `bidirectional=True`
+parameter.  Note, however, that this doubles the size of the output vectors!
+```python
+lstm = nn.LSTM(input_size=5, hidden_size=3, bidirectional=True)
+xs = torch.randn((10, 5))
+hs, _ = lstm(xs.view(10, 1, -1))
+hs.shape        # => torch.Size([10, 1, 6]) 
+```
+Note that in the example above, the size of the last dimension changes from 5
+(the input size) to 6 (twice of the provided `hidden_size` parameter).
+
+#### Dropout
+
+TODO
 
 
 ## Dynamic sequence lengths
