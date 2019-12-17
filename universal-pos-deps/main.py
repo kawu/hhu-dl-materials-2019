@@ -127,10 +127,11 @@ def total_loss(tagger: PosTagger, data_set: Iterable[Sent]) -> TT:
     pass
     # Make sure the dimensions match
     assert target_ixs.shape[0] == pred_scores.shape[0]
-    # TODO: assert that target_ixs is a vector (1d tensor)
-    # TODO: In particular, the second dimension of the predicted scores
-    # should correspond to the size of the tagset, i.e.?
-    assert pred_scores.shape[1] == None
+    # Assert that target_ixs is a vector (1d tensor)
+    assert target_ixs.dim() == 1
+    # The second dimension of the predicted scores
+    # should correspond to the size of the tagset:
+    assert pred_scores.shape[1] == len(tagger.tagset)
     # TODO: Calculate the loss and return it
     pass
 
