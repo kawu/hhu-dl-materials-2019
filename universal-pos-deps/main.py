@@ -4,13 +4,14 @@ import torch
 import torch.nn as nn
 
 from neural.types import TT
+from neural.training import train
 
 from data import Word, POS, Sent
 import data
 from word_embedding import WordEmbedder, AtomicEmbedder
 
 
-# TODO: Implement this class
+# DONE: Implement this class
 class PosTagger(nn.Module):
     """Simple POS tagger based on LSTM.
 
@@ -20,7 +21,7 @@ class PosTagger(nn.Module):
     * Simple linear layer is used for scoring
     """
 
-    # TODO EX6: adapt this method to use LSTM
+    # DONE EX6: adapt this method to use LSTM
     def __init__(self, word_emb: WordEmbedder, tagset: Set[POS]):
         super(PosTagger, self).__init__()
         # Keep the word embedder, so that it get registered
@@ -30,17 +31,22 @@ class PosTagger(nn.Module):
         self.tagset = tagset
         # We use the linear layer to score the embedding vectors
         # TODO EX6: account for LSTM
+        # DONE: we keep the size of the hidden layer equal to
+        # the embedding size
         self.linear_layer = nn.Linear(
             self.word_emb.embedding_size(),
             len(tagset)
         )
-        # To normalize the output of the linear layer
-        # (TODO: do we need it?)
-        self.normalizer = nn.Sigmoid()
-        # TODO EX6: add LSTM submodule
-        pass
+        # # To normalize the output of the linear layer
+        # # (do we need it?)
+        # self.normalizer = nn.Sigmoid()
+        # DONE EX6: add LSTM submodule
+        self.lstm = nn.LSTM(
+            self.word_emb.embedding_size(),
+            self.word_emb.embedding_size()
+        )
 
-    # TODO EX6: adapt this method to use LSTM
+    # DONE EX6: adapt this method to use LSTM
     def forward(self, sent: Sequence[Word]) -> TT:
         """Calculate the score vectors for the individual words."""
         # Embed all the words and create the embedding matrix
@@ -49,15 +55,17 @@ class PosTagger(nn.Module):
         assert embs.shape[0] == len(sent)
         # The second dimension should match the embedding size
         assert embs.shape[1] == self.word_emb.embedding_size()
-        # TODO EX6: apply LSTM to word embeddings
-        pass
+        # DONE EX6: apply LSTM to word embeddings
+        embs = embs.view(len(sent), 1, -1)
+        ctx_embs, _ = self.lstm(embs)
+        # Reshape back the contextualized embeddings
+        ctx_embs = ctx_embs.view(len(sent), -1)
         # Calculate the matrix with the scores
-        scores = self.linear_layer(embs)
+        scores = self.linear_layer(ctx_embs)
         # The first dimension should match the number of words
         assert scores.shape[0] == len(sent)
         # The second dimension should match the size of the tagset
         assert scores.shape[1] == len(self.tagset)
-        # TODO: do we need do apply some normalizer (sigmoid, softmax?)
         # Finally, return the scores
         return scores
 
@@ -109,7 +117,7 @@ def accuracy(tagger: PosTagger, data_set: Iterable[Sent]) -> float:
     return k / n
 
 
-# TODO: implement this function
+# DONE: implement this function
 def total_loss(tagger: PosTagger, data_set: Iterable[Sent]) -> TT:
     """Calculate the total total, cross entropy loss over the given dataset."""
     # Create two lists for target indices (corresponding to POS tags we
@@ -121,10 +129,25 @@ def total_loss(tagger: PosTagger, data_set: Iterable[Sent]) -> TT:
     for sent in data_set:
         # Unzip the sentence into a (list of words, list of target POS tags)
         (words, gold_tags) = zip(*sent)
-        # TODO: Determine the target POS tag indices and update `target_ixs`
-        # TODO: Determine the predicted scores and update `pred_scores`
-    # TODO: Convert the target indices and the predictions to tensors
-    pass
+        # DONE: Determine the target POS tag indices and update `target_ixs`
+        for tag in gold_tags:
+            # Determine the index corresponding to the POS gold_tag
+            ix = list(tagger.tagset).index(tag)
+            # Append it to the target list
+            target_ixs.append(ix)
+        # DONE: Determine the predicted scores and update `pred_scores`
+        scores = tagger.forward(words)
+        # TODO: is there a more efficient way?
+        pred_scores.extend(scores)
+        # Additional assertion (we can remove it later if everything works)
+        # At this point, pred_scores[-1] contains the scores corresponding
+        # to the last word in `sent`
+        assert pred_scores[-1].dim() == 1
+        # print(pred_scores[-1])
+        assert len(pred_scores[-1]) == len(tagger.tagset)
+    # DONE: Convert the target indices and the predictions to tensors
+    target_ixs = torch.LongTensor(target_ixs)
+    pred_scores = torch.stack(pred_scores)
     # Make sure the dimensions match
     assert target_ixs.shape[0] == pred_scores.shape[0]
     # Assert that target_ixs is a vector (1d tensor)
@@ -132,8 +155,9 @@ def total_loss(tagger: PosTagger, data_set: Iterable[Sent]) -> TT:
     # The second dimension of the predicted scores
     # should correspond to the size of the tagset:
     assert pred_scores.shape[1] == len(tagger.tagset)
-    # TODO: Calculate the loss and return it
-    pass
+    # DONE: Calculate the loss and return it
+    loss = nn.CrossEntropyLoss()
+    return loss(pred_scores, target_ixs)
 
 
 # Training dataset
@@ -172,4 +196,11 @@ word_emb = AtomicEmbedder(word_set, 10)
 # Create the tagger
 tagger = PosTagger(word_emb, tagset)
 
-# TODO: train the model (see `train` in `neural/training`)
+# DONE: train the model (see `train` in `neural/training`)
+train(
+    tagger, train_set, dev_set,
+    total_loss, accuracy,
+    epoch_num=25,
+    learning_rate=0.01,
+    report_rate=5
+)
