@@ -50,10 +50,10 @@ softmax(s2, dim=0)     # => tensor([0.2447, 0.0900, 0.6652])
 ```
 
 Let's assume that the target classes are `NOUN` (index `0`) and `VERB` (index
-`2`), correspondingly.  That is, the model would predict the noun correctly,
+`1`), correspondingly.  That is, the model would predict the noun correctly,
 but not the verb.  We can represent the target classes using a single tensor:
 ```python
-targets = torch.LongTensor([0, 2])
+targets = torch.LongTensor([0, 1])
 ```
 At this point, we can calculate the loss:
 ```python
@@ -66,13 +66,13 @@ scores = torch.stack([s1, s2])
 # the size of the batch (here: 2)
 assert scores.shape[0] == targets.shape[0]
 # Calculate the actual loss
-loss(scores, targets)   # => tensor(0.4076)
+loss(scores, targets)   # => tensor(1.4076)
 ```
-It's easy to check that, if the scores correspond to targets, the loss is
+It's easy to check that, if the scores correspond to the targets, the loss is
 lower:
 ```python
 s1 = torch.tensor([5.0, -5.0, -5.0])
-s2 = torch.tensor([-5.0, -5.0, 5.0])
+s2 = torch.tensor([-5.0, 5.0, -5.0])
 loss(torch.stack([s1, s2]), targets)   # => tensor(9.0833e-05)
 ```
 
