@@ -51,8 +51,7 @@ xs.view(10, 1, -1).shape     # => torch.Size([10, 1, 5])
 
 Now we can apply LSTM to our single-element batch:
 ```python
-xs_batched = xs.view(10, 1, -1)
-hs, _ = lstm(xs_batched)
+hs, _ = lstm(xs.view(10, 1, -1))
 hs.shape        # => torch.Size([10, 1, 3])
 ```
 As you can see, the last dimension -- which represents the actual vectors that
