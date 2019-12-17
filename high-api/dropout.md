@@ -89,13 +89,14 @@ particular.
 ffn = FFN(100, 50, 10, dropout=0.5)
 # Create a random input tensor
 x = torch.randn(100)
+# Make sure we are in the training mode
+ffn.train()
 # We can be pretty sure that the result will be different in different FFN
 # applications because of dropout (pointless exercise: what is the probability
 # that the assertion below fails?)
 assert (ffn(x) != ffn(x)).all()
-# However, if we turn the evaluation mode on, the results
-# are guaranteed to be the same, becuase dropout does not
-# apply in this case
+# However, if we turn the evaluation mode on, the results are guaranteed to
+# be the same, becuase dropout does not apply in this case
 ffn.eval()
 assert (ffn(x) == ffn(x)).all()
 ```

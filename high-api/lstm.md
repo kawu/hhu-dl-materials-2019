@@ -106,7 +106,11 @@ Note that in the example above, the size of the last dimension changes from 5
 
 #### Dropout
 
-TODO
+When 2 or more LSTM layers are used (see [above](#number-of-layers)), you can
+suply a `dropout` rate which *introduces a Dropout layer on the outputs of
+each LSTM layer except the last layer, with dropout probability equal to
+`dropout`* (see PyTorch docs).  As usual, the purpose of this is to counter the
+overfitting issue.  See also the [notes on dropout](dropout.md).
 
 
 ## Dynamic sequence lengths
