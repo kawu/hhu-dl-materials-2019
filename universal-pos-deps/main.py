@@ -35,7 +35,7 @@ class PosTagger(nn.Module):
             len(tagset)
         )
         # To normalize the output of the linear layer
-        # (do we need it? we will see)
+        # (TODO: do we need it?)
         self.normalizer = nn.Sigmoid()
         # TODO EX6: add LSTM submodule
         pass
@@ -48,7 +48,6 @@ class PosTagger(nn.Module):
         # The first dimension should match the number of words
         assert embs.shape[0] == len(sent)
         # The second dimension should match the embedding size
-        # TODO EX6: account for LSTM
         assert embs.shape[1] == self.word_emb.embedding_size()
         # TODO EX6: apply LSTM to word embeddings
         pass
