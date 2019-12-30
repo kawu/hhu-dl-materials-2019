@@ -2,6 +2,7 @@ from typing import Sequence, Iterable, Set, List
 
 import torch
 import torch.nn as nn
+import torch.nn.utils.rnn as rnn
 
 from neural.types import TT
 from neural.training import train
@@ -69,6 +70,45 @@ class PosTagger(nn.Module):
         # Finally, return the scores
         return scores
 
+    def forwards(self, sents: Iterable[Sequence[Word]]) -> List[TT]:
+        """Calculate the score vectors for the individual words."""
+        # Embed all the sentences separately (we could further consider
+        # embedding all the sentences at once, but this would require
+        # creating a padded embedding (4-dimensional) tensor)
+        embs = [
+            self.word_emb.forwards(sent)
+            for sent in sents
+        ]
+        # Pack embeddings as a packed sequence
+        packed_embs = rnn.pack_sequence(embs, enforce_sorted=False)
+        # Apply LSTM to the packed sequence of word embeddings
+        packed_hidden, _ = self.lstm(packed_embs)
+        # Each element of the .data attribute of the resulting hidden
+        # packed sequence should now match the input size of the linear
+        # scoring layer
+        assert packed_hidden.data.shape[1] == self.linear_layer.in_features
+        # Apply the linear layer to each element of `packed_hidden.data`
+        # individually
+        scores_data = self.linear_layer(packed_hidden.data)
+        # Recreate a packed sequence out of the resulting scoring data;
+        # this is somewhat low-level and not really recommended by PyTorch
+        # documnetation -- do you know a better way?
+        packed_scores = rnn.PackedSequence(
+            scores_data,
+            batch_sizes=packed_hidden.batch_sizes,
+            sorted_indices=packed_hidden.sorted_indices,
+            unsorted_indices=packed_hidden.unsorted_indices
+        )
+        # Pad the resulting packed sequence
+        padded_scores, padded_len = rnn.pad_packed_sequence(
+            packed_scores, batch_first=True)
+        # Convert the padded representation to a list of score tensors
+        scores = []
+        for sco, n in zip(padded_scores, padded_len):
+            scores.append(sco[:n])
+        # Finally, return the scores
+        return scores
+
     # DONE (modulo testing): implement this method
     def tag(self, sent: Sequence[Word]) -> Sequence[POS]:
         """Predict the POS tags in the given sentence."""
@@ -123,7 +163,7 @@ def total_loss(tagger: PosTagger, data_set: Iterable[Sent]) -> TT:
     # Create two lists for target indices (corresponding to POS tags we
     # want our mode to predict) and the actually predicted scores.
     target_ixs = []     # type: List[int]
-    pred_scores = []    # type: List[TT]
+    inputs = []         # type: List[Sequence[Word]]
     # Loop over the dataset in order to determine the target POS tags
     # and the predictions
     for sent in data_set:
@@ -135,19 +175,12 @@ def total_loss(tagger: PosTagger, data_set: Iterable[Sent]) -> TT:
             ix = list(tagger.tagset).index(tag)
             # Append it to the target list
             target_ixs.append(ix)
-        # DONE: Determine the predicted scores and update `pred_scores`
-        scores = tagger.forward(words)
-        # TODO: is there a more efficient way?
-        pred_scores.extend(scores)
-        # Additional assertion (we can remove it later if everything works)
-        # At this point, pred_scores[-1] contains the scores corresponding
-        # to the last word in `sent`
-        assert pred_scores[-1].dim() == 1
-        # print(pred_scores[-1])
-        assert len(pred_scores[-1]) == len(tagger.tagset)
-    # DONE: Convert the target indices and the predictions to tensors
+        # Append the new sentence to the inputs list
+        inputs.append(words)
+    # Calculate the scores in a batch and concat them
+    pred_scores = torch.cat(tagger.forwards(inputs))
+    # Convert the target indices to a tensor
     target_ixs = torch.LongTensor(target_ixs)
-    pred_scores = torch.stack(pred_scores)
     # Make sure the dimensions match
     assert target_ixs.shape[0] == pred_scores.shape[0]
     # Assert that target_ixs is a vector (1d tensor)

@@ -53,7 +53,7 @@ If this is surprising to you, note that when several words are embedded
 together, we first calculate the indices corresponding to the individual words,
 which does not involve backpropagation because the indices are fixed, we only
 adapt the corresponding embedding vectors during training.  Hence, the backward
-method of the Embedding class also words ,,in a batch'', i.e., for the entire
+method of the Embedding class also works ,,in a batch'', i.e., for the entire
 group of words in parallel.
 
 As a result of this optimization:
@@ -61,4 +61,31 @@ As a result of this optimization:
 In [1]: timeit -n 1 -r 3 run main
 ...
 3min 29s ± 202 ms per loop (mean ± std. dev. of 3 runs, 1 loop each)
+```
+
+<!---
+TODO: consider embedding for several sentences at the same time.
+-->
+
+
+### LSTM
+
+As described on the [page about LSTMs](TODO), applying LSTM to a batch of
+sentences is not trivial because the lengts of the individual sentences can
+differ.  To this end, a
+[PackedSequence](https://pytorch.org/docs/stable/nn.html?highlight=lstm#torch.nn.utils.rnn.PackedSequence)
+can be used.
+
+This optimization involves:
+* Adding the `forwards` method to the POS tagger, which processes sentences in
+  batches using the packed sequence representation (of course, you could use a
+  different name for this method)
+* Using the new tagger's `forwards` method in the `total_loss` function, to
+  actually processes sentences in batches during training.
+
+As a result of this optimization:
+```
+In [1]: timeit -n 1 -r 3 run main
+...
+43.8 s ± 714 ms per loop (mean ± std. dev. of 3 runs, 1 loop each)
 ```
