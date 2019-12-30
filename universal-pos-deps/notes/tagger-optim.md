@@ -6,7 +6,8 @@ tagger.
 
 ### Baseline
 
-The baseline tagger is the one implemented before the Christmas break.
+Baseline is the tagger [implemented before the Christmas
+break](https://github.com/kawu/hhu-dl-materials/tree/e1f252990fb01cd5e3a36d2b20b9f932aaccc625).
 You can measure its performance in IPython:
 ```
 In [1]: timeit -n 1 -r 3 run main
@@ -31,9 +32,9 @@ implementation of the model).
 ### Embeddings
 
 In the baseline implementation of the generic embedding class:
-* Whenever an out-of-vocabulary (OOV) word is encountered, a zero embedding vector
-  is created explicitly.
-* Vocabulary elements (in our case -- words) are always embedded individually.
+* Whenever an out-of-vocabulary (OOV) word is encountered, a [zero embedding vector
+  is created explicitly](https://github.com/kawu/hhu-dl-materials/blob/e1f252990fb01cd5e3a36d2b20b9f932aaccc625/universal-pos-deps/neural/embedding.py#L61-L62).
+* Vocabulary elements (in our case -- words) are always [embedded individually](https://github.com/kawu/hhu-dl-materials/blob/e1f252990fb01cd5e3a36d2b20b9f932aaccc625/universal-pos-deps/neural/embedding.py#L69-L72).
 
 We can improve on these two points by, respectively:
 * Using the padding index of the [PyTorch Embedding
@@ -43,6 +44,7 @@ We can improve on these two points by, respectively:
 The former allows to avoid explicitly creating zero embedding vectors.  It also
 enables the latter optimization -- embedding words in groups -- which allows to
 avoid stacking together (with `torch.stack`) the resulting embedding vectors.
+See [the corresponding diff](https://github.com/kawu/hhu-dl-materials/commit/b5e57f73e0eb6ee58dd049a9e0f07ca0c477507e#diff-61ae524f1b0f2b45b8f89e7ff015956e) for details.
 
 <!---
 If we first create the embedding vectors and then stack them together, as in
