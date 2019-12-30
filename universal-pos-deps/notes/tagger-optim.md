@@ -4,7 +4,7 @@ This document describes the steps implemented in order to optimize the POS
 tagger.
 
 
-### Baseline
+## Baseline
 
 Baseline is the tagger [implemented before the Christmas
 break](https://github.com/kawu/hhu-dl-materials/tree/e1f252990fb01cd5e3a36d2b20b9f932aaccc625).
@@ -29,7 +29,7 @@ same (modulo randomization, which makes the results differ even for the same
 implementation of the model).
 
 
-### Embeddings
+## Embeddings
 
 In the baseline implementation of the generic embedding class:
 * Whenever an out-of-vocabulary (OOV) word is encountered, a [zero embedding vector
@@ -74,7 +74,7 @@ TODO: consider embedding for several sentences at the same time.
 -->
 
 
-### LSTM
+## LSTM
 
 As described on the [page about
 LSTMs](https://github.com/kawu/hhu-dl-materials/blob/dev/high-api/lstm.md#dynamic-sequence-lengths),
@@ -99,3 +99,33 @@ In [1]: timeit -n 1 -r 3 run main
 ...
 43.8 s ± 714 ms per loop (mean ± std. dev. of 3 runs, 1 loop each)
 ```
+
+
+## Reporting
+
+Turning off reporting -- i.e., setting the `report_rate` argument of the
+`train` function to a value higher than `epoch_num` at the end of `main.py` --
+gives:
+```
+In [1]: timeit -n 1 -r 3 run main
+...
+33.7 s ± 1.02 s per loop (mean ± std. dev. of 3 runs, 1 loop each)
+```
+This reveals that a significant amount of computation time (around 25\%) is
+spent on reporting the accuracy and loss on the `dev` and `train` sets.  The
+accuracy function in particular is rather inefficient because it processes
+dataset elements sequentially.
+
+To remedy this:
+* A version of the `tag` method which [tags sentences in batches](https://github.com/kawu/hhu-dl-materials/blob/1ee4a13ca7b75e95ba6af84e5b6950d54121de75/universal-pos-deps/main.py#L140-L168) is implemented.
+* The `accuracy` function is [adapted to work in batches](https://github.com/kawu/hhu-dl-materials/blob/1ee4a13ca7b75e95ba6af84e5b6950d54121de75/universal-pos-deps/main.py#L171-L197).
+
+See also [the corresponding
+diff](https://github.com/kawu/hhu-dl-materials/commit/1ee4a13ca7b75e95ba6af84e5b6950d54121de75#diff-39e3f0a6559bc7cfeea0212650b872f4).
+As a result of this optimization:
+```
+In [1]: timeit -n 1 -r 3 run main
+...
+37.4 s ± 705 ms per loop (mean ± std. dev. of 3 runs, 1 loop each)
+```
+which is better than the previous `43.8 s`.
