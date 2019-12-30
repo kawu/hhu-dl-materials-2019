@@ -38,13 +38,13 @@ In the baseline implementation of the generic embedding class:
 
 We can improve on these two points by, respectively:
 * Using the padding index of the [PyTorch Embedding
-  class](https://pytorch.org/docs/stable/nn.html#embedding).
-* Embedding words in groups.
+  class](https://pytorch.org/docs/stable/nn.html#embedding).  See the corresponding code [here](https://github.com/kawu/hhu-dl-materials/blob/b5e57f73e0eb6ee58dd049a9e0f07ca0c477507e/universal-pos-deps/neural/embedding.py#L49-L60) and [here](https://github.com/kawu/hhu-dl-materials/blob/b5e57f73e0eb6ee58dd049a9e0f07ca0c477507e/universal-pos-deps/neural/embedding.py#L71-L73).
+* [Embedding words in groups](https://github.com/kawu/hhu-dl-materials/blob/b5e57f73e0eb6ee58dd049a9e0f07ca0c477507e/universal-pos-deps/neural/embedding.py#L76-L84).
 
 The former allows to avoid explicitly creating zero embedding vectors.  It also
 enables the latter optimization -- embedding words in groups -- which allows to
 avoid stacking together (with `torch.stack`) the resulting embedding vectors.
-See [the corresponding diff](https://github.com/kawu/hhu-dl-materials/commit/b5e57f73e0eb6ee58dd049a9e0f07ca0c477507e#diff-61ae524f1b0f2b45b8f89e7ff015956e) for details.
+See also [the corresponding diff](https://github.com/kawu/hhu-dl-materials/commit/b5e57f73e0eb6ee58dd049a9e0f07ca0c477507e#diff-61ae524f1b0f2b45b8f89e7ff015956e) for details.
 
 <!---
 If we first create the embedding vectors and then stack them together, as in
@@ -84,15 +84,15 @@ individual sentences can differ.  To this end, a
 can be used.
 
 This optimization involves:
-* Adding the `forwards` method to the POS tagger, which processes sentences in
+* Adding the [`forwards` method](https://github.com/kawu/hhu-dl-materials/blob/6351c5e1cd4333fa4bfb2f86c59616dd4cd58d64/universal-pos-deps/main.py#L73-L110) to the POS tagger, which processes sentences in
   batches using the packed sequence representation.
   <!--- 
   (of course, you could use a different name for this method)
   -->
-* Using the new `forwards` method in the `total_loss` function, to actually
+* Using the new `forwards` method in the [`total_loss` function](https://github.com/kawu/hhu-dl-materials/blob/6351c5e1cd4333fa4bfb2f86c59616dd4cd58d64/universal-pos-deps/main.py#L178-L181), to actually
   processes sentences in batches during training.
 
-See [the corresponding diff](https://github.com/kawu/hhu-dl-materials/commit/6351c5e1cd4333fa4bfb2f86c59616dd4cd58d64#diff-39e3f0a6559bc7cfeea0212650b872f4) for details.
+See also [the corresponding diff](https://github.com/kawu/hhu-dl-materials/commit/6351c5e1cd4333fa4bfb2f86c59616dd4cd58d64#diff-39e3f0a6559bc7cfeea0212650b872f4) for details.
 As a result of this optimization:
 ```
 In [1]: timeit -n 1 -r 3 run main
