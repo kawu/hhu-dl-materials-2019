@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.utils.rnn as rnn
 
 from neural.types import TT
-from neural.training import train
+from neural.training import train, batch_loader
 
 from data import Word, POS, Sent
 import data
@@ -137,23 +137,63 @@ class PosTagger(nn.Module):
             # Return the predicted POS tags
             return predictions
 
+    def tags(self, batch: Sequence[Sequence[Word]]) -> Iterable[Sequence[POS]]:
+        """Predict the POS tags in the given batch of sentences.
 
-def accuracy(tagger: PosTagger, data_set: Iterable[Sent]) -> float:
+        A variant of the `tag` method which works on a batch of sentences.
+        """
+        with torch.no_grad():
+            # POS tagging is to be carried out based on the resulting scores
+            scores_batch = self.forwards(batch)
+            for scores, sent in zip(scores_batch, batch):
+                # Create a list for predicted POS tags
+                predictions = []
+                # For each word, we must select the POS tag corresponding to
+                # the index with the highest score
+                for score_vect in scores:
+                    # Determine the position with the highest score
+                    _, ix = torch.max(score_vect, 0)
+                    # Make sure `ix` is a 0d tensor
+                    assert ix.dim() == 0
+                    ix = ix.item()
+                    # Assert the index is within the range of POS tag indices
+                    assert 0 <= ix < len(self.tagset)
+                    # Determine the corresponding POS tag
+                    pos = list(self.tagset)[ix]
+                    # Append the new prediction
+                    predictions.append(pos)
+                # We should have as many predicted POS tags as input words
+                assert len(sent) == len(predictions)
+                # Return the predicted POS tags
+                yield predictions
+
+
+def accuracy(
+        tagger: PosTagger, data_set: Iterable[Sent], batch_size=64) -> float:
     """Calculate the accuracy of the model on the given dataset.
 
     The accuracy is defined as the percentage of the words in the data_set
     for which the model predicts the correct POS tag.
     """
     k, n = 0., 0.
-    for sent in data_set:
-        # Split the sentence into input words and POS tags
-        words, gold_poss = zip(*sent)
-        # Predict the POS tags using the model
-        pred_poss = tagger.tag(words)
-        for (pred_pos, gold_pos) in zip(pred_poss, gold_poss):
-            if pred_pos == gold_pos:
-                k += 1.
-            n += 1.
+    # We load the dataset in batches to speed the calculation up
+    for batch in batch_loader(data_set, batch_size=batch_size):
+        # Calculate the input batch
+        inputs = []
+        for sent in batch:
+            # Split the sentence into input words and POS tags
+            words, _ = zip(*sent)
+            inputs.append(list(words))
+        # Tag all the sentences
+        predictions = tagger.tags(inputs)
+        # Process the predictions and compare with the gold POS tags
+        for sent, pred_poss in zip(batch, predictions):
+            # Split the sentence into input words and POS tags
+            _, gold_poss = zip(*sent)
+            for (pred_pos, gold_pos) in zip(pred_poss, gold_poss):
+                if pred_pos == gold_pos:
+                    k += 1.
+                n += 1.
     return k / n
 
 
