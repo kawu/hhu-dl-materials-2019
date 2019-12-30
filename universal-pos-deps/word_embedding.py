@@ -96,6 +96,13 @@ class AtomicEmbedder(WordEmbedder):
         """Embed the given word as a vector."""
         return self.emb(self.preprocess(word))
 
+    def forwards(self, words: Iterable[Word]) -> TT:
+        """Embed the given sequence of words."""
+        # This is faster than the default implementation (see the
+        # `WordEmbedder` class) because it relies on the more
+        # performant `self.emb.fowards` method.
+        return self.emb.forwards(map(self.preprocess, words))
+
     def embedding_size(self) -> int:
         """Return the embedding size of the word embedder."""
         return self.emb.embedding_size()
