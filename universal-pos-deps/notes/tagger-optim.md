@@ -92,6 +92,7 @@ This optimization involves:
 * Using the new `forwards` method in the `total_loss` function, to actually
   processes sentences in batches during training.
 
+See [the corresponding diff](https://github.com/kawu/hhu-dl-materials/commit/6351c5e1cd4333fa4bfb2f86c59616dd4cd58d64#diff-39e3f0a6559bc7cfeea0212650b872f4) for details.
 As a result of this optimization:
 ```
 In [1]: timeit -n 1 -r 3 run main
