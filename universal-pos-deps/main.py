@@ -234,7 +234,10 @@ def total_loss(tagger: PosTagger, data_set: Iterable[Sent]) -> TT:
 
 
 # Training dataset
-train_set = data.MemPosDataSet("UD_English-ParTUT/en_partut-ud-train.conllu")
+train_set = data.MemPosDataSet(
+    "UD_English-ParTUT/en_partut-ud-train.conllu",
+    sort_by_len=True
+)
 
 # Development dataset
 dev_set = data.MemPosDataSet("UD_English-ParTUT/en_partut-ud-dev.conllu")

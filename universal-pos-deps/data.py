@@ -59,8 +59,10 @@ class MemPosDataSet(PosDataSet):
     Use this class if speed is more important than memory usage.
     """
 
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str, sort_by_len=False):
         self.data_set = list(load_data(file_path))
+        if sort_by_len:
+            self.data_set.sort(key=len, reverse=True)
 
     def __iter__(self):
         for elem in self.data_set:
