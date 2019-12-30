@@ -84,12 +84,12 @@ individual sentences can differ.  To this end, a
 can be used.
 
 This optimization involves:
-* Adding the [`forwards` method](https://github.com/kawu/hhu-dl-materials/blob/6351c5e1cd4333fa4bfb2f86c59616dd4cd58d64/universal-pos-deps/main.py#L73-L110) to the POS tagger, which processes sentences in
+* [Adding the `forwards` method](https://github.com/kawu/hhu-dl-materials/blob/6351c5e1cd4333fa4bfb2f86c59616dd4cd58d64/universal-pos-deps/main.py#L73-L110) to the POS tagger, which processes sentences in
   batches using the packed sequence representation.
   <!--- 
   (of course, you could use a different name for this method)
   -->
-* Using the new `forwards` method in the [`total_loss` function](https://github.com/kawu/hhu-dl-materials/blob/6351c5e1cd4333fa4bfb2f86c59616dd4cd58d64/universal-pos-deps/main.py#L178-L181), to actually
+* [Using the new `forwards` method in the `total_loss` function](https://github.com/kawu/hhu-dl-materials/blob/6351c5e1cd4333fa4bfb2f86c59616dd4cd58d64/universal-pos-deps/main.py#L178-L181), to actually
   processes sentences in batches during training.
 
 See also [the corresponding diff](https://github.com/kawu/hhu-dl-materials/commit/6351c5e1cd4333fa4bfb2f86c59616dd4cd58d64#diff-39e3f0a6559bc7cfeea0212650b872f4) for details.
