@@ -129,3 +129,25 @@ In [1]: timeit -n 1 -r 3 run main
 37.4 s ± 705 ms per loop (mean ± std. dev. of 3 runs, 1 loop each)
 ```
 which is better than the previous `43.8 s`.
+
+
+## Dataset ordering
+
+Recurrent networks (such as LSTM) work best (in terms of speed) when all the
+sequences in a
+[PackedSequence](https://pytorch.org/docs/stable/nn.html?highlight=lstm#torch.nn.utils.rnn.PackedSequence)
+have roughly the same length.  This allows better parallelization of recurrent
+computations (the details are beyond the scope of this document, though).
+
+In practice, this means that all sentences in a (SGD) batch should have similar
+length.  This can be simply achieved by [sorting the training dataset by
+length](https://github.com/kawu/hhu-dl-materials/blob/3cd09d1e0e337051608ca90fb220a11a4f93738c/universal-pos-deps/data.py#L62-L65).
+See also [the corresponding
+diff](https://github.com/kawu/hhu-dl-materials/commit/3cd09d1e0e337051608ca90fb220a11a4f93738c).
+
+As a result of this optimization:
+```
+In [1]: timeit -n 1 -r 3 run main
+...
+25.7 s ± 474 ms per loop (mean ± std. dev. of 3 runs, 1 loop each)
+```
