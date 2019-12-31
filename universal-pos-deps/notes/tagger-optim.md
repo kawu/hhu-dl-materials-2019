@@ -79,7 +79,7 @@ TODO: consider embedding for several sentences at the same time.
 As described on the [page about
 LSTMs](https://github.com/kawu/hhu-dl-materials/blob/dev/high-api/lstm.md#dynamic-sequence-lengths),
 applying LSTM to a batch of sentences is not trivial because the lengths of the
-individual sentences can differ.  To this end, a
+individual sentences can differ.  To deal with this issue, a
 [PackedSequence](https://pytorch.org/docs/stable/nn.html?highlight=lstm#torch.nn.utils.rnn.PackedSequence)
 can be used.
 
