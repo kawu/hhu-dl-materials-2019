@@ -49,8 +49,8 @@ document about PyTorch modules.  In the evaluation mode, dropout is equivalent
 to an identity function (`lambda x: x`):
 ```python
 dropout.eval()
-dropout.training            # => False (not in the training mode)
-assert (x == dropout(x))    # dropout(x) just returns x
+dropout.training            	# => False (not in the training mode)
+assert (x == dropout(x)).all()  # dropout(x) just returns x
 ```
 
 Note that, in practice, `dropout` is virtually never the top-level module of
