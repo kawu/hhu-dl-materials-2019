@@ -1,6 +1,7 @@
 from typing import Iterable, Set
 
 from abc import ABC, abstractmethod
+import io
 
 import torch
 import torch.nn as nn
@@ -30,7 +31,7 @@ class WordEmbedder(ABC, nn.Module):
         pass
 
 
-# TODO: Implement this as a part of Ex.~2.  HINT: use the
+# DONE: Implement this as a part of Ex.~2.  HINT: use the
 # Embedding class implemented in neural/embedding.py.
 class AtomicEmbedder(WordEmbedder):
     """Word embedding class which considers each word as an atomic entity.
@@ -106,3 +107,46 @@ class AtomicEmbedder(WordEmbedder):
     def embedding_size(self) -> int:
         """Return the embedding size of the word embedder."""
         return self.emb.embedding_size()
+
+
+# TODO EX7: complete the implementation of this class
+class FastText(WordEmbedder):
+    """Module for fastText word embedding."""
+
+    def __init__(self, file_path, limit: int = 10 ** 6):
+        super(FastText, self).__init__()
+        # Load vectors
+        self._load_vectors(file_path, limit)
+
+    def _load_vectors(self, fname, limit):
+        # Code adapted from:
+        # https://fasttext.cc/docs/en/english-vectors.html#format
+        fast_file = io.open(fname, 'r', encoding='utf-8',
+                            newline='\n', errors='ignore')
+        _num, dim = map(int, fast_file.readline().split())
+        # Store the embedding size
+        self.emb_size = dim
+        # Use .data dictionary to store the embeddings
+        self.data = {}
+        k = 0
+        # Each subsequent line contains the word and the corresponding
+        # embedding vector
+        for line in fast_file:
+            tokens = line.rstrip().split(' ')
+            word = tokens[0]
+            emb = list(map(float, tokens[1:]))
+            assert len(emb) == dim
+            self.data[word] = torch.tensor(emb, dtype=torch.float)
+            # We only want to load a certain amout of most-frequent
+            # embedding vectors, hence `break` below
+            k += 1
+            if k >= limit:
+                break
+
+    def forward(self, word: Word) -> TT:
+        """Embed the given word."""
+        # TODO EX7: implement this function
+        pass
+
+    def embedding_size(self):
+        return self.emb_size

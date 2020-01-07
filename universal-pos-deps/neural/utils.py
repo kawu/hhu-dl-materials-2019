@@ -1,9 +1,31 @@
 from typing import Iterator, List, Any
 
 import torch
+import torch.nn as nn
 import torch.nn.utils.rnn as rnn
 
 from neural.types import TT
+
+
+def eval_on(model: nn.Module):
+    """Enter the evaluation mode.
+
+    Should be used like the `torch.no_grad` function.
+
+    with eval_on(model):
+        ...
+    """
+
+    class EvalMode:
+
+        def __enter__(self):
+            self.mode = model.training
+            model.train(False)
+
+        def __exit__(self, _tp, _val, _tb):
+            model.train(self.mode)
+
+    return EvalMode()
 
 
 def avg(xs):

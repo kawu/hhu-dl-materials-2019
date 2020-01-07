@@ -22,7 +22,7 @@ class PosTagger(nn.Module):
     * Simple linear layer is used for scoring
     """
 
-    # DONE EX6: adapt this method to use LSTM
+    # TODO EX6(d): consider chaning some of the LSTM hyperparameters
     def __init__(self, word_emb: WordEmbedder, tagset: Set[POS]):
         super(PosTagger, self).__init__()
         # Keep the word embedder, so that it get registered
@@ -30,21 +30,16 @@ class PosTagger(nn.Module):
         self.word_emb = word_emb
         # Keep the tagset
         self.tagset = tagset
+        # We keep the size of the hidden layer equal to the embedding size
+        # TODO EX8: set dropout-related in the LSTM
+        self.lstm = nn.LSTM(
+            self.word_emb.embedding_size(),
+            hidden_size=self.word_emb.embedding_size(),
+        )
         # We use the linear layer to score the embedding vectors
-        # TODO EX6: account for LSTM
-        # DONE: we keep the size of the hidden layer equal to
-        # the embedding size
         self.linear_layer = nn.Linear(
             self.word_emb.embedding_size(),
             len(tagset)
-        )
-        # # To normalize the output of the linear layer
-        # # (do we need it?)
-        # self.normalizer = nn.Sigmoid()
-        # DONE EX6: add LSTM submodule
-        self.lstm = nn.LSTM(
-            self.word_emb.embedding_size(),
-            self.word_emb.embedding_size()
         )
 
     # DONE EX6: adapt this method to use LSTM
@@ -81,8 +76,14 @@ class PosTagger(nn.Module):
         ]
         # Pack embeddings as a packed sequence
         packed_embs = rnn.pack_sequence(embs, enforce_sorted=False)
+        # The .data attribute of the packed sequence has the length
+        # of the sum of the sentence lengths
+        assert packed_embs.data.shape[0] == sum(len(semb) for semb in embs)
         # Apply LSTM to the packed sequence of word embeddings
         packed_hidden, _ = self.lstm(packed_embs)
+        # The length of the .data attribute doesn't change (the cumulative
+        # number of words in the batch does not change)
+        assert packed_hidden.data.shape[0] == packed_embs.data.shape[0]
         # Each element of the .data attribute of the resulting hidden
         # packed sequence should now match the input size of the linear
         # scoring layer
@@ -112,36 +113,15 @@ class PosTagger(nn.Module):
     # DONE (modulo testing): implement this method
     def tag(self, sent: Sequence[Word]) -> Sequence[POS]:
         """Predict the POS tags in the given sentence."""
-        # TODO: does it make sense to use `tag` as part of training?
-        with torch.no_grad():
-            # POS tagging is to be carried out based on the resulting scores
-            scores = self.forward(sent)
-            # Create a list for predicted POS tags
-            predictions = []
-            # For each word, we must select the POS tag corresponding to the
-            # index with the highest score
-            for score_vect in scores:
-                # Determine the position with the highest score
-                _, ix = torch.max(score_vect, 0)
-                # Make sure `ix` is a 0d tensor
-                assert ix.dim() == 0
-                ix = ix.item()
-                # Assert the index is within the range of POS tag indices
-                assert 0 <= ix < len(self.tagset)
-                # Determine the corresponding POS tag
-                pos = list(self.tagset)[ix]
-                # Append the new prediction
-                predictions.append(pos)
-            # We should have as many predicted POS tags as input words
-            assert len(sent) == len(predictions)
-            # Return the predicted POS tags
-            return predictions
+        return list(self.tags([sent]))[0]
 
     def tags(self, batch: Sequence[Sequence[Word]]) -> Iterable[Sequence[POS]]:
         """Predict the POS tags in the given batch of sentences.
 
         A variant of the `tag` method which works on a batch of sentences.
         """
+        # TODO EX8: make sure that dropout is not applied when tagging!
+        # TODO: does it make sense to use `tag` as part of training?
         with torch.no_grad():
             # POS tagging is to be carried out based on the resulting scores
             scores_batch = self.forwards(batch)
@@ -267,12 +247,14 @@ tagset = set(
 print("Tagset:", tagset)
 
 # Create the word embedding module
+# TODO EX7: use fastText embeddings instead!
 word_emb = AtomicEmbedder(word_set, 10)
 
 # Create the tagger
+# TODO EX6: account for modified hyperparameters
 tagger = PosTagger(word_emb, tagset)
 
-# DONE: train the model (see `train` in `neural/training`)
+# Train the model (see `train` in `neural/training`)
 train(
     tagger, train_set, dev_set,
     total_loss, accuracy,
