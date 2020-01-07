@@ -49,12 +49,51 @@ document about PyTorch modules.  In the evaluation mode, dropout is equivalent
 to an identity function (`lambda x: x`):
 ```python
 dropout.eval()
-assert (x == dropout(x))    # dropout(x) just returns x
+dropout.training            	# => False (not in the training mode)
+assert (x == dropout(x)).all()  # dropout(x) just returns x
 ```
 
 Note that, in practice, `dropout` is virtually never the top-level module of
 your PyTorch program, so you should not use `dropout.eval()`, but rather
 `main_module.eval()`, where `main_module` is the top-level PyTorch module.
+
+#### Using `with`
+
+It is equally important not to forget to restore the original mode at the end
+of evaluation.  A rather elegant solution is to use the [`with`
+statement](https://docs.python.org/3/reference/compound_stmts.html#with) and a
+[context
+manager](https://docs.python.org/3/reference/datamodel.html#with-statement-context-managers)
+which guarantee that the original mode is restored (in an exception-safe way).
+
+```python
+def eval_on(model: nn.Module):
+    """Create a context manager to enter the evaluation mode."""
+
+    class EvalMode:
+
+        def __enter__(self):
+            self.mode = model.training
+            model.train(False)
+
+        def __exit__(self, _tp, _val, _tb):
+            model.train(self.mode)
+
+    return EvalMode()
+```
+
+You can use `eval_on` very much like
+[`torch.no_grad()`](https://pytorch.org/docs/stable/autograd.html#torch.autograd.no_grad):
+```python
+dropout.train()
+dropout.training            # => True
+with eval_on(dropout):
+    print(dropout.training) # => False
+dropout.training            # => True
+```
+
+Again, in practice, apply `eval_on` to the top-level module, so that the
+training/evaluation mode information get propagated to all sub-modules.
 
 ## Larger example
 
