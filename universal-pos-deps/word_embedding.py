@@ -146,7 +146,11 @@ class FastText(WordEmbedder):
     def forward(self, word: Word) -> TT:
         """Embed the given word."""
         # TODO EX7: implement this function
-        pass
+        with torch.no_grad():
+            try:
+                return self.data[word]
+            except KeyError:
+                return torch.zeros(self.embedding_size())
 
     def embedding_size(self):
         return self.emb_size

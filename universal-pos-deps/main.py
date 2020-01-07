@@ -9,7 +9,7 @@ from neural.training import train, batch_loader
 
 from data import Word, POS, Sent
 import data
-from word_embedding import WordEmbedder, AtomicEmbedder
+from word_embedding import WordEmbedder, AtomicEmbedder, FastText
 
 
 # DONE: Implement this class
@@ -22,8 +22,9 @@ class PosTagger(nn.Module):
     * Simple linear layer is used for scoring
     """
 
-    # TODO EX6(d): consider chaning some of the LSTM hyperparameters
-    def __init__(self, word_emb: WordEmbedder, tagset: Set[POS]):
+    # DONE EX6(d): consider chaning some of the LSTM hyperparameters
+    def __init__(self,
+                 word_emb: WordEmbedder, tagset: Set[POS], hid_size: int):
         super(PosTagger, self).__init__()
         # Keep the word embedder, so that it get registered
         # as a sub-module of the POS tagger.
@@ -34,11 +35,12 @@ class PosTagger(nn.Module):
         # TODO EX8: set dropout-related in the LSTM
         self.lstm = nn.LSTM(
             self.word_emb.embedding_size(),
-            hidden_size=self.word_emb.embedding_size(),
+            hidden_size=hid_size,
+            bidirectional=True
         )
         # We use the linear layer to score the embedding vectors
         self.linear_layer = nn.Linear(
-            self.word_emb.embedding_size(),
+            hid_size * 2,
             len(tagset)
         )
 
@@ -87,6 +89,7 @@ class PosTagger(nn.Module):
         # Each element of the .data attribute of the resulting hidden
         # packed sequence should now match the input size of the linear
         # scoring layer
+        # print(packed_hidden.data.shape[1], self.linear_layer.in_features)
         assert packed_hidden.data.shape[1] == self.linear_layer.in_features
         # Apply the linear layer to each element of `packed_hidden.data`
         # individually
@@ -248,11 +251,12 @@ print("Tagset:", tagset)
 
 # Create the word embedding module
 # TODO EX7: use fastText embeddings instead!
-word_emb = AtomicEmbedder(word_set, 10)
+# word_emb = AtomicEmbedder(word_set, 10)
+word_emb = FastText("wiki-news-300d-1M-subword-selected.vec")
 
 # Create the tagger
 # TODO EX6: account for modified hyperparameters
-tagger = PosTagger(word_emb, tagset)
+tagger = PosTagger(word_emb, tagset, hid_size=10)
 
 # Train the model (see `train` in `neural/training`)
 train(
