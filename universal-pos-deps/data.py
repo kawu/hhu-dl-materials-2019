@@ -1,5 +1,4 @@
-from typing import Sequence, Tuple, Iterator
-# from abc import ABC, abstractmethod
+from typing import Sequence, Iterator, NamedTuple
 
 from conllu import parse_incr
 
@@ -12,8 +11,19 @@ Word = str
 # Part-of-speech tag
 POS = str
 
-# Annotated sentence: sequence of words paired with tuples
-Sent = Sequence[Tuple[Word, POS]]
+# Dependency head index
+Head = int
+
+
+# Token
+class Token(NamedTuple):
+    word: Word
+    upos: POS
+    head: Head
+
+
+# Annotated sentence: sequence of `Token`s
+Sent = Sequence[Token]
 
 
 def load_data(file_path: str) -> Iterator[Sent]:
@@ -24,10 +34,12 @@ def load_data(file_path: str) -> Iterator[Sent]:
             for tok in tok_list:
                 form = tok["form"]
                 upos = tok["upostag"]
+                head = tok["head"]
                 # P8 -> Ex3: discard tokens which are not part of the
                 # selected tokenization.  We assume that tokenization is done.
                 if upos != '_':
-                    sent.append((form, upos))
+                    assert 0 <= head <= len(tok_list)
+                    sent.append(Token(form, upos, head))
             yield sent
 
 

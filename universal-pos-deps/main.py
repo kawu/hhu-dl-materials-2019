@@ -165,15 +165,15 @@ def accuracy(
         inputs = []
         for sent in batch:
             # Split the sentence into input words and POS tags
-            words, _ = zip(*sent)
+            words = list(map(lambda tok: tok.word, sent))
             inputs.append(list(words))
         # Tag all the sentences
         predictions = tagger.tags(inputs)
         # Process the predictions and compare with the gold POS tags
         for sent, pred_poss in zip(batch, predictions):
             # Split the sentence into input words and POS tags
-            _, gold_poss = zip(*sent)
-            for (pred_pos, gold_pos) in zip(pred_poss, gold_poss):
+            gold_tags = map(lambda tok: tok.upos, sent)
+            for (pred_pos, gold_pos) in zip(pred_poss, gold_tags):
                 if pred_pos == gold_pos:
                     k += 1.
                 n += 1.
@@ -191,7 +191,8 @@ def total_loss(tagger: PosTagger, data_set: Iterable[Sent]) -> TT:
     # and the predictions
     for sent in data_set:
         # Unzip the sentence into a (list of words, list of target POS tags)
-        (words, gold_tags) = zip(*sent)
+        words = list(map(lambda tok: tok.word, sent))
+        gold_tags = map(lambda tok: tok.upos, sent)
         # DONE: Determine the target POS tag indices and update `target_ixs`
         for tag in gold_tags:
             # Determine the index corresponding to the POS gold_tag
@@ -231,9 +232,9 @@ print("Dev size:", len(list(dev_set)))
 
 # Determine the set of words in the dataset
 word_set = set(
-    word
+    tok.word
     for sent in train_set
-    for (word, _pos) in sent
+    for tok in sent
 )
 
 # Number of words
@@ -241,9 +242,9 @@ print("Number of words:", len(word_set))
 
 # Determine the POS tagset
 tagset = set(
-    pos
+    tok.upos
     for sent in train_set
-    for (_word, pos) in sent
+    for tok in sent
 )
 
 # Tagset
