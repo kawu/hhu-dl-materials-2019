@@ -146,6 +146,8 @@ class FastText(WordEmbedder):
     def forward(self, word: Word) -> TT:
         """Embed the given word."""
         # TODO EX7: implement this function
+        # TODO UPDATE 13.01.2020: is using torch.no_grad() here
+        # really necessary?
         with torch.no_grad():
             try:
                 return self.data[word]
