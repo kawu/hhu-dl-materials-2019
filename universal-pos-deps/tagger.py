@@ -184,22 +184,19 @@ class Tagger(nn.Module):
         pos_scores = self.forwards_pos(packed_hidden)
         dep_scores = self.forwards_dep(packed_hidden)
         # Return the scores
-        return zip(pos_scores, dep_scores)
+        return list(zip(pos_scores, dep_scores))
 
     ###########################################
     # Part III: tagging (evaluation mode)
     ###########################################
 
-    def tag(self, sent: Sequence[Word]) -> Sequence[POS]:
-        """Predict the POS tags in the given sentence."""
+    def tag(self, sent: Sequence[Word]) -> Sequence[Tuple[POS, Head]]:
+        """Predict the POS tags and dependency heads in the given sentence."""
         return list(self.tags([sent]))[0]
 
     def tags(self, batch: Sequence[Sequence[Word]]) \
-            -> Iterable[Sequence[Tuple[POS, Head]]]:
-        """Predict the POS tags in the given batch of sentences.
-
-        A variant of the `tag` method which works on a batch of sentences.
-        """
+            -> Iterable[List[Tuple[POS, Head]]]:
+        """Predict the POS tags and dependency heads in the given batch."""
         # TODO EX8: make sure that dropout is not applied when tagging!
         # TODO: does it make sense to use `tag` as part of training?
         with torch.no_grad():
@@ -214,7 +211,7 @@ class Tagger(nn.Module):
                 # heads as input words
                 assert len(sent) == len(pos_preds) == len(dep_preds)
                 # Return the predicted POS tags
-                yield zip(pos_preds, dep_preds)
+                yield list(zip(pos_preds, dep_preds))
 
     def predict_pos_tags(self, pos_scores: TT) -> List[POS]:
         """Predict POS tags given POS-related scores (single sentence)."""
@@ -238,7 +235,7 @@ class Tagger(nn.Module):
         # Return the predicted POS tags
         return pos_predictions
 
-    def predict_heads(self, head_scores: TT) -> List[int]:
+    def predict_heads(self, head_scores: TT) -> List[Head]:
         """Predict dependencies based on the head scores (single sentence)."""
         # Sentence length
         sent_len = len(head_scores)
