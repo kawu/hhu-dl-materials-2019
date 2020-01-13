@@ -1,4 +1,4 @@
-from typing import Sequence, Iterable, Set, List
+from typing import Sequence, Iterable, Set, List, Tuple
 
 import torch
 import torch.nn as nn
@@ -9,10 +9,9 @@ from neural.training import train, batch_loader
 
 from data import Word, POS, Sent
 import data
-from word_embedding import WordEmbedder, AtomicEmbedder, FastText
+from word_embedding import WordEmbedder, FastText
 
 
-# DONE: Implement this class
 class PosTagger(nn.Module):
     """Simple POS tagger based on LSTM.
 
@@ -20,9 +19,10 @@ class PosTagger(nn.Module):
     * LSTM is run over the word vector representations
     * The output "hidden" representations are used to predict the POS tags
     * Simple linear layer is used for scoring
+
+    TODO: update the description considering dependency parsing.
     """
 
-    # DONE EX6(d): consider chaning some of the LSTM hyperparameters
     def __init__(self,
                  word_emb: WordEmbedder, tagset: Set[POS], hid_size: int):
         super(PosTagger, self).__init__()
@@ -44,76 +44,136 @@ class PosTagger(nn.Module):
             len(tagset)
         )
 
-    # DONE EX6: adapt this method to use LSTM
-    def forward(self, sent: Sequence[Word]) -> TT:
-        """Calculate the score vectors for the individual words."""
+    ###########################################
+    # Part I: scoring without batching
+    ###########################################
+
+    def embed(self, sent: Sequence[Word]) -> TT:
+        """Embed and contextualize (using LSTM) the given sentence."""
         # Embed all the words and create the embedding matrix
         embs = self.word_emb.forwards(sent)
         # The first dimension should match the number of words
         assert embs.shape[0] == len(sent)
         # The second dimension should match the embedding size
         assert embs.shape[1] == self.word_emb.embedding_size()
-        # DONE EX6: apply LSTM to word embeddings
+        # Apply LSTM to word embeddings
         embs = embs.view(len(sent), 1, -1)
         ctx_embs, _ = self.lstm(embs)
         # Reshape back the contextualized embeddings
         ctx_embs = ctx_embs.view(len(sent), -1)
+        # Return the resulting contextualized embeddings
+        return ctx_embs
+
+    def forward_pos(self, embs: TT) -> TT:
+        """Calculate the POS score vectors for the individual words."""
+        # The second dimension should match the scoring layer input size
+        assert embs.shape[1] == self.linear_layer.in_features
         # Calculate the matrix with the scores
-        scores = self.linear_layer(ctx_embs)
-        # The first dimension should match the number of words
-        assert scores.shape[0] == len(sent)
+        scores = self.linear_layer(embs)
         # The second dimension should match the size of the tagset
         assert scores.shape[1] == len(self.tagset)
         # Finally, return the scores
         return scores
 
-    def forwards(self, sents: Iterable[Sequence[Word]]) -> List[TT]:
-        """Calculate the score vectors for the individual words."""
-        # Embed all the sentences separately (we could further consider
-        # embedding all the sentences at once, but this would require
-        # creating a padded embedding (4-dimensional) tensor)
-        embs = [
-            self.word_emb.forwards(sent)
-            for sent in sents
-        ]
-        # Pack embeddings as a packed sequence
-        packed_embs = rnn.pack_sequence(embs, enforce_sorted=False)
-        # The .data attribute of the packed sequence has the length
-        # of the sum of the sentence lengths
-        assert packed_embs.data.shape[0] == sum(len(semb) for semb in embs)
-        # Apply LSTM to the packed sequence of word embeddings
-        packed_hidden, _ = self.lstm(packed_embs)
-        # The length of the .data attribute doesn't change (the cumulative
-        # number of words in the batch does not change)
-        assert packed_hidden.data.shape[0] == packed_embs.data.shape[0]
-        # Each element of the .data attribute of the resulting hidden
-        # packed sequence should now match the input size of the linear
-        # scoring layer
-        # print(packed_hidden.data.shape[1], self.linear_layer.in_features)
-        assert packed_hidden.data.shape[1] == self.linear_layer.in_features
-        # Apply the linear layer to each element of `packed_hidden.data`
-        # individually
-        scores_data = self.linear_layer(packed_hidden.data)
-        # Recreate a packed sequence out of the resulting scoring data;
-        # this is somewhat low-level and not really recommended by PyTorch
-        # documnetation -- do you know a better way?
-        packed_scores = rnn.PackedSequence(
-            scores_data,
-            batch_sizes=packed_hidden.batch_sizes,
-            sorted_indices=packed_hidden.sorted_indices,
-            unsorted_indices=packed_hidden.unsorted_indices
-        )
-        # Pad the resulting packed sequence
-        padded_scores, padded_len = rnn.pad_packed_sequence(
-            packed_scores, batch_first=True)
-        # Convert the padded representation to a list of score tensors
-        scores = []
-        for sco, n in zip(padded_scores, padded_len):
-            scores.append(sco[:n])
-        # Finally, return the scores
-        return scores
+    # TODO: implement this function
+    def forward_dep(self, embs: TT) -> TT:
+        """Calculate the dependency score vectors for the individual words."""
+        # Dummy implementation (TODO: add description)
+        return torch.zeros(embs.shape[0], embs.shape[0]+1)
 
-    # DONE (modulo testing): implement this method
+    def forward(self, sent: Sequence[Word]) -> Tuple[TT, TT]:
+        """Calculate the score vectors for the individual words.
+
+        The result is a pair of:
+        * POS tagging-related scores (see `forward_pos`)
+        * Dependency parsing-related scores (see `forward_dep`)
+        """
+        # Embed and contextualize the input words
+        ctx_embs = self.embed(sent)
+        # The first dimension should match the number of words
+        assert ctx_embs.shape[0] == len(sent)
+        # Calculate the POS scores
+        pos_scores = self.forward_pos(ctx_embs)
+        # Calculate the dependency scores
+        dep_scores = self.forward_dep(ctx_embs)
+        # Return the scores
+        return pos_scores, dep_scores
+
+    ###########################################
+    # Part II: batching-enabled scoring
+    ###########################################
+
+    # def embeds(self, sents: Iterable[Sequence[Word]]) -> rnn.PackedSequence:
+    #     """Embed and contextualize (using LSTM) the given batch."""
+    #     # Embed all the sentences separately (we could further consider
+    #     # embedding all the sentences at once, but this would require
+    #     # creating a padded embedding (4-dimensional) tensor)
+    #     embs = [
+    #         self.word_emb.forwards(sent)
+    #         for sent in sents
+    #     ]
+    #     # Pack embeddings as a packed sequence
+    #     packed_embs = rnn.pack_sequence(embs, enforce_sorted=False)
+    #     # The .data attribute of the packed sequence has the length
+    #     # of the sum of the sentence lengths
+    #     assert packed_embs.data.shape[0] == sum(len(semb) for semb in embs)
+    #     # Apply LSTM to the packed sequence of word embeddings
+    #     packed_hidden, _ = self.lstm(packed_embs)
+    #     # The length of the .data attribute doesn't change (the cumulative
+    #     # number of words in the batch does not change)
+    #     assert packed_hidden.data.shape[0] == packed_embs.data.shape[0]
+    #     # Return the resulting packed sequence with contextualized embeddings
+    #     return packed_hidden
+
+    # def forwards_pos(self, packed_hidden: rnn.PackedSequence) -> List[TT]:
+    #     """Calculate the POS scores for the individual words."""
+    #     # Each element of the .data attribute of the hidden packed sequence
+    #     # should now match the input size of the linear scoring layer
+    #     assert packed_hidden.data.shape[1] == self.linear_layer.in_features
+    #     # Apply the linear layer to each element of `packed_hidden.data`
+    #     # individually
+    #     scores_data = self.linear_layer(packed_hidden.data)
+    #     # Recreate a packed sequence out of the resulting scoring data;
+    #     # this is somewhat low-level and not really recommended by PyTorch
+    #     # documentation -- do you know a better way?
+    #     packed_scores = rnn.PackedSequence(
+    #         scores_data,
+    #         batch_sizes=packed_hidden.batch_sizes,
+    #         sorted_indices=packed_hidden.sorted_indices,
+    #         unsorted_indices=packed_hidden.unsorted_indices
+    #     )
+    #     # Pad the resulting packed sequence
+    #     padded_scores, padded_len = rnn.pad_packed_sequence(
+    #         packed_scores, batch_first=True)
+    #     # Convert the padded representation to a list of score tensors
+    #     scores = []
+    #     for sco, n in zip(padded_scores, padded_len):
+    #         scores.append(sco[:n])
+    #     # Finally, return the scores
+    #     return scores
+
+    # def forwards(self, sents: Iterable[Sequence[Word]]) -> List[Tuple[TT, TT]]:
+    #     """Calculate the score vectors for the individual words.
+
+    #     Batching-enabled version of `forwards`.
+    #     """
+    #     # Embed and contextualize the entire batch
+    #     packed_hidden = self.embeds(sents)
+    #     # Calculate the POS-related scores
+    #     pos_scores = self.forwards_pos(packed_hidden)
+    #     # Return the scores
+    #     return zip(pos_scores, None)
+
+    def forwards(self, sents):
+        ys = []
+        for sent in sents:
+            ys.append(self.forward(sent))
+        return ys
+
+    ###########################################
+    # Part III: tagging (evaluation mode)
+    ###########################################
+
     def tag(self, sent: Sequence[Word]) -> Sequence[POS]:
         """Predict the POS tags in the given sentence."""
         return list(self.tags([sent]))[0]
@@ -127,7 +187,7 @@ class PosTagger(nn.Module):
         # TODO: does it make sense to use `tag` as part of training?
         with torch.no_grad():
             # POS tagging is to be carried out based on the resulting scores
-            scores_batch = self.forwards(batch)
+            scores_batch, _ = zip(*self.forwards(batch))
             for scores, sent in zip(scores_batch, batch):
                 # Create a list for predicted POS tags
                 predictions = []
@@ -180,9 +240,8 @@ def accuracy(
     return k / n
 
 
-# DONE: implement this function
-def total_loss(tagger: PosTagger, data_set: Iterable[Sent]) -> TT:
-    """Calculate the total total, cross entropy loss over the given dataset."""
+def pos_loss(tagger: PosTagger, data_set: Iterable[Sent]) -> TT:
+    """The POS tagging-related cross entropy loss over the given dataset."""
     # Create two lists for target indices (corresponding to POS tags we
     # want our mode to predict) and the actually predicted scores.
     target_ixs = []     # type: List[int]
@@ -202,19 +261,20 @@ def total_loss(tagger: PosTagger, data_set: Iterable[Sent]) -> TT:
         # Append the new sentence to the inputs list
         inputs.append(words)
     # Calculate the scores in a batch and concat them
-    pred_scores = torch.cat(tagger.forwards(inputs))
+    pos_scores, _ = zip(*tagger.forwards(inputs))
+    pos_scores = torch.cat(pos_scores)
     # Convert the target indices to a tensor
     target_ixs = torch.LongTensor(target_ixs)
     # Make sure the dimensions match
-    assert target_ixs.shape[0] == pred_scores.shape[0]
+    assert target_ixs.shape[0] == pos_scores.shape[0]
     # Assert that target_ixs is a vector (1d tensor)
     assert target_ixs.dim() == 1
     # The second dimension of the predicted scores
     # should correspond to the size of the tagset:
-    assert pred_scores.shape[1] == len(tagger.tagset)
-    # DONE: Calculate the loss and return it
+    assert pos_scores.shape[1] == len(tagger.tagset)
+    # Calculate the loss and return it
     loss = nn.CrossEntropyLoss()
-    return loss(pred_scores, target_ixs)
+    return loss(pos_scores, target_ixs)
 
 
 # Training dataset
@@ -251,18 +311,16 @@ tagset = set(
 print("Tagset:", tagset)
 
 # Create the word embedding module
-# TODO EX7: use fastText embeddings instead!
 # word_emb = AtomicEmbedder(word_set, 10)
 word_emb = FastText("wiki-news-300d-1M-subword-selected.vec")
 
 # Create the tagger
-# TODO EX6: account for modified hyperparameters
 tagger = PosTagger(word_emb, tagset, hid_size=10)
 
 # Train the model (see `train` in `neural/training`)
 train(
     tagger, train_set, dev_set,
-    total_loss, accuracy,
+    pos_loss, accuracy,
     epoch_num=25,
     learning_rate=0.01,
     report_rate=5
