@@ -49,11 +49,11 @@ All the dependency-related scores are currently [set to
 #### Tagging
 
 The tagger [predicts the POS tags and dependency heads
-jointly](TODO).
+jointly](https://github.com/kawu/hhu-dl-materials/blob/302b36505f3673b48df28766164dd3d6065511d9/universal-pos-deps/tagger.py#L197-L214).
 The [head prediction
-subroutine](TODO)
+subroutine](https://github.com/kawu/hhu-dl-materials/blob/302b36505f3673b48df28766164dd3d6065511d9/universal-pos-deps/tagger.py#L238-L254)
 is already implemented and works similarly to the [POS tag prediction
-subroutine](https://github.com/kawu/hhu-dl-materials/blob/897a6ad472389b406f857c2eef12573d79ba383c/universal-pos-deps/tagger.py#L219-L239).
+subroutine](https://github.com/kawu/hhu-dl-materials/blob/302b36505f3673b48df28766164dd3d6065511d9/universal-pos-deps/tagger.py#L216-L236).
 
 #### Accuracy
 
