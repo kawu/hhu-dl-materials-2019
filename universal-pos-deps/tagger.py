@@ -244,7 +244,7 @@ class Tagger(nn.Module):
         for score_vect in head_scores:
             # Determine the position with the highest score
             ix = torch.argmax(score_vect).item()
-            # Assert the index is within the range of POS tag indices
+            # Assert the index is within the range of the possible head indices
             assert 0 <= ix <= sent_len
             # Append the new prediction
             head_predictions.append(ix)
