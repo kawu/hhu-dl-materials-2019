@@ -1,7 +1,7 @@
 ## Yield
 
 Let's define a simple generator function which generates numbers from `0` to
-`n` and then prints "last line".
+`n-1` and then prints "last line".
 ```python
 def yield_test(n):
     k = 0
@@ -36,7 +36,7 @@ print(len(xs))
 
 However, if we quit the for loop (e.g., using "break"), even after processing
 all the elements, the code after the last `yield` in `yield_test` won't be
-executed (and, in particular, "last line" won't be printed)
+executed (and, in particular, "last line" won't be printed).
 ```python
 i = 0
 for x in yield_test(5):
@@ -52,7 +52,7 @@ for x in yield_test(5):
 ```
 
 Similar behavior occurs with `zip`: "last line" is not printed
-(which explains why our code didn't work)
+(which [explains why our code didn't work](https://github.com/kawu/hhu-dl-materials/blob/bf83a277a522ab6100f4feaf8aafdac789dfa1ff/universal-pos-deps/tagger.py#L281-L283)).
 ```python
 xs = range(5)
 ys = yield_test(5)
@@ -63,7 +63,7 @@ print(list(zip(xs, ys)))
 
 ## Context manager
 
-A context manager, as described on github (TODO), seems like a good solution to
+A context manager, as described [on github](https://github.com/kawu/hhu-dl-materials/blob/master/high-api/dropout.md#using-with), seems like a good solution to
 the problem -- it guarantees that the model is set to the original mode
 (evaluation or training) at the end of the `with` block.
 ```python
@@ -87,7 +87,7 @@ def eval_on(model: nn.Module):
 When combined with `yield`, it's still not perfect, though.  The code below
 will correctly print "before: True", "inside: False", and "after: True".
 However, if will also print "between: False", which shows that the training
-mode is set to `False` also outside of the syntactic `with eval_on(model)`
+mode can be set to `False` also outside of the syntactic `with eval_on(model)`
 block.
 ```python
 def test_eval_on(model):
@@ -103,9 +103,9 @@ for x in zip(range(1), test_eval_on(model)):
 print("after:", model.training)
 ```
 
-This can lead to an unexpected behavior/bugs, so it is probably best to avoid
+This can lead to unexpected behavior/bugs, so it is probably best to avoid
 combining yield with `eval_on`.  This suggests that `with torch.no_grad` used
-in our code is not perfectly safe either, since `yield` is used within the
+[in our code](https://github.com/kawu/hhu-dl-materials/blob/bf83a277a522ab6100f4feaf8aafdac789dfa1ff/universal-pos-deps/tagger.py#L204) is not perfectly safe either, since `yield` is used within the
 corresponding syntactic block.  Theoretically, `yield` could cause a kind of a
 leakage: the gradient-calculating machinery could be turned off outside of the
 `with` block.  This suggests that we should rewrite the tagging method to move
