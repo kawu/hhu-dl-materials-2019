@@ -38,7 +38,9 @@ class Tagger(nn.Module):
         self.lstm = nn.LSTM(
             self.word_emb.embedding_size(),
             hidden_size=hid_size,
-            bidirectional=True
+            bidirectional=True,
+            num_layers=2,
+            dropout=0.2
         )
         # We use the linear layer to score the embedding vectors
         self.linear_layer = nn.Linear(
@@ -198,11 +200,15 @@ class Tagger(nn.Module):
     def tags(self, batch: Sequence[Sequence[Word]]) \
             -> Iterable[List[Tuple[POS, Head]]]:
         """Predict the POS tags and dependency heads in the given batch."""
-        # TODO EX8: make sure that dropout is not applied when tagging!
         # TODO: does it make sense to use `tag` as part of training?
         with torch.no_grad():
+            # Turn evaluation mode on
+            self.eval()
             # POS tagging is to be carried out based on the resulting scores
             pos_scores_batch, dep_scores_batch = zip(*self.forwards(batch))
+            # Turn evaluation mode off
+            self.train()
+            # print("train mode is on:", self.training)
             for pos_scores, dep_scores, sent in zip(
                     pos_scores_batch, dep_scores_batch, batch):
                 # Predict POS tags and dependency heads

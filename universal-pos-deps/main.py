@@ -43,13 +43,13 @@ print("Tagset:", tagset)
 word_emb = FastText("wiki-news-300d-1M-subword-selected.vec")
 
 # Create the tagger
-tagger = Tagger(word_emb, tagset, hid_size=10)
+tagger = Tagger(word_emb, tagset, hid_size=50)
 
 # Train the model (see `train` in `neural/training`)
 train(
     tagger, train_set, dev_set,
     pos_loss, pos_accuracy,
-    epoch_num=25,
+    epoch_num=50,
     learning_rate=0.01,
     report_rate=5
 )
