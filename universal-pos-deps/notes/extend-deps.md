@@ -47,10 +47,10 @@ All the dependency-related scores are currently [set to
 0](https://github.com/kawu/hhu-dl-materials/blob/897a6ad472389b406f857c2eef12573d79ba383c/universal-pos-deps/tagger.py#L80-L87).
 
 Note also that the batching-enabled [forwards_dep
-method](https://github.com/kawu/hhu-dl-materials/blob/74fc0061a56c7a51537e9b7384d20dabd49dbac9/universal-pos-deps/tagger.py#L160-L174),
-which serves to calculate the dependency-related scores, is currently
-implemented in terms of the simpler [forwad_dep
-method](https://github.com/kawu/hhu-dl-materials/blob/74fc0061a56c7a51537e9b7384d20dabd49dbac9/universal-pos-deps/tagger.py#L81-L87).
+method](https://github.com/kawu/hhu-dl-materials/blob/ebac2027fd2727400878e30cb7fb46cd52207fda/universal-pos-deps/tagger.py#L160-L175),
+which serves to calculate the dependency-related scores for a batch of
+sentences, is currently implemented in terms of the simpler [forwad_dep
+method](https://github.com/kawu/hhu-dl-materials/blob/ebac2027fd2727400878e30cb7fb46cd52207fda/universal-pos-deps/tagger.py#L80-L87).
 This means that implementing the latter will suffice to get the model working.
 
 #### Tagging
