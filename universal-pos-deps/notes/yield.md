@@ -1,3 +1,33 @@
+# Intro
+
+This document explains why the following code fragment (from `tagger.py`)
+didn't work during the session -- more precisely, why `self.train()` in the
+last line was never executed.
+```python
+    def tags(self, batch: Sequence[Sequence[Word]]) \
+            -> Iterable[List[Tuple[POS, Head]]]:
+        """Predict the POS tags and dependency heads in the given batch."""
+        # Turn evaluation mode on
+        self.eval()
+        # TODO: does it make sense to use `tag` as part of training?
+        with torch.no_grad():
+            # POS tagging is to be carried out based on the resulting scores
+            pos_scores_batch, dep_scores_batch = zip(*self.forwards(batch))
+            # print("train mode is on:", self.training)
+            for pos_scores, dep_scores, sent in zip(
+                    pos_scores_batch, dep_scores_batch, batch):
+                # Predict POS tags and dependency heads
+                pos_preds = self.predict_pos_tags(pos_scores)
+                dep_preds = self.predict_heads(dep_scores)
+                # We should have as many predicted POS tags and dependency
+                # heads as input words
+                assert len(sent) == len(pos_preds) == len(dep_preds)
+                # Return the predicted POS tags
+                yield list(zip(pos_preds, dep_preds))
+        # Turn evaluation mode off
+        self.train()
+```
+
 ## Yield
 
 Let's define a simple generator function which generates numbers from `0` to
