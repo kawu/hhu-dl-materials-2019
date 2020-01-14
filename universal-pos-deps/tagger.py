@@ -165,7 +165,8 @@ class Tagger(nn.Module):
         padded_hidden, padded_len = rnn.pad_packed_sequence(
             packed_hidden, batch_first=True
         )
-        # Calculate dummy dependency scores and return them
+        # Split the padded representation into sentences and calculate the
+        # dependency scores using `forward_dep`
         scores = []
         for hidden, n in zip(padded_hidden, padded_len):
             hidden = hidden[:n]  # Remove padding
