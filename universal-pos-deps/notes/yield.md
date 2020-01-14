@@ -116,7 +116,7 @@ def eval_on(model: nn.Module):
 
 When combined with `yield`, it's still not perfect, though.  The code below
 will correctly print "before: True", "inside: False", and "after: True".
-However, if will also print "between: False", which shows that the training
+However, it will also print "between: False", which shows that the training
 mode can be set to `False` also outside of the syntactic `with eval_on(model)`
 block.
 ```python
@@ -134,9 +134,14 @@ print("after:", model.training)
 ```
 
 This can lead to unexpected behavior/bugs, so it is probably best to avoid
-combining yield with `eval_on`.  This suggests that `with torch.no_grad` used
+combining `yield` with the context manager`eval_on`.  Note that this most
+likely applies to `torch.no_grad`, too!
+
+<!---
+This suggests that `with torch.no_grad` used
 [in our code](https://github.com/kawu/hhu-dl-materials/blob/bf83a277a522ab6100f4feaf8aafdac789dfa1ff/universal-pos-deps/tagger.py#L204) is not perfectly safe either, since `yield` is used within the
 corresponding syntactic block.  Theoretically, `yield` could cause a kind of a
 leakage: the gradient-calculating machinery could be turned off outside of the
 `with` block.  This suggests that we should rewrite the tagging method to move
 `torch.no_grad` one level lower.
+-->
