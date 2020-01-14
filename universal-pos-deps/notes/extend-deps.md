@@ -32,19 +32,26 @@ The implementation of the scoring model, as before, is divided into two parts.
 In the [first
 part](https://github.com/kawu/hhu-dl-materials/blob/897a6ad472389b406f857c2eef12573d79ba383c/universal-pos-deps/tagger.py#L49-L105),
 scoring for individual sentences is implemented.  In the [second
-part](https://github.com/kawu/hhu-dl-materials/blob/897a6ad472389b406f857c2eef12573d79ba383c/universal-pos-deps/tagger.py#L107-L187)
+part](https://github.com/kawu/hhu-dl-materials/blob/897a6ad472389b406f857c2eef12573d79ba383c/universal-pos-deps/tagger.py#L107-L187),
 sentences are processed in batches.  The latter is used by default, but the
 simpler version (which works over single sentences) allows to check if the
 optimized version works as expected.
 
 The [forward
-function](https://github.com/kawu/hhu-dl-materials/blob/897a6ad472389b406f857c2eef12573d79ba383c/universal-pos-deps/tagger.py#L89-L105)
+method](https://github.com/kawu/hhu-dl-materials/blob/897a6ad472389b406f857c2eef12573d79ba383c/universal-pos-deps/tagger.py#L89-L105)
 now returns a pair of score tensors: POS tagging-related and dependency
 parsing-related scores, respectively.  Both types of scores are calculated
 based on the same, [contextualized embedding
 vectors](https://github.com/kawu/hhu-dl-materials/blob/897a6ad472389b406f857c2eef12573d79ba383c/universal-pos-deps/tagger.py#L53-L67).
 All the dependency-related scores are currently [set to
 0](https://github.com/kawu/hhu-dl-materials/blob/897a6ad472389b406f857c2eef12573d79ba383c/universal-pos-deps/tagger.py#L80-L87).
+
+Note also that the batching-enabled [forwards_dep
+method](https://github.com/kawu/hhu-dl-materials/blob/74fc0061a56c7a51537e9b7384d20dabd49dbac9/universal-pos-deps/tagger.py#L160-L174),
+which serves to calculate the dependency-related scores, is currently
+implemented in terms of the simpler [forwad_dep
+method](https://github.com/kawu/hhu-dl-materials/blob/74fc0061a56c7a51537e9b7384d20dabd49dbac9/universal-pos-deps/tagger.py#L81-L87).
+This means that implementing the latter will suffice to get the model working.
 
 #### Tagging
 
