@@ -361,13 +361,13 @@ def pos_loss(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
     return loss(pos_scores, target_ixs)
 
 
-def total_loss_simple(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
+def total_loss(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
     """Calculate the total cross entropy loss over the given dataset.
 
     The total loss is defined as a sum of the POS tagging-related loss and
     the dependency parsing-related loss.
 
-    See also `total_loss` for a more optimized version.
+    See also `total_loss_alt` for a more optimized version.
     """
 
     #########################################################
@@ -439,7 +439,7 @@ def total_loss_simple(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
     return pos_loss + dep_loss
 
 
-def total_loss(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
+def total_loss_alt(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
     """Calculate the total cross entropy loss over the given dataset.
 
     The total loss is defined as a sum of the POS tagging-related loss and
