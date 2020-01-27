@@ -4,6 +4,7 @@ from typing import Sequence, Iterable, Set, List, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.utils.rnn as rnn
+import torch.nn.functional as F
 
 from neural.types import TT
 from neural.training import batch_loader
@@ -358,3 +359,90 @@ def pos_loss(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
     # Calculate the loss and return it
     loss = nn.CrossEntropyLoss()
     return loss(pos_scores, target_ixs)
+
+
+def total_loss(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
+    """Calculate the total cross entropy loss over the given dataset.
+
+    The total loss is simply a sum of the POS tagging-related loss and
+    the dependency parsing-related loss.
+    """
+
+    # Create a list for input sentences
+    inputs = []          # type: List[Sequence[Word]]
+    # Create two lists for target indices (POS tags and head indices)
+    target_pos_ixs = []  # type: List[int]
+    target_heads = []    # type: List[Head]
+
+    #########################################################
+    # Calculate the inputs and the target outputs
+    #########################################################
+
+    # Loop over the dataset in order to determine the target indices
+    for sent in data_set:
+        # Extract the input words, gold POS tags, and gold dependency heads
+        words = map(lambda tok: tok.word, sent)
+        gold_tags = map(lambda tok: tok.upos, sent)
+        gold_heads = map(lambda tok: tok.head, sent)
+        # Append the new sentence to the inputs list
+        inputs.append(list(words))
+        # Determine the target POS tag indices
+        for tag in gold_tags:
+            # Determine the index corresponding to the gold POS tag
+            ix = list(tagger.tagset).index(tag)
+            # Append it to the target list
+            target_pos_ixs.append(ix)
+        # Extend the target heads list
+        target_heads.extend(gold_heads)
+
+    # Convert the target POS indices into a tensor
+    target_pos_ixs = torch.LongTensor(target_pos_ixs)
+
+    # Convert the target dependency indices into a tensor
+    target_heads = torch.LongTensor(target_heads)
+
+    #########################################################
+    # Calculate the scores with the model
+    #########################################################
+
+    # Calculate all the scores in a batch
+    pred_pos_scores, pred_head_scores = zip(*tagger.forwards(inputs))
+
+    #########################################################
+    # Calculate the POS tagging-related loss
+    #########################################################
+
+    # Concatenate POS scores
+    pred_pos_scores = torch.cat(pred_pos_scores)
+    # Create a cross entropy object
+    loss = nn.CrossEntropyLoss()
+    # Calculate the POS tagging-related loss
+    pos_loss = loss(pred_pos_scores, target_pos_ixs)
+
+    #########################################################
+    # Calculate the dependency parsing-related loss
+    #########################################################
+
+    # Pad and concatenate dependency scores
+    maxlen = max(scores.shape[1] for scores in pred_head_scores)
+    pred_head_scores = torch.cat(list(
+        # We use padding because the number of possible indices is different
+        # for each sentence (in case of POS tagging this is easier, because
+        # the number of POS tags is fixed); by using a very low padding
+        # value (e.g., -10000.) we indicate that the model doesn't consider
+        # them as valid heads
+        F.pad(scores, (0, maxlen - len(scores)), value=-10000.)
+        for scores in pred_head_scores
+    ))
+
+    # Calculate the dependency parsing-related loss
+    dep_loss = loss(pred_head_scores, target_heads)
+
+    #########################################################
+    # Return the total loss
+    #########################################################
+
+    # Return the sum of POS loss and dependency loss (you could also
+    # use a weighted average, for instance, to indicate that either
+    # dependency parsing or POS tagging is more important)
+    return pos_loss + dep_loss
