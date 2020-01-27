@@ -421,7 +421,7 @@ def total_loss_simple(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
             # Append it to the target list
             target_pos_ixs.append(ix)
         # Append gold heads tensor to the target heads list
-        target_heads.append(torch.LongTensor(gold_heads))
+        target_heads.append(torch.LongTensor(list(gold_heads)))
 
     # Convert the target POS indices into a tensor
     target_pos_ixs = torch.LongTensor(target_pos_ixs)
