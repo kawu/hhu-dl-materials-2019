@@ -1,7 +1,7 @@
 
 from neural.training import train
 import data
-from tagger import Tagger, pos_accuracy, pos_loss
+from tagger import Tagger, dep_accuracy, total_loss
 from word_embedding import FastText
 
 
@@ -48,7 +48,7 @@ tagger = Tagger(word_emb, tagset, hid_size=50)
 # Train the model (see `train` in `neural/training`)
 train(
     tagger, train_set, dev_set,
-    pos_loss, pos_accuracy,
+    total_loss, dep_accuracy,
     epoch_num=50,
     learning_rate=0.01,
     report_rate=5

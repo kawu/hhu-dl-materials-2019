@@ -48,6 +48,18 @@ class Tagger(nn.Module):
             hid_size * 2,
             len(tagset)
         )
+        # Dependent represnetation
+        self.dep_repr = nn.Linear(
+            hid_size * 2,
+            hid_size * 2
+        )
+        # Head represnetation
+        self.hed_repr = nn.Linear(
+            hid_size * 2,
+            hid_size * 2
+        )
+        # Representation of the dummy root
+        self.root_repr = nn.Parameter(torch.zeros(hid_size*2))
 
     ###########################################
     # Part I: scoring without batching
@@ -87,7 +99,20 @@ class Tagger(nn.Module):
         # two words is set to be 0; the task is two calculate meaningful
         # scores
         sent_len = embs.shape[0]
-        return torch.zeros(sent_len, sent_len+1)
+        # Calculate the dependent representations
+        D = self.dep_repr(embs)
+        # Calculate the head representations
+        H = self.hed_repr(embs)
+        # Add the root dummy vector
+        H_r = torch.cat([self.root_repr.view(1, -1), H], dim=0)
+        # Calculate the resulting scores
+        scores = torch.mm(D, H_r.t())
+        # Make sure that the shape is correct
+        assert scores.dim() == 2
+        assert scores.shape[0] == sent_len
+        assert scores.shape[1] == sent_len + 1
+        # Return the scores
+        return scores
 
     def forward(self, sent: Sequence[Word]) -> Tuple[TT, TT]:
         """Calculate the score vectors for the individual words.
