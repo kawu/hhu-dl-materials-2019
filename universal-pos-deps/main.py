@@ -40,7 +40,11 @@ print("Tagset:", tagset)
 
 # Create the word embedding module
 # word_emb = AtomicEmbedder(word_set, 10)
-word_emb = FastText("wiki-news-300d-1M-subword-selected.vec")
+word_emb = FastText(
+    "wiki-news-300d-1M-subword-selected.vec",
+    limit=10**5,    # The maximum number of words to load
+    dropout=0.25
+)
 
 # Create the tagger
 tagger = Tagger(word_emb, tagset, hid_size=200, hid_dropout=0.5)

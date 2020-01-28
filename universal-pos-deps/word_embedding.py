@@ -113,8 +113,11 @@ class AtomicEmbedder(WordEmbedder):
 class FastText(WordEmbedder):
     """Module for fastText word embedding."""
 
-    def __init__(self, file_path, limit: int = 10 ** 6):
+    def __init__(self, file_path, limit: int = 10 ** 6,
+                 dropout: float = 0.0):
         super(FastText, self).__init__()
+        # Create dropout object
+        self.dropout = nn.Dropout(p=dropout, inplace=False)
         # Load vectors
         self._load_vectors(file_path, limit)
 
@@ -148,11 +151,19 @@ class FastText(WordEmbedder):
         # TODO EX7: implement this function
         # TODO UPDATE 13.01.2020: is using torch.no_grad() here
         # really necessary?
-        with torch.no_grad():
-            try:
-                return self.data[word]
-            except KeyError:
-                return torch.zeros(self.embedding_size())
+
+        # with torch.no_grad():
+        #     try:
+        #         return self.data[word]
+        #     except KeyError:
+        #         return torch.zeros(self.embedding_size())
+
+        try:
+            emb = self.data[word]
+            emb = self.dropout(emb)
+            return emb
+        except KeyError:
+            return torch.zeros(self.emb_size)
 
     def embedding_size(self):
         return self.emb_size
