@@ -2,12 +2,13 @@
 from typing import Sequence, Iterable, Set, List, Tuple
 
 import torch
+from torch import mm
 import torch.nn as nn
 import torch.nn.utils.rnn as rnn
-import torch.nn.functional as F
 
 from neural.types import TT
 from neural.training import batch_loader
+from neural.mlp import MLP
 
 from data import Word, POS, Head, Sent
 from word_embedding import WordEmbedder
@@ -27,7 +28,8 @@ class Tagger(nn.Module):
     """
 
     def __init__(self,
-                 word_emb: WordEmbedder, tagset: Set[POS], hid_size: int):
+                 word_emb: WordEmbedder, tagset: Set[POS],
+                 hid_size: int, hid_dropout=0.5):
         super(Tagger, self).__init__()
         # Keep the word embedder, so that it get registered
         # as a sub-module of the POS tagger.
@@ -35,31 +37,32 @@ class Tagger(nn.Module):
         # Keep the tagset
         self.tagset = tagset
         # We keep the size of the hidden layer equal to the embedding size
-        # TODO EX8: set dropout-related in the LSTM
         self.lstm = nn.LSTM(
             self.word_emb.embedding_size(),
             hidden_size=hid_size,
             bidirectional=True,
             num_layers=2,
-            dropout=0.2
+            dropout=hid_dropout
         )
+        # Dropout for the output of the hidden layer
+        self.hid_dropout = nn.Dropout(p=hid_dropout, inplace=True)
         # We use the linear layer to score the embedding vectors
         self.linear_layer = nn.Linear(
-            hid_size * 2,
+            hid_size*2,
             len(tagset)
         )
-        # Dependent represnetation
-        self.dep_repr = nn.Linear(
-            hid_size * 2,
-            hid_size * 2
+        # Dependent represenetation
+        self.dep_repr = MLP(
+            hid_size*2, hid_size*2, hid_size*2
         )
-        # Head represnetation
-        self.hed_repr = nn.Linear(
-            hid_size * 2,
-            hid_size * 2
+        # Head represenetation
+        self.hed_repr = MLP(
+            hid_size*2, hid_size*2, hid_size*2
         )
         # Representation of the dummy root
         self.root_repr = nn.Parameter(torch.zeros(hid_size*2))
+        # Create the bias vector
+        self.bias = nn.Parameter(torch.randn(hid_size*2))
 
     ###########################################
     # Part I: scoring without batching
@@ -67,19 +70,20 @@ class Tagger(nn.Module):
 
     def embed(self, sent: Sequence[Word]) -> TT:
         """Embed and contextualize (using LSTM) the given sentence."""
-        # Embed all the words and create the embedding matrix
-        embs = self.word_emb.forwards(sent)
-        # The first dimension should match the number of words
-        assert embs.shape[0] == len(sent)
-        # The second dimension should match the embedding size
-        assert embs.shape[1] == self.word_emb.embedding_size()
-        # Apply LSTM to word embeddings
-        embs = embs.view(len(sent), 1, -1)
-        ctx_embs, _ = self.lstm(embs)
-        # Reshape back the contextualized embeddings
-        ctx_embs = ctx_embs.view(len(sent), -1)
-        # Return the resulting contextualized embeddings
-        return ctx_embs
+        raise Exception("not implemented")
+        # # Embed all the words and create the embedding matrix
+        # embs = self.word_emb.forwards(sent)
+        # # The first dimension should match the number of words
+        # assert embs.shape[0] == len(sent)
+        # # The second dimension should match the embedding size
+        # assert embs.shape[1] == self.word_emb.embedding_size()
+        # # Apply LSTM to word embeddings
+        # embs = embs.view(len(sent), 1, -1)
+        # ctx_embs, _ = self.lstm(embs)
+        # # Reshape back the contextualized embeddings
+        # ctx_embs = ctx_embs.view(len(sent), -1)
+        # # Return the resulting contextualized embeddings
+        # return ctx_embs
 
     def forward_pos(self, embs: TT) -> TT:
         """Calculate the POS score vectors for the individual words."""
@@ -92,7 +96,7 @@ class Tagger(nn.Module):
         # Finally, return the scores
         return scores
 
-    # TODO: implement this function
+    # DONE: implement this function
     def forward_dep(self, embs: TT) -> TT:
         """Calculate the dependency score vectors for the individual words."""
         # This is a dummy implementation, in which the score between each
@@ -106,7 +110,8 @@ class Tagger(nn.Module):
         # Add the root dummy vector
         H_r = torch.cat([self.root_repr.view(1, -1), H], dim=0)
         # Calculate the resulting scores
-        scores = torch.mm(D, H_r.t())
+        H_r.t_()  # transpose the head matrix in place
+        scores = mm(D, H_r) + mm(self.bias.view(1, -1), H_r)
         # Make sure that the shape is correct
         assert scores.dim() == 2
         assert scores.shape[0] == sent_len
@@ -155,6 +160,8 @@ class Tagger(nn.Module):
         # The length of the .data attribute doesn't change (the cumulative
         # number of words in the batch does not change)
         assert packed_hidden.data.shape[0] == packed_embs.data.shape[0]
+        # Apply dropout (in place)
+        self.hid_dropout(packed_hidden.data)
         # Return the resulting packed sequence with contextualized embeddings
         return packed_hidden
 
