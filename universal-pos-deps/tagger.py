@@ -421,7 +421,7 @@ def total_loss(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
     assert pred_pos_scores.shape[0] == target_pos_ixs.shape[0]
     assert pred_pos_scores.shape[1] == len(tagger.tagset)
     # Create a cross entropy object
-    loss = nn.CrossEntropyLoss()
+    loss = nn.CrossEntropyLoss(reduction='sum')
     # Calculate the POS tagging-related loss
     pos_loss = loss(pred_pos_scores, target_pos_ixs)
 
