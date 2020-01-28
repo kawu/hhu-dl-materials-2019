@@ -389,10 +389,9 @@ def pos_loss(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
 def total_loss(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
     """Calculate the total cross entropy loss over the given dataset.
 
-    The total loss is defined as a sum of the POS tagging-related loss and
-    the dependency parsing-related loss.
-
-    See also `total_loss_alt` for a more optimized version.
+    The total loss is defined as the sum of:
+    * the POS tagging-related loss and
+    * the dependency parsing-related loss
     """
 
     #########################################################
@@ -402,7 +401,7 @@ def total_loss(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
     # Create a list for input sentences
     inputs = []          # type: List[Sequence[Word]]
 
-    # Create two lists for target indices (POS tags and head indices)
+    # Create two lists for target indices (POS tags and dep head indices)
     target_pos_ixs = []  # type: List[int]
     target_heads = []    # type: List[TT]
 
@@ -423,7 +422,8 @@ def total_loss(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
         # Append gold heads tensor to the target heads list
         target_heads.append(torch.LongTensor(list(gold_heads)))
 
-    # Convert the target POS indices into a tensor
+    # Convert the target POS indices into a tensor (so its type
+    # is now simply TT)
     target_pos_ixs = torch.LongTensor(target_pos_ixs)
 
     #########################################################
@@ -439,6 +439,12 @@ def total_loss(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
 
     # Concatenate POS scores
     pred_pos_scores = torch.cat(pred_pos_scores)
+    # Check dimensions
+    assert target_pos_ixs.dim() == 1
+    assert pred_pos_scores.dim() == 2
+    assert pred_pos_scores.shape[0] == sum(len(sent) for sent in inputs)
+    assert pred_pos_scores.shape[0] == target_pos_ixs.shape[0]
+    assert pred_pos_scores.shape[1] == len(tagger.tagset)
     # Create a cross entropy object
     loss = nn.CrossEntropyLoss()
     # Calculate the POS tagging-related loss
@@ -450,102 +456,21 @@ def total_loss(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
 
     # Store the dependency parsing loss in a variable
     dep_loss = 0.0
-    # Calculate the loss for each sentence separately
-    for pred_scores, targets in zip(pred_head_scores, target_heads):
-        dep_loss += loss(pred_scores, targets)
+    # Calculate the loss for each sentence separately (this could be further
+    # optimized using padding)
+    for sent, pred, target in zip(inputs, pred_head_scores, target_heads):
+        # Check dimensions
+        assert target.dim() == 1
+        assert pred.dim() == 2
+        assert pred.shape[0] == target.shape[0] == len(sent)
+        assert pred.shape[1] == len(sent) + 1
+        # Calculate the loss using the beforehand created nn.CrossEntropyLoss
+        # object and update the total dependency loss
+        dep_loss += loss(pred, target)
 
     #########################################################
     # Return the total loss
     #########################################################
 
-    # Return the sum of POS loss and dependency loss (you could also
-    # use a weighted average, for instance, to indicate that either
-    # dependency parsing or POS tagging is more important)
-    return pos_loss + dep_loss
-
-
-def total_loss_alt(tagger: Tagger, data_set: Iterable[Sent]) -> TT:
-    """Calculate the total cross entropy loss over the given dataset.
-
-    The total loss is defined as a sum of the POS tagging-related loss and
-    the dependency parsing-related loss.
-    """
-
-    #########################################################
-    # Calculate the inputs and the target outputs
-    #########################################################
-
-    # Create a list for input sentences
-    inputs = []          # type: List[Sequence[Word]]
-    # Create two lists for target indices (POS tags and head indices)
-    target_pos_ixs = []  # type: List[int]
-    target_heads = []    # type: List[Head]
-
-    # Loop over the dataset in order to determine the target indices
-    for sent in data_set:
-        # Extract the input words, gold POS tags, and gold dependency heads
-        words = map(lambda tok: tok.word, sent)
-        gold_tags = map(lambda tok: tok.upos, sent)
-        gold_heads = map(lambda tok: tok.head, sent)
-        # Append the new sentence to the inputs list
-        inputs.append(list(words))
-        # Determine the target POS tag indices
-        for tag in gold_tags:
-            # Determine the index corresponding to the gold POS tag
-            ix = list(tagger.tagset).index(tag)
-            # Append it to the target list
-            target_pos_ixs.append(ix)
-        # Extend the target heads list
-        target_heads.extend(gold_heads)
-
-    # Convert the target POS indices into a tensor
-    target_pos_ixs = torch.LongTensor(target_pos_ixs)
-
-    # Convert the target dependency indices into a tensor
-    target_heads = torch.LongTensor(target_heads)
-
-    #########################################################
-    # Calculate the scores with the model
-    #########################################################
-
-    # Calculate all the scores in a batch
-    pred_pos_scores, pred_head_scores = zip(*tagger.forwards(inputs))
-
-    #########################################################
-    # Calculate the POS tagging-related loss
-    #########################################################
-
-    # Concatenate POS scores
-    pred_pos_scores = torch.cat(pred_pos_scores)
-    # Create a cross entropy object
-    loss = nn.CrossEntropyLoss()
-    # Calculate the POS tagging-related loss
-    pos_loss = loss(pred_pos_scores, target_pos_ixs)
-
-    #########################################################
-    # Calculate the dependency parsing-related loss
-    #########################################################
-
-    # Pad and concatenate dependency scores
-    maxlen = max(scores.shape[1] for scores in pred_head_scores)
-    pred_head_scores = torch.cat(list(
-        # We use padding because the number of possible indices is different
-        # for each sentence (in case of POS tagging this is easier, because
-        # the number of POS tags is fixed); by using a very low padding
-        # value (e.g., -10000.) we indicate that the model doesn't consider
-        # them as valid heads
-        F.pad(scores, (0, maxlen - len(scores)), value=-10000.)
-        for scores in pred_head_scores
-    ))
-
-    # Calculate the dependency parsing-related loss
-    dep_loss = loss(pred_head_scores, target_heads)
-
-    #########################################################
-    # Return the total loss
-    #########################################################
-
-    # Return the sum of POS loss and dependency loss (you could also
-    # use a weighted average, for instance, to indicate that either
-    # dependency parsing or POS tagging is more important)
+    # Return the sum of POS loss and dependency loss
     return pos_loss + dep_loss
