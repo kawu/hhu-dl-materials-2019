@@ -57,3 +57,12 @@ train(
     learning_rate=0.01,
     report_rate=10
 )
+
+# Second training phase (with lower learning-rate)
+train(
+    tagger, train_set, dev_set,
+    total_loss, dep_accuracy,
+    epoch_num=20,
+    learning_rate=0.001,
+    report_rate=10
+)
